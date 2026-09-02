@@ -1,0 +1,37 @@
+services:
+  postgres:
+    image: postgres:18.4
+    container_name: imagelab_postgres
+    environment:
+      POSTGRES_USER: imagelab
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: imagelab
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U imagelab -d imagelab']
+      interval: 1s
+      timeout: 5s
+      retries: 5
+    networks:
+      - imagelab_lab_01_network
+
+  app:
+    build: .
+    container_name: imagelab_app
+    ports:
+      - '4000:4000'
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USER: imagelab
+      DB_PASSWORD: password
+      DB_NAME: imagelab
+    networks:
+      - imagelab_lab_01_network
+
+networks:
+  imagelab_lab_01_network:
+    name: imagelab_lab_01_network
+    driver: bridge

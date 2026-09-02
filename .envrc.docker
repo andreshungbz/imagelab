@@ -1,0 +1,2 @@
+export IMAGELAB_DB_DSN=postgres://imagelab:password@postgres:5432/imagelab?sslmode=disable
+export PORT=4000
