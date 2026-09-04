@@ -105,8 +105,8 @@ func (m JobModel) GetByPublicID(publicID string) (*Job, error) {
 	return &job, nil
 }
 
-// ClaimNext retrieves the next queued job of type "consumer_activity_report" from the database.
-func (m JobModel) ClaimNext(ctx context.Context) (*Job, error) {
+// ClaimNext retrieves the next queued job of a specified type from the database.
+func (m JobModel) ClaimNext(ctx context.Context, jobType string) (*Job, error) {
 	tx, err := m.DB.BeginTx(ctx, nil)
 	if err != nil {
 		return nil, err
@@ -115,7 +115,7 @@ func (m JobModel) ClaimNext(ctx context.Context) (*Job, error) {
 
 	// Construct the query.
 	query := `SELECT id, public_id, consumer_id, job_type, payload FROM jobs
-		WHERE status = 'queued' AND job_type = 'consumer_activity_report'
+		WHERE status = 'queued' AND job_type = $1
 		ORDER BY created_at FOR UPDATE SKIP LOCKED LIMIT 1`
 
 	// Execute the query, scan the returned values into a new job struct, update job status to 'processing',
@@ -123,7 +123,7 @@ func (m JobModel) ClaimNext(ctx context.Context) (*Job, error) {
 	// from JSON since ReportPayload is a Go struct.
 	var job Job
 	var payload []byte
-	if err := tx.QueryRowContext(ctx, query).Scan(&job.ID, &job.PublicID,
+	if err := tx.QueryRowContext(ctx, query, jobType).Scan(&job.ID, &job.PublicID,
 		&job.ConsumerID, &job.JobType, &payload); err != nil {
 		return nil, err
 	}

@@ -37,7 +37,7 @@ func (app *application) startReportWorker(ctx context.Context) {
 // processNextReportJob claims and processes the next report job from the database.
 func (app *application) processNextReportJob(ctx context.Context) error {
 	// Claim and log the next report job, handling errors.
-	job, err := app.models.Jobs.ClaimNext(ctx)
+	job, err := app.models.Jobs.ClaimNext(ctx, "consumer_activity_report")
 	if err != nil {
 		return err
 	}
