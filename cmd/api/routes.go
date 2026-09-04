@@ -28,6 +28,10 @@ func (app *application) routes() http.Handler {
 	// Job routes
 	router.HandlerFunc(http.MethodGet, "/v1/jobs/:id", app.getJobHandler)
 
+	// Image routes
+	router.HandlerFunc(http.MethodPost, "/v1/images", app.processImageHandler)
+	router.HandlerFunc(http.MethodGet, "/v1/images/:image_id/variants/:image_variant", app.getImageVariantHandler)
+
 	// GLOBAL MIDDLEWARE
 
 	return app.requestLogger(router)

@@ -2,6 +2,9 @@
 .env
 .envrc
 
+# Storage artifacts
+storage/
+
 # Compiled binaries
 bin/
 *.exe

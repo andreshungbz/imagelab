@@ -16,6 +16,13 @@ type ReportPayload struct {
 	To   time.Time `json:"to"`
 }
 
+// ImagePayload represents the expected payload structure for an image processing job.
+type ImagePayload struct {
+	ImageID    string   `json:"image_id"`
+	SourcePath string   `json:"source_path"`
+	Variants   []string `json:"variants"`
+}
+
 // Job represents a record in the jobs table of the database.
 type Job struct {
 	ID           string          `json:"-"`
