@@ -153,7 +153,7 @@ func (m JobModel) MarkCompleted(ctx context.Context, id string, result []byte) e
 // MarkFailed updates the status of a job to "failed" in the database and sets its error message.
 func (m JobModel) MarkFailed(ctx context.Context, id, message string) error {
 	_, err := m.DB.ExecContext(ctx,
-		`UPDATE jobs SET status = 'failed', error_message = $2, completed_at = now() WHERE id = $1`,
+		`UPDATE jobs SET status = 'failed', error_message = $2, failed_at = now() WHERE id = $1`,
 		id, message)
 	return err
 }

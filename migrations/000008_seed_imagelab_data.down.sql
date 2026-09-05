@@ -1,0 +1,12 @@
+-- Filename: 000004_create_jobs_table.down.sql
+BEGIN;
+
+DELETE FROM api_keys
+WHERE
+    id IN ('0198f000-0000-7000-8000-000000000105');
+
+DELETE FROM consumers
+WHERE
+    id IN ('0198f000-0000-7000-8000-000000000004');
+
+COMMIT;
