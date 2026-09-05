@@ -6,7 +6,11 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"os"
+	"path/filepath"
 	"strings"
+
+	"github.com/google/uuid"
 )
 
 // envelope encloses a JSON response.
@@ -94,4 +98,48 @@ func (app *application) readJSON(w http.ResponseWriter, r *http.Request, dst any
 	}
 
 	return nil
+}
+
+// storeImage stores a file in the server's storage directory with a server-controlled filename.
+func storeImage(r io.ReadSeeker, dir, format string) (string, error) {
+	// Ensure we start writing from the beginning of the file.
+	_, err := r.Seek(0, io.SeekStart)
+	if err != nil {
+		return "", err
+	}
+
+	// Determine the file extension from the detected image format.
+	var extension string
+	switch format {
+	case "jpeg":
+		extension = ".jpg" // Normalize the .jpeg extension to .jpg for consistency.
+	case "png":
+		extension = ".png"
+	default:
+		return "", fmt.Errorf("unsupported file format: %s", format)
+	}
+
+	// Create the storage directory if it doesn't exist.
+	if err := os.MkdirAll(dir, 0755); err != nil {
+		return "", err
+	}
+
+	// Generate server-controlled filename that is a UUIDv4 string and the path.
+	storedFilename := uuid.NewString() + extension
+
+	// Create the destination file.
+	path := filepath.Join(dir, storedFilename)
+	dst, err := os.Create(path)
+	if err != nil {
+		return "", err
+	}
+	defer dst.Close()
+
+	// Store the image.
+	if _, err := io.Copy(dst, r); err != nil {
+		os.Remove(path) // Remove partially written file.
+		return "", err
+	}
+
+	return storedFilename, nil
 }
