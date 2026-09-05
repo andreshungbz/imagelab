@@ -14,8 +14,9 @@ var ErrEditConflict = errors.New("edit conflict")
 type Models struct {
 	Consumers ConsumerModel
 	// Reports   ReportModel
-	Jobs   JobModel
-	Images ImageModel
+	Jobs          JobModel
+	Images        ImageModel
+	ImageVariants ImageVariantModel
 }
 
 // NewModels initializes the Models struct with the provided database connection.
@@ -23,7 +24,8 @@ func NewModels(db *sql.DB) Models {
 	return Models{
 		Consumers: ConsumerModel{DB: db},
 		// Reports:   ReportModel{DB: db},
-		Jobs:   JobModel{DB: db},
-		Images: ImageModel{DB: db},
+		Jobs:          JobModel{DB: db},
+		Images:        ImageModel{DB: db},
+		ImageVariants: ImageVariantModel{DB: db},
 	}
 }
