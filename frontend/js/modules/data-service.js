@@ -1,5 +1,5 @@
 import { emitter } from "./event-emitter.js";
-import { state } from "../state.js";
+import { state } from "./state.js";
 
 const API_BASE = "/v1";
 

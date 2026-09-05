@@ -1,6 +1,6 @@
 import { DataService } from "./modules/data-service.js";
 import { emitter } from "./modules/event-emitter.js";
-import { state, resetState } from "./state.js";
+import { state, resetState } from "./modules/state.js";
 
 // import { render } from "./modules/render.js";
 // import { setupHandlers } from "./modules/handlers.js";
