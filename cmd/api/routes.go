@@ -23,7 +23,7 @@ func (app *application) routes() http.Handler {
 	router.HandlerFunc(http.MethodPost, "/v1/consumers", app.createConsumerHandler)
 
 	// Report routes
-	router.HandlerFunc(http.MethodPost, "/v1/reports", app.createReportHandler)
+	// router.HandlerFunc(http.MethodPost, "/v1/reports", app.createReportHandler)
 
 	// Job routes
 	router.HandlerFunc(http.MethodGet, "/v1/jobs/:id", app.getJobHandler)

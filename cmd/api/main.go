@@ -21,9 +21,10 @@ var (
 
 // config stores the API server configuration.
 type config struct {
-	port               int           // API server port
-	env                string        // (development|staging|production)
-	reportDelay        time.Duration // Artificial report generation delay
+	port int    // API server port
+	env  string // (development|staging|production)
+	// reportDelay        time.Duration // Artificial report generation delay
+	imageDelay         time.Duration // Artificial image processing delay
 	workerPollInterval time.Duration // Interval for the report worker to poll for queued jobs
 	db                 struct {
 		dsn          string        // Data source name
@@ -36,11 +37,12 @@ type config struct {
 // application holds the dependencies for the HTTP handlers, helpers, middleware, etc.
 // so that they are all accessible through dependency injection.
 type application struct {
-	config       config
-	logger       *slog.Logger
-	models       data.Models        // Data models for the application
-	wg           sync.WaitGroup     // Synchronization primitive to manage goroutines
-	workerCancel context.CancelFunc // Worker cancellation function to stop the report worker gracefully
+	config config
+	logger *slog.Logger
+	models data.Models    // Data models for the application
+	wg     sync.WaitGroup // Synchronization primitive to manage goroutines
+	// reportWorkerCancel context.CancelFunc // Worker cancellation function to stop the report worker gracefully
+	imageWorkerCancel context.CancelFunc // Worker cancellation function to stop the image worker gracefully
 }
 
 func main() {
@@ -61,8 +63,9 @@ func main() {
 	// Version flag
 	displayVersion := flag.Bool("version", false, "Display program version")
 
-	// Report worker flags
-	flag.DurationVar(&cfg.reportDelay, "report-delay", 0, "Artificial report-generation delay")
+	// Worker flags
+	// flag.DurationVar(&cfg.reportDelay, "report-delay", 0, "Artificial report-generation delay")
+	flag.DurationVar(&cfg.imageDelay, "image-delay", 0, "Artificial image processing delay")
 	flag.DurationVar(&cfg.workerPollInterval, "worker-poll-interval", 250*time.Millisecond, "Worker queue-check interval")
 
 	flag.Parse()
@@ -95,10 +98,16 @@ func main() {
 	}
 
 	// Start the report worker (in a separate goroutine) with a cancellable context.
-	workerCtx, cancelWorker := context.WithCancel(context.Background())
-	app.workerCancel = cancelWorker
-	defer cancelWorker()
-	app.startReportWorker(workerCtx)
+	// workerCtx, cancelWorker := context.WithCancel(context.Background())
+	// app.reportWorkerCancel = cancelWorker
+	// defer cancelWorker()
+	// app.startReportWorker(workerCtx)
+
+	// Start the image worker (in a separate goroutine) with a cancellable context.
+	imageCtx, cancelImage := context.WithCancel(context.Background())
+	app.imageWorkerCancel = cancelImage
+	defer cancelImage()
+	app.startImageWorker(imageCtx)
 
 	// Start the API server.
 	err = app.serve()

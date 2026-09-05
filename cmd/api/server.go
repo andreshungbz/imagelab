@@ -46,8 +46,13 @@ func (app *application) serve() error {
 		app.logger.Info("completing background tasks", "addr", srv.Addr)
 
 		// Report worker goroutine
-		if app.workerCancel != nil {
-			app.workerCancel()
+		// if app.reportWorkerCancel != nil {
+		// 	app.reportWorkerCancel()
+		// }
+
+		// Image worker goroutine
+		if app.imageWorkerCancel != nil {
+			app.imageWorkerCancel()
 		}
 
 		app.wg.Wait() // Block here until all background tasks are finished.
