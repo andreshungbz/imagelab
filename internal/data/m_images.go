@@ -54,8 +54,7 @@ func (m ImageModel) GetByID(id int64) (*Image, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
-	// Execute the query and scan the returned values into a new Image struct,
-	// handling missing records and other errors as a catch-all.
+	// Execute the query and scan the returned values into a new Image struct.
 	var img Image
 	err := m.DB.QueryRowContext(ctx, query, id).Scan(
 		&img.ID,
@@ -66,6 +65,7 @@ func (m ImageModel) GetByID(id int64) (*Image, error) {
 		&img.CreatedAt,
 	)
 	if err != nil {
+		// image ID not found in the database
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, ErrRecordNotFound
 		}
