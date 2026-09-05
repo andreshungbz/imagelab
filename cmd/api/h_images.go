@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"image"
 	_ "image/jpeg"
@@ -24,16 +25,22 @@ func (app *application) processImageHandler(w http.ResponseWriter, r *http.Reque
 
 	// Image Validation
 	v := validator.New()
-	// Validate maximum image size (10 MB).
-	const maxImageSize = 10 * 1024 * 1024
-	v.Check(header.Size <= maxImageSize, "image", "must be less than 10MB")
-	// Validate image format (JPEG or PNG).
+	// Validate image file and format.
 	_, format, err := image.DecodeConfig(file)
 	if err != nil {
-		app.badRequestResponse(w, r, err)
-		return
+		// Validate image file.
+		if errors.Is(err, image.ErrFormat) {
+			v.AddError("file", "must be a valid image file (jpeg or png)")
+		} else {
+			v.AddError("file", "unable to parse image file")
+		}
+	} else {
+		// Validate particular image format.
+		v.Check(format == "jpeg" || format == "png", "image", "must be a valid image format (jpeg or png)")
 	}
-	v.Check(format == "jpeg" || format == "png", "image", "must be a valid image format (jpeg or png)")
+	// Validate maximum image size (10 MB).
+	const maxImageSize = 10 * 1024 * 1024
+	v.Check(header.Size <= maxImageSize, "image", "size must be less than 10MB")
 	if !v.Valid() {
 		app.failedValidationResponse(w, r, v.Errors)
 		return
