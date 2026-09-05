@@ -1,0 +1,26 @@
+/* Fonts */
+@import url("https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap");
+
+/* Color Palette */
+/* https://coolors.co/palette/006d77-83c5be-edf6f9-ffddd2-e29578 */
+:root {
+  --primary: #006d77;
+  --secondary: #83c5be;
+  --background: #edf6f9;
+  --neutral: #ffddd2;
+  --accent: #e29578;
+}
+
+/* Styling Reset */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+body {
+  display: flex;
+  justify-content: center;
+  font-family: "Inter", sans-serif;
+}

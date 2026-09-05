@@ -1,1 +1,59 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ImageLab</title>
+    <link rel="icon" href="./favicon.ico" type="image/x-icon" />
+    <link rel="stylesheet" href="./styles/globals.css" />
+    <script type="module" src="./js/app.js"></script>
+  </head>
+  <body>
+    <div class="container">
+      <!-- Header -->
+      <header>
+        <div>
+          <div>Logo</div>
+          <h1>ImageLab</h1>
+          <div class="tagline">Asynchronous Image Processing</div>
+        </div>
+        <div>
+          <div class="workspace">LOCAL Workspace</div>
+        </div>
+      </header>
 
+      <main>
+        <!-- Usage Information -->
+        <section id="information">
+          <h2>Process Image Variants</h2>
+          <p>
+            Upload an image and generate optimized variants in the background.
+          </p>
+        </section>
+
+        <section id="image-upload">
+          <!-- Image Upload Section -->
+          <section id="image-input">
+            <div class="section-header">
+              <h3><span>🖼️</span> Upload Image</h3>
+            </div>
+          </section>
+
+          <!-- Job Status Section -->
+          <section id="job-status">
+            <div class="section-header">
+              <h3><span>🖼️</span> Job Status</h3>
+            </div>
+          </section>
+        </section>
+
+        <!-- Results Section -->
+        <section id="results">
+          <div class="section-header">
+            <h3><span>🖼️</span> Generated Image Variants</h3>
+          </div>
+        </section>
+      </main>
+    </div>
+  </body>
+</html>
