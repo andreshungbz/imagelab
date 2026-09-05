@@ -26,9 +26,10 @@ help:
 ## run: Run the cmp/api application
 .PHONY: run
 run:
-	@go run ./cmd/api \
+	go run ./cmd/api \
 		-db-dsn=${IMAGELAB_DB_DSN} \
-		-port=${PORT}
+		-port=${PORT} \
+		-consumer-id=${CONSUMER_ID}
 
 # ==================================================================================== #
 # DATABASE MIGRATIONS
@@ -115,22 +116,26 @@ build/api:
 test/report-delay/0s:
 	go run ./cmd/api \
 		-db-dsn=${IMAGELAB_DB_DSN} \
+		-consumer-id=${CONSUMER_ID} \
 		-report-delay=0s
 
 .PHONY: test/report-delay/3s
 test/report-delay/3s:
 	go run ./cmd/api \
 		-db-dsn=${IMAGELAB_DB_DSN} \
+		-consumer-id=${CONSUMER_ID} \
 		-report-delay=3s
 
 .PHONY: test/report-delay/7s
 test/report-delay/7s:
 	go run ./cmd/api \
 		-db-dsn=${IMAGELAB_DB_DSN} \
+		-consumer-id=${CONSUMER_ID} \
 		-report-delay=7s
 
 .PHONY: test/report-delay/12s
 test/report-delay/12s:
 	go run ./cmd/api \
 		-db-dsn=${IMAGELAB_DB_DSN} \
+		-consumer-id=${CONSUMER_ID} \
 		-report-delay=12s

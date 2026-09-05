@@ -26,6 +26,7 @@ type config struct {
 	// reportDelay        time.Duration // Artificial report generation delay
 	imageDelay         time.Duration // Artificial image processing delay
 	workerPollInterval time.Duration // Interval for the report worker to poll for queued jobs
+	consumerID         string        // Consumer ID for testing purposes
 	db                 struct {
 		dsn          string        // Data source name
 		maxOpenConns int           // Maximum number of open connections to the database
@@ -67,6 +68,9 @@ func main() {
 	// flag.DurationVar(&cfg.reportDelay, "report-delay", 0, "Artificial report-generation delay")
 	flag.DurationVar(&cfg.imageDelay, "image-delay", 0, "Artificial image processing delay")
 	flag.DurationVar(&cfg.workerPollInterval, "worker-poll-interval", 250*time.Millisecond, "Worker queue-check interval")
+
+	// Consumer flag
+	flag.StringVar(&cfg.consumerID, "consumer-id", "", "Consumer ID for testing purposes")
 
 	flag.Parse()
 

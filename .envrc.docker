@@ -1,2 +1,3 @@
 export IMAGELAB_DB_DSN=postgres://imagelab:password@postgres:5432/imagelab?sslmode=disable
 export PORT=4000
+export CONSUMER_ID=0198f000-0000-7000-8000-000000000004
