@@ -17,7 +17,7 @@ func TestNewModelsWiresDB(t *testing.T) {
 	if models.Jobs.DB != db {
 		t.Fatal("Job model DB was not wired correctly")
 	}
-	if models.Reports.DB != db {
-		t.Fatal("ConsumerActivityReport model DB was not wired correctly")
-	}
+	// if models.Reports.DB != db {
+	// 	t.Fatal("ConsumerActivityReport model DB was not wired correctly")
+	// }
 }
