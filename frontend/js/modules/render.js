@@ -12,7 +12,7 @@ function renderImageInput() {
   // Get the container element and necessary state values.
   const container = document.querySelector("#image-input");
   if (!container) return;
-  const { previewURL, metadata, isUploading, error } = state.upload;
+  const { previewURL, metadata, isSubmitting, error } = state.upload;
 
   // Add initial content.
   let content = `
@@ -81,15 +81,15 @@ function renderImageInput() {
               }</span>
             </div>
 
-            <label for="file-input" class="btn btn-secondary ${isUploading ? "disabled" : ""}">
+            <label for="file-input" class="btn btn-secondary ${isSubmitting ? "disabled" : ""}">
               Choose Another Image
             </label>
           </div>
         </div>
 
         <div class="preview-actions">
-          <button type="submit" id="btn-process-upload" class="btn btn-primary" ${isUploading ? "disabled" : ""}>
-            ${isUploading ? "Submitting..." : "Process Image"}
+          <button type="submit" id="btn-process-upload" class="btn btn-primary" ${isSubmitting ? "disabled" : ""}>
+            ${isSubmitting ? "Submitting..." : "Process Image"}
           </button>
         </div>
       </form>

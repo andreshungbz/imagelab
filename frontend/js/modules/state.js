@@ -11,7 +11,7 @@ export const state = {
       width: 0,
       height: 0,
     },
-    isUploading: false,
+    isSubmitting: false,
     error: null,
   },
 
@@ -92,7 +92,7 @@ export function resetState() {
     width: 0,
     height: 0,
   };
-  state.upload.isUploading = false;
+  state.upload.isSubmitting = false;
   state.upload.error = null;
 
   // Reset Job Section.

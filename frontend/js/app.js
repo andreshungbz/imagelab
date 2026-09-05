@@ -43,8 +43,8 @@ emitter.on("upload:validation_error", (errorMessage) => {
 emitter.on("upload:process", () => {
   if (!state.upload.file) return;
 
-  // Set uploading flag.
-  state.upload.isUploading = true;
+  // Set submitting flag.
+  state.upload.isSubmitting = true;
 
   // Step Progress: Original Stored --> active
   state.job.progress.originalStored.status = "active";
@@ -56,8 +56,8 @@ emitter.on("upload:process", () => {
 // upload:success is triggered when the image upload succeeds and the server
 // returns a 202 Accepted response with the process_image_variants job.
 emitter.on("upload:success", (data) => {
-  // Reset uploading flag.
-  state.upload.isUploading = false;
+  // Reset submitting flag.
+  state.upload.isSubmitting = false;
 
   // Populate job state.
   state.job.publicID = data.public_id;
@@ -80,8 +80,8 @@ emitter.on("upload:success", (data) => {
 emitter.on("upload:error", (errorMessage) => {
   state.upload.error = errorMessage;
 
-  // Reset uploading flag.
-  state.upload.isUploading = false;
+  // Reset submitting flag.
+  state.upload.isSubmitting = false;
 
   // Step Progress: Original Stored --> failed
   state.job.progress.originalStored.status = "failed";
