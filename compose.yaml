@@ -12,11 +12,11 @@ services:
       timeout: 5s
       retries: 5
     networks:
-      - imagelab_lab_01_network
+      - imagelab_network
 
-  app:
+  api:
     build: .
-    container_name: imagelab_app
+    container_name: imagelab_api
     ports:
       - '4000:4000'
     depends_on:
@@ -29,9 +29,20 @@ services:
       DB_PASSWORD: password
       DB_NAME: imagelab
     networks:
-      - imagelab_lab_01_network
+      - imagelab_network
+
+  web:
+    image: caddy:2-alpine
+    container_name: imagelab_web
+    ports:
+      - '5500:5500'
+    volumes:
+      - ./frontend:/usr/share/caddy
+    command: caddy file-server --listen :5500 --root /usr/share/caddy
+    networks:
+      - imagelab_network
 
 networks:
-  imagelab_lab_01_network:
-    name: imagelab_lab_01_network
+  imagelab_network:
+    name: imagelab_network
     driver: bridge
