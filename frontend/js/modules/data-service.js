@@ -1,7 +1,7 @@
 import { emitter } from "./event-emitter.js";
 import { state } from "./state.js";
 
-const API_BASE = "http://localhost:4000/v1";
+const API_BASE = "http://localhost:4000";
 
 // DataService is the layer that interacts with the server API to interact with the database.
 export const DataService = {
@@ -11,7 +11,7 @@ export const DataService = {
       // Prepare image data and send POST request.
       const formData = new FormData();
       formData.append("image", file);
-      const res = await fetch(`${API_BASE}/images`, {
+      const res = await fetch(`${API_BASE}/v1/images`, {
         method: "POST",
         body: formData,
       });
@@ -46,9 +46,9 @@ export const DataService = {
   },
 
   // pollJobStatus polls the server for status updates on a processing job.
-  async pollJobStatus(publicID) {
+  async pollJobStatus(statusURL) {
     try {
-      const res = await fetch(`${API_BASE}/jobs/${publicID}`);
+      const res = await fetch(`${API_BASE}${statusURL}`);
       // Handle HTTP level errors (500, 503, 404) as transport/server availability issues.
       if (!res.ok) {
         throw new Error(`Server temporarily unreachable (${res.status})`);

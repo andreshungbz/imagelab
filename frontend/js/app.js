@@ -56,13 +56,15 @@ emitter.on("upload:process", () => {
 // upload:success is triggered when the image upload succeeds and the server
 // returns a 202 Accepted response with the process_image_variants job.
 emitter.on("upload:success", (data) => {
+  console.log(data);
   // Reset submitting flag.
   state.upload.isSubmitting = false;
 
   // Populate job state.
-  state.job.publicID = data.public_id;
+  state.job.publicID = data.job_id;
   state.job.imageID = data.image_id;
-  state.job.status = data.status || "queued";
+  state.job.status = data.status;
+  state.job.statusURL = data.status_url;
 
   // Step Progress: Original Stored --> completed, Generating Variants --> active
   state.job.progress.originalStored.status = "completed";
@@ -106,11 +108,11 @@ emitter.on("job:poll_start", () => {
   state.job.error = null;
 
   // Trigger immediate initial check before setting up interval.
-  DataService.pollJobStatus(state.job.publicID);
+  DataService.pollJobStatus(state.job.statusURL);
 
   // Periodically check for job status updates on the server.
   state.job.pollTimerID = setInterval(() => {
-    DataService.pollJobStatus(state.job.publicID);
+    DataService.pollJobStatus(state.job.statusURL);
   }, state.job.pollingInterval);
 });
 

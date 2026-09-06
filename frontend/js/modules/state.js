@@ -20,6 +20,7 @@ export const state = {
     publicID: "",
     imageID: 0,
     status: "", // 'queued' | 'processing' | 'completed' | 'failed'
+    statusURL: "",
     error: null,
 
     // Progress steps
@@ -99,6 +100,7 @@ export function resetState() {
   state.job.publicID = "";
   state.job.imageID = 0;
   state.job.status = "";
+  state.job.statusURL = "";
   state.job.error = null;
   state.job.isPolling = false;
   state.job.pollTimerID = null;
