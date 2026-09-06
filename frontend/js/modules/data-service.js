@@ -3,8 +3,7 @@ import { state } from "./state.js";
 
 const API_BASE = "http://localhost:4000/v1";
 
-// DataService is the layer that interacts with the server API to interact
-// with the database.
+// DataService is the layer that interacts with the server API to interact with the database.
 export const DataService = {
   // uploadImage sends the image file to the server API
   async uploadImage(file) {
