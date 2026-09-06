@@ -17,7 +17,7 @@ function renderImageInput() {
   // Add initial content.
   let content = `
     <div class="section-header">
-      <h3><span>🖼️</span> Upload Image</h3>
+      <h3><span>☁️</span> Upload Image</h3>
     </div>
   `;
 
@@ -34,13 +34,13 @@ function renderImageInput() {
             style="display: none;"
           />
           <div class="dropzone-content">
-            <div class="upload-icon">📁</div>
+            <div>☁️</div>
             <div><strong>Drag & Drop an Image Here</strong></div>
-            <div class="text-muted">or choose a file to get started</div>
+            <div class="text-muted">Or choose a file to get started.</div>
 
             <div class="browse-action">
               <label for="file-input" class="btn btn-secondary btn-browse-label">
-                Choose Image
+                🖼️ Choose Image
               </label>
             </div>
 
@@ -50,7 +50,7 @@ function renderImageInput() {
 
         <div class="preview-actions">
           <button type="submit" id="btn-process-upload" class="btn btn-primary" disabled>
-            Process Image
+            ⬆️ Process Image
           </button>
         </div>
       </form>
@@ -99,7 +99,7 @@ function renderImageInput() {
 
         <div class="preview-actions">
           <button type="submit" id="btn-process-upload" class="btn btn-primary" ${isProcessDisabled ? "disabled" : ""}>
-            Process Image
+            ⬆️ Process Image
           </button>
         </div>
       </form>
@@ -151,8 +151,9 @@ function renderJobStatus() {
   if (!previewURL) {
     content += `
       <div class="job-status-empty text-muted">
-        <span>📋</span>
-        <p>No job active. Upload an image to start processing.</p>
+        <div>📋</div>
+        <div><strong>No Active Job</strong></div>
+        <div class="text-muted">Upload an image to create a processing job.</div>
       </div>
     `;
   }
@@ -245,17 +246,16 @@ function renderResults() {
   // Add initial content.
   let content = `
     <div class="section-header">
-      <h3><span>📬</span> Generated Image Variants</h3>
+      <h3><span>🖼️</span> Generated Image Variants</h3>
     </div>
   `;
 
   // NO VARIANTS BRANCH
   if (!variants || variants.length === 0) {
     content += `
-      <div class="results-empty text-muted">
-        <span>🗂️</span>
-        <p>No images generated yet. Processed image variants will appear here.</p>
-      </div>
+      <div>🖼️</div>
+      <div><strong>No Images Generated Yet</strong></div>
+      <div class="text-muted">Processed image variants will appear here.</div>
     `;
   }
   // VARIANTS AVAILABLE BRANCH
