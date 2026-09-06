@@ -1,7 +1,7 @@
 import { emitter } from "./event-emitter.js";
 import { state } from "./state.js";
 
-const API_BASE = "/v1";
+const API_BASE = "http://localhost:4000/v1";
 
 // DataService is the layer that interacts with the server API to interact
 // with the database.
@@ -17,16 +17,32 @@ export const DataService = {
         body: formData,
       });
 
-      // Check for response errors.
-      const data = await res.json();
+      // Check for HTTP response errors.
       if (!res.ok) {
-        const errorMessage = data.error?.image || data.error || "Upload failed";
+        let errorMessage = `Server returned an error (${res.status}). Please try again.`;
+
+        try {
+          const errorData = await res.json();
+          errorMessage =
+            errorData?.error?.image || errorData?.error || errorMessage;
+        } catch {
+          // Body was non-JSON or empty; retain status code message.
+        }
+
         throw new Error(errorMessage);
       }
 
+      // Parse JSON response.
+      const data = await res.json();
       emitter.emit("upload:success", data);
     } catch (err) {
-      emitter.emit("upload:error", err.message);
+      // TypeError triggers on network failure (e.g., "Failed to fetch" when server is down).
+      const userMessage =
+        err instanceof TypeError
+          ? "Unable to connect to the server. The server may be down."
+          : err.message;
+
+      emitter.emit("upload:error", userMessage);
     }
   },
 
