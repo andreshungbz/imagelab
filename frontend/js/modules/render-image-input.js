@@ -86,7 +86,7 @@ export function renderImageInput() {
             </div>
 
             <label for="file-input" class="btn btn-secondary ${isSubmitting ? "disabled" : ""}">
-              Choose Another Image
+              🖼️ Choose Another Image
             </label>
           </div>
         </div>
