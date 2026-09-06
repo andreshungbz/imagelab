@@ -47,6 +47,12 @@ function renderImageInput() {
             <div><small>Supports JPEG or PNG Images (Maximum 10MB File Size)</small></div>
           </div>
         </div>
+
+        <div class="preview-actions">
+          <button type="submit" id="btn-process-upload" class="btn btn-primary" disabled>
+            Process Image
+          </button>
+        </div>
       </form>
     `;
   }
@@ -88,8 +94,8 @@ function renderImageInput() {
         </div>
 
         <div class="preview-actions">
-          <button type="submit" id="btn-process-upload" class="btn btn-primary" ${isSubmitting ? "disabled" : ""}>
-            ${isSubmitting ? "Submitting..." : "Process Image"}
+          <button type="submit" id="btn-process-upload" class="btn btn-primary" ${!previewURL || isSubmitting ? "disabled" : ""}>
+            Process Image
           </button>
         </div>
       </form>
