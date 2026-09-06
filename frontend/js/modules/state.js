@@ -115,6 +115,5 @@ export function resetState() {
 
   // Reset Results Section.
   state.results.image_variants = [];
-  state.results.isLoading = false;
   state.results.error = null;
 }

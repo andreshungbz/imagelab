@@ -74,9 +74,6 @@ emitter.on("upload:success", (data) => {
   state.job.progress.originalStored.timestamp = new Date().toLocaleTimeString();
   state.job.progress.generatingVariants.status = "active";
 
-  // Set loading flag.
-  state.results.isLoading = true;
-
   render();
   emitter.emit("job:poll_start");
 });
@@ -151,17 +148,11 @@ emitter.on("job:completed", (jobData) => {
   state.job.progress.completed.timestamp = now;
   state.job.status = "completed";
 
-  // Set loading flag.
-  state.results.isLoading = true;
-
   render();
 
   // Fetch binary blob data for all variants returned in job results.
   if (jobData.variants && jobData.variants.length > 0) {
     DataService.fetchVariantBlobs(jobData.variants);
-  } else {
-    state.results.isLoading = false;
-    render();
   }
 });
 
@@ -178,9 +169,6 @@ emitter.on("job:failed", (errorMessage) => {
 
   // Step Progress: Generating Variants --> failed
   state.job.progress.generatingVariants.status = "failed";
-
-  // Reset loading flag.
-  state.results.isLoading = false;
 
   render();
 });
@@ -208,7 +196,6 @@ emitter.on("job:network_error", (message) => {
 
 // variants:fetched is triggered when binary image blobs are loaded and converted to local ObjectURLs.
 emitter.on("variants:fetched", (variantsWithBlobs) => {
-  state.results.isLoading = false;
   state.results.error = null;
   state.results.image_variants = variantsWithBlobs;
   render();
@@ -216,7 +203,6 @@ emitter.on("variants:fetched", (variantsWithBlobs) => {
 
 // variants:error is triggered when variants fetching binary image data fails.
 emitter.on("variants:error", (errorMessage) => {
-  state.results.isLoading = false;
   state.results.error = errorMessage;
   render();
 });
