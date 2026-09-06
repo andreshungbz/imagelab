@@ -5,6 +5,9 @@
 # Storage artifacts
 storage/
 
+# Editor artifacts
+.zed/
+
 # Compiled binaries
 bin/
 *.exe
