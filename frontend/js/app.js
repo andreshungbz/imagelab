@@ -18,6 +18,9 @@ emitter.on("upload:selected", ({ file, previewURL, metadata }) => {
   state.upload.previewURL = previewURL;
   state.upload.metadata = metadata;
 
+  // Set initial status text for display
+  state.job.status = "pending";
+
   // Step Progress: Upload Accepted --> completed
   state.job.progress.uploadAccepted.status = "completed";
   state.job.progress.uploadAccepted.timestamp = new Date().toLocaleTimeString();

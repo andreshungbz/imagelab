@@ -19,7 +19,7 @@ export const state = {
   job: {
     publicID: "",
     imageID: 0,
-    status: "", // 'queued' | 'processing' | 'completed' | 'failed'
+    status: "", // 'pending' | 'queued' | 'processing' | 'completed' | 'failed'
     statusURL: "",
     error: null,
 

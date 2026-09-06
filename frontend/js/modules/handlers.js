@@ -96,4 +96,11 @@ export function setupHandlers() {
   });
 
   // JOB STATUS SECTION HANDLERS
+
+  // Manually Start Polling Button Handler
+  jobStatusSection.addEventListener("click", (e) => {
+    if (e.target.id === "btn-check-status") {
+      emitter.emit("job:poll_start");
+    }
+  });
 }
