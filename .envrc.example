@@ -1,3 +1,4 @@
 export IMAGELAB_DB_DSN=postgres://imagelab:password@localhost:5432/imagelab?sslmode=disable
 export PORT=4000
+export CORS_TRUSTED_ORIGINS="http://localhost:5500 http://kangaroo.coydog-matrix.ts.net:5500 http://hyena.coydog-matrix.ts.net:5500"
 export CONSUMER_ID=0198f000-0000-7000-8000-000000000004

@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"log/slog"
 	"os"
+	"strings"
 	"sync"
 	"time"
 
@@ -32,6 +33,9 @@ type config struct {
 		maxOpenConns int           // Maximum number of open connections to the database
 		maxIdleConns int           // Maximum number of idle connections in the connection pool
 		maxIdleTime  time.Duration // Maximum amount of time a connection may be idle
+	}
+	cors struct {
+		trustedOrigins []string
 	}
 }
 
@@ -71,6 +75,12 @@ func main() {
 
 	// Consumer flag
 	flag.StringVar(&cfg.consumerID, "consumer-id", "", "Consumer ID for testing purposes")
+
+	// CORS trusted origins flag
+	flag.Func("cors-trusted-origins", "Trusted CORS origins (space separated)", func(val string) error {
+		cfg.cors.trustedOrigins = strings.Fields(val)
+		return nil
+	})
 
 	flag.Parse()
 

@@ -34,5 +34,7 @@ func (app *application) routes() http.Handler {
 
 	// GLOBAL MIDDLEWARE
 
-	return app.requestLogger(router)
+	return app.requestLogger( // First middleware
+		app.enableCORS(router), // Last middleware
+	)
 }

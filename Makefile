@@ -29,6 +29,7 @@ run:
 	go run ./cmd/api \
 		-db-dsn=${IMAGELAB_DB_DSN} \
 		-port=${PORT} \
+		-cors-trusted-origins=${CORS_TRUSTED_ORIGINS} \
 		-consumer-id=${CONSUMER_ID}
 
 # ==================================================================================== #
@@ -111,31 +112,3 @@ build/api:
 # ==================================================================================== #
 # TESTS
 # ==================================================================================== #
-
-.PHONY: test/report-delay/0s
-test/report-delay/0s:
-	go run ./cmd/api \
-		-db-dsn=${IMAGELAB_DB_DSN} \
-		-consumer-id=${CONSUMER_ID} \
-		-report-delay=0s
-
-.PHONY: test/report-delay/3s
-test/report-delay/3s:
-	go run ./cmd/api \
-		-db-dsn=${IMAGELAB_DB_DSN} \
-		-consumer-id=${CONSUMER_ID} \
-		-report-delay=3s
-
-.PHONY: test/report-delay/7s
-test/report-delay/7s:
-	go run ./cmd/api \
-		-db-dsn=${IMAGELAB_DB_DSN} \
-		-consumer-id=${CONSUMER_ID} \
-		-report-delay=7s
-
-.PHONY: test/report-delay/12s
-test/report-delay/12s:
-	go run ./cmd/api \
-		-db-dsn=${IMAGELAB_DB_DSN} \
-		-consumer-id=${CONSUMER_ID} \
-		-report-delay=12s

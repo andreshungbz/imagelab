@@ -30,6 +30,46 @@ func (app *application) requestLogger(next http.Handler) http.Handler {
 	})
 }
 
+// enableCORS configures browser CORS by reflecting a request's origin if they are in
+// the list of trusted origins configured on server start. It also handles CORS
+// preflight requests appropriately.
+func (app *application) enableCORS(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// indicator for caches that these responses may vary
+		w.Header().Add("Vary", "Origin")
+		w.Header().Add("Vary", "Access-Control-Request-Method")
+
+		// retrieve the Origin header of the request
+		origin := r.Header.Get("Origin")
+
+		if origin != "" {
+			// loop through every configured trusted origin
+			for i := range app.config.cors.trustedOrigins {
+				if origin == app.config.cors.trustedOrigins[i] { // on match
+					// set that origin for Access-Control-Allow-Origin,
+					// allowing cross-origin requests
+					w.Header().Set("Access-Control-Allow-Origin", origin)
+
+					// handle CORS preflight requests by checking OPTIONS and Access-Control-Request-Method
+					if r.Method == http.MethodOptions && r.Header.Get("Access-Control-Request-Method") != "" {
+						// set the non-CORS-safe HTTP methods
+						w.Header().Set("Access-Control-Allow-Methods", "OPTIONS, PUT, PATCH, DELETE")
+						w.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
+
+						// write 200 instead of 204 No Content for browser compatibility
+						w.WriteHeader(http.StatusOK)
+						return
+					}
+
+					break
+				}
+			}
+		}
+
+		next.ServeHTTP(w, r)
+	})
+}
+
 // gzipResponseWriter is a light wrapper around http.ResponseWriter that
 // compresses responses written in the gzip format.
 type gzipResponseWriter struct {
