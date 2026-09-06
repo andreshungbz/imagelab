@@ -51,7 +51,7 @@ ALTER DATABASE imagelab OWNER TO imagelab;
 
 #### API Server Setup
 
-In the project root directory, set up the environment variables and run the database migrations. By default, the API server will be available at http://localhost:4000.
+In the project root directory, set up the environment variables, run the database migrations, and start the API server. By default, the API server will be available at http://localhost:4000.
 
 ```
 cp .envrc.example .envrc
@@ -62,7 +62,7 @@ make run
 #### Web Application Setup
 
 > [!NOTE]
-> Using another host other than `localhost` or a different port other than `5500` requires appriately setting the `CORS_TRUSTED_ORIGINS` environment variable so that the API server does not block requests from the web application.
+> Using another host other than `localhost` or a different port other than `5500` requires appropriately setting the `CORS_TRUSTED_ORIGINS` environment variable so that the API server does not block requests from the web application.
 
 Use any HTTP server application such as [nginx](https://nginx.org/en/), [Apache](https://httpd.apache.org/), or [Caddy](https://caddyserver.com/) to serve the static web application files in the `/frontend` directory. The [Live Server](https://marketplace.visualstudio.com/items?itemName=ritwickdey.LiveServer) extension for VS Code can also be used, but ensure the workspace is the `/frontend` directory and not the repository root. Then, the web application will be available at http://localhost:5500.
 
