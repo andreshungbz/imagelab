@@ -1,6 +1,6 @@
 # ImageLab
 
-ImageLab is a single-page application for generating image variants. It is a demonstration of Asynchronous APIs and the Event-Emitter pattern. The application consists of three main parts: an API server written in Go (`/cmd/api`), a web application using HTML, CSS and JavaScript (`/frontend`), and a PostgreSQL database (`/migrations`).
+ImageLab is a single-page application for generating image variants. It is a demonstration of Asynchronous APIs and the Event-Emitter pattern. The application consists of three main parts: an API server written in Go (`/cmd/api`), a web application using HTML, CSS, and JavaScript (`/frontend`), and a PostgreSQL database (`/migrations`).
 
 ## CMPS4191 Test 1
 
@@ -19,7 +19,7 @@ ImageLab is a single-page application for generating image variants. It is a dem
 
 ### Docker Compose
 
-If you have Docker installed, the provided `compose.yaml` sets up the database and migrations, the API server, and the web application. Run the following command while in the project root directory, then access the URLs with the default ports.
+If you have Docker installed, the provided `compose.yaml` sets up the database and migrations, the API server, and the web application. Run the following command from the project root directory, then access the URLs on their default ports.
 
 ```
 docker compose up
