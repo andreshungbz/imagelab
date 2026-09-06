@@ -1,7 +1,9 @@
 import { emitter } from "./event-emitter.js";
 import { state } from "./state.js";
 
-const API_BASE = "http://localhost:4000";
+// Dynamically resolve the API host and base URL based on the current location.
+const API_HOST = window.location.hostname;
+const API_BASE = `http://${API_HOST}:4000`;
 
 // DataService is the layer that interacts with the server API to interact with the database.
 export const DataService = {
