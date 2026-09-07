@@ -110,9 +110,9 @@ func storeImage(r io.ReadSeeker, dir, format string) (string, error) {
 
 	// Determine the file extension from the detected image format.
 	var extension string
-	switch format {
-	case "jpeg":
-		extension = ".jpg" // Normalize the .jpeg extension to .jpg for consistency.
+	switch strings.ToLower(format) {
+	case "jpeg", "jpg":
+		extension = ".jpeg"
 	case "png":
 		extension = ".png"
 	default:
@@ -141,5 +141,5 @@ func storeImage(r io.ReadSeeker, dir, format string) (string, error) {
 		return "", err
 	}
 
-	return storedFilename, nil
+	return path, nil
 }
