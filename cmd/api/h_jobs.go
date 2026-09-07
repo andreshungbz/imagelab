@@ -9,8 +9,8 @@ import (
 	"github.com/julienschmidt/httprouter"
 )
 
-// getJobHandler retrieves a job from the database by its public ID.
-func (app *application) getJobHandler(w http.ResponseWriter, r *http.Request) {
+// getImageJobHandler retrieves a job from the database by its public ID.
+func (app *application) getImageJobHandler(w http.ResponseWriter, r *http.Request) {
 	// Retrieve the job from the database using the public ID from the URL, handling errors.
 	// Like createReportHandler, a data.ErrRecordNotFound error can occur if the provided
 	// job public ID does not exist in the database.
