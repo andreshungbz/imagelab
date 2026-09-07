@@ -18,7 +18,7 @@ type ReportPayload struct {
 
 // ImagePayload represents the expected payload structure for an image processing job.
 type ImagePayload struct {
-	ImageID    string   `json:"image_id"`
+	ImageID    int64    `json:"image_id"`
 	SourcePath string   `json:"source_path"`
 	Variants   []string `json:"variants"`
 }
@@ -30,11 +30,11 @@ type Job struct {
 	ConsumerID   string          `json:"consumer_id"`
 	JobType      string          `json:"job_type"`
 	Status       string          `json:"status"`
-	Payload      ReportPayload   `json:"payload"`
+	Payload      any             `json:"payload"`
 	Result       json.RawMessage `json:"result,omitempty"`
 	ErrorMessage *string         `json:"error_message,omitempty"`
 	StartedAt    *time.Time      `json:"started_at,omitempty"`
-	CompletedAt  *time.Time      `json:"completed_at,omitempty"`
+	CompletedAt  *time.Time      `json:"completed_at"`
 	CreatedAt    time.Time       `json:"created_at"`
 }
 
@@ -98,8 +98,21 @@ func (m JobModel) GetByPublicID(publicID string) (*Job, error) {
 		}
 		return nil, err
 	}
-	if err := json.Unmarshal(payload, &job.Payload); err != nil {
-		return nil, err
+
+	// Unmarshal the payload into the appropriate concrete struct based on JobType.
+	switch job.JobType {
+	case "process_image_variants":
+		var p ImagePayload
+		if err := json.Unmarshal(payload, &p); err != nil {
+			return nil, err
+		}
+		job.Payload = p
+	default:
+		var p map[string]any
+		if err := json.Unmarshal(payload, &p); err != nil {
+			return nil, err
+		}
+		job.Payload = p
 	}
 
 	return &job, nil

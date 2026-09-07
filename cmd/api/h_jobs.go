@@ -2,6 +2,7 @@ package main
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 
 	"github.com/andreshungbz/imagelab/internal/data"
@@ -23,8 +24,23 @@ func (app *application) getJobHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Safely assert that the payload is an ImagePayload.
+	imgPayload, ok := job.Payload.(data.ImagePayload)
+	if !ok {
+		app.serverErrorResponse(w, r, fmt.Errorf("unexpected payload structure for job type %q", job.JobType))
+		return
+	}
+
 	// Send a JSON response of the retrieved job, handling any errors.
-	if err := app.writeJSON(w, http.StatusOK, envelope{"job": job}, nil); err != nil {
+	response := envelope{
+		"id":           job.PublicID,
+		"image_id":     imgPayload.ImageID,
+		"status":       job.Status,
+		"queued_at":    job.CreatedAt,
+		"started_at":   job.StartedAt,
+		"completed_at": job.CompletedAt,
+	}
+	if err := app.writeJSON(w, http.StatusOK, response, nil); err != nil {
 		app.serverErrorResponse(w, r, err)
 	}
 }
