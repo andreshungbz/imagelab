@@ -132,17 +132,30 @@ func (m JobModel) ClaimNext(ctx context.Context, jobType string) (*Job, error) {
 		ORDER BY created_at FOR UPDATE SKIP LOCKED LIMIT 1`
 
 	// Execute the query, scan the returned values into a new job struct, update job status to 'processing',
-	// and handle other errors as a catch-all. The payload field needs to be unmarshaled
-	// from JSON since ReportPayload is a Go struct.
+	// and handle other errors as a catch-all. The payload field needs to be unmarshaled to a Go struct.
 	var job Job
 	var payload []byte
 	if err := tx.QueryRowContext(ctx, query, jobType).Scan(&job.ID, &job.PublicID,
 		&job.ConsumerID, &job.JobType, &payload); err != nil {
 		return nil, err
 	}
-	if err := json.Unmarshal(payload, &job.Payload); err != nil {
-		return nil, err
+
+	// Unmarshal the payload into the appropriate concrete struct based on JobType.
+	switch job.JobType {
+	case "process_image_variants":
+		var p ImagePayload
+		if err := json.Unmarshal(payload, &p); err != nil {
+			return nil, err
+		}
+		job.Payload = p
+	default:
+		var p map[string]any
+		if err := json.Unmarshal(payload, &p); err != nil {
+			return nil, err
+		}
+		job.Payload = p
 	}
+
 	if _, err := tx.ExecContext(ctx,
 		`UPDATE jobs SET status = 'processing', started_at = now() WHERE id = $1`, job.ID); err != nil {
 		return nil, err

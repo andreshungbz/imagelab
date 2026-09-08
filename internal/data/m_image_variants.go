@@ -3,7 +3,15 @@ package data
 import (
 	"context"
 	"database/sql"
+	"encoding/json"
 	"errors"
+	"fmt"
+	"image"
+	_ "image/jpeg"
+	_ "image/png"
+	"os"
+	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/lib/pq"
@@ -24,6 +32,100 @@ type ImageVariant struct {
 // ImageVariantModel wraps a sql.DB connection pool used to interact with the database.
 type ImageVariantModel struct {
 	DB *sql.DB
+}
+
+// GenerateVariant processes, saves, and inserts a single image variant into the database.
+func (m ImageVariantModel) GenerateVariant(imageID int64, sourcePath string, variantName string) (*ImageVariant, error) {
+	// Open the source file and decode the image.
+	srcFile, err := os.Open(sourcePath)
+	if err != nil {
+		return nil, fmt.Errorf("failed to open source file: %w", err)
+	}
+	defer srcFile.Close()
+	srcImg, _, err := image.Decode(srcFile)
+	if err != nil {
+		return nil, fmt.Errorf("failed to decode source image: %w", err)
+	}
+
+	// Generate the specified image variant.
+	var transformed image.Image
+	switch variantName {
+	case "thumbnail":
+		transformed = cropCenterSquare(srcImg, 150)
+	case "preview":
+		transformed = fitBounds(srcImg, 800, 600)
+	case "display":
+		transformed = fitBounds(srcImg, 1200, 900)
+	default:
+		return nil, fmt.Errorf("unsupported variant name: %s", variantName)
+	}
+
+	// Create the output directory and extension for the image variant.
+	outDir := filepath.Join("storage", "variants", fmt.Sprintf("%d", imageID))
+	if err := os.MkdirAll(outDir, 0755); err != nil {
+		return nil, fmt.Errorf("failed to create variants directory: %w", err)
+	}
+	ext := strings.ToLower(filepath.Ext(sourcePath))
+	if ext == ".jpg" {
+		ext = ".jpeg"
+	}
+	destPath := filepath.Join(outDir, fmt.Sprintf("%s%s", variantName, ext))
+
+	// Save the image variant to the server.
+	if err := encodeAndSaveImage(destPath, transformed); err != nil {
+		return nil, fmt.Errorf("failed to save variant %s: %w", variantName, err)
+	}
+
+	// Get the file info of the saved variant and create an ImageVariant struct.
+	variantImageInfo, err := os.Stat(destPath)
+	if err != nil {
+		return nil, fmt.Errorf("failed to stat variant file: %w", err)
+	}
+	bounds := transformed.Bounds()
+	variant := &ImageVariant{
+		ImageID:        imageID,
+		Name:           variantName,
+		StoredFilename: destPath,
+		Width:          bounds.Dx(),
+		Height:         bounds.Dy(),
+		SizeBytes:      variantImageInfo.Size(),
+	}
+
+	// Insert the new image_variant record into the database.
+	if err := m.Insert(variant); err != nil {
+		return nil, fmt.Errorf("failed to insert variant record to DB: %w", err)
+	}
+
+	return variant, nil
+}
+
+// GenerateVariants generates each requested variant and constructs the JSON-serializable job result.
+func (m ImageVariantModel) GenerateVariants(imageID int64, sourcePath string, variants []string) ([]byte, error) {
+	// Create an anonymous struct representing the expected job result structure.
+	type variantResult struct {
+		Name   string `json:"name"`
+		Width  int    `json:"width"`
+		Height int    `json:"height"`
+		URL    string `json:"url"`
+	}
+
+	// Generate all variants and collect the results.
+	results := make([]variantResult, 0, len(variants))
+	for _, name := range variants {
+		v, err := m.GenerateVariant(imageID, sourcePath, name)
+		if err != nil {
+			return nil, err
+		}
+
+		results = append(results, variantResult{
+			Name:   v.Name,
+			Width:  v.Width,
+			Height: v.Height,
+			URL:    fmt.Sprintf("/v1/images/%d/variants/%s", imageID, v.Name),
+		})
+	}
+
+	return json.Marshal(results)
 }
 
 // Insert writes a new image variant record to the database.

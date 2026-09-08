@@ -4,7 +4,10 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"fmt"
 	"time"
+
+	"github.com/andreshungbz/imagelab/internal/data"
 )
 
 // startReportWorker starts a background goroutine that polls the jobs table for new report jobs to process.
@@ -74,15 +77,13 @@ import (
 
 // startImageWorker starts a background goroutine that polls the jobs table for new image jobs to process.
 func (app *application) startImageWorker(ctx context.Context) {
-	app.wg.Add(1)
-
-	go func() {
-		defer app.wg.Done()
-
+	// WaitGroup.Go automatically handles WaitGroup.Add and WaitGroup.Done.
+	app.wg.Go(func() {
+		// Setup the ticker to poll for new image jobs at the configured interval.
 		ticker := time.NewTicker(app.config.workerPollInterval)
 		defer ticker.Stop()
 
-		// Until shutdown, process the next image job at the configured interval.
+		// Until shutdown, process the next image job.
 		for {
 			select {
 			case <-ctx.Done():
@@ -95,7 +96,7 @@ func (app *application) startImageWorker(ctx context.Context) {
 				}
 			}
 		}
-	}()
+	})
 }
 
 // processNextImageJob claims and processes the next image job from the database.
@@ -105,8 +106,14 @@ func (app *application) processNextImageJob(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
-	app.logger.Info("image job started", "job_id", job.PublicID,
-		"artificial_delay", app.config.imageDelay)
+
+	// Assert that the payload is an ImagePayload.
+	imgPayload, ok := job.Payload.(data.ImagePayload)
+	if !ok {
+		return fmt.Errorf("unexpected payload structure for job type %q", job.JobType)
+	}
+
+	app.logger.Info("image job started", "job_id", job.PublicID, "artificial_delay", app.config.imageDelay)
 
 	// Apply the artificial image delay if configured to be greater than 0.
 	if app.config.imageDelay > 0 {
@@ -119,7 +126,15 @@ func (app *application) processNextImageJob(ctx context.Context) error {
 		}
 	}
 
-	// TODO: Implement image processing.
+	// Generate image variants, marking the job as completed or failed appropriately.
+	result, err := app.models.ImageVariants.GenerateVariants(imgPayload.ImageID, imgPayload.SourcePath, imgPayload.Variants)
+	if err != nil {
+		return app.models.Jobs.MarkFailed(ctx, job.ID, err.Error())
+	}
+	if err := app.models.Jobs.MarkCompleted(ctx, job.ID, result); err != nil {
+		return err
+	}
+	app.logger.Info("image job completed", "job_id", job.PublicID)
 
 	return nil
 }
