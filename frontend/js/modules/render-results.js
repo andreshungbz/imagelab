@@ -6,7 +6,7 @@ export function renderResults() {
   // Get the container element and necessary state values.
   const container = document.querySelector("#results");
   if (!container) return;
-  const { variants, error } = state.results;
+  const { image_variants: variants, error } = state.results;
 
   // Add initial content.
   let content = `
