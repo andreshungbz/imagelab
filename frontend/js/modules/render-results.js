@@ -1,63 +1,96 @@
 import { state } from "./state.js";
 import { formatMimeType, formatBytes, escapeHTML } from "./helpers.js";
+import { icon } from "./icons.js";
 
-// renderResults renders the image variants processed by the job.
+// renderResults renders the resulting generated image variants and their statuses.
 export function renderResults() {
   // Get the container element and necessary state values.
   const container = document.querySelector("#results");
   if (!container) return;
   const { image_variants: variants, error } = state.results;
 
-  // Add initial content.
+  // Determine if the job is currently processing based on its public ID and status.
+  const isProcessing =
+    Boolean(state.job.publicID) &&
+    ["pending", "queued", "processing"].includes(state.job.status);
+  
+  // Pending cards are source previews, never downloadable generated results.
+  const displayedVariants = variants.length
+    ? variants
+    : isProcessing
+      ? ["Thumbnail", "Preview", "Display"].map((label) => ({
+          label,
+          status: "pending",
+        }))
+      : [];
+
+  // Start building the content for the results section.
   let content = `
     <div class="section-header">
-      <h3><span>🖼️</span> Generated Image Variants</h3>
+      <h3 id="results-heading">${icon("image")} Generated Image Variants</h3>
     </div>
   `;
 
-  // NO VARIANTS BRANCH
-  if (!variants || variants.length === 0) {
+  // If there are no displayed variants, show an empty state message.
+  if (!displayedVariants.length) {
     content += `
-      <div>🖼️</div>
-      <div><strong>No Images Generated Yet</strong></div>
-      <div class="text-muted">Processed image variants will appear here.</div>
+      <div class="empty-state results-empty">
+        <div class="empty-icon">${icon("image")}</div>
+        <strong>No Images Generated Yet</strong>
+        <p>Processed image variants will appear here.</p>
+      </div>
     `;
-  }
-  // VARIANTS AVAILABLE BRANCH
-  else {
-    // Iterate over variants and add to content.
+  // Otherwise, render the variant cards.
+  } else {
     content += `<div class="results-grid">`;
-    variants.forEach((variant) => {
-      const safeLabel = escapeHTML(variant.label || "Variant");
-      const displayUrl = variant.localURL || variant.url;
-      const safeUrl = escapeHTML(displayUrl);
-      const safeDownloadName = escapeHTML(variant.name || `${safeLabel}.png`);
-      const safeMime = variant.mimeType ? formatMimeType(variant.mimeType) : "";
-      const safeSize = variant.sizeBytes ? formatBytes(variant.sizeBytes) : "";
+    displayedVariants.forEach((variant) => {
+      const label = variant.label || variant.name || "Variant";
+      const safeLabel = escapeHTML(label);
+      const displayURL = variant.localURL || variant.url;
+      const isReady =
+        Boolean(displayURL) &&
+        (!variant.status || ["ready", "completed"].includes(variant.status));
+      const isFailed = variant.status === "failed";
+      const variantStatus = isReady ? "ready" : isFailed ? "failed" : "pending";
+      const safeURL = escapeHTML(
+        isReady ? displayURL : state.upload.previewURL,
+      );
+      const safeDownloadName = escapeHTML(variant.name || `${label}.png`);
+      const mime = variant.mimeType ? formatMimeType(variant.mimeType) : "";
+      const size = variant.sizeBytes ? formatBytes(variant.sizeBytes) : "";
       const dimensions =
         variant.width && variant.height
-          ? `${variant.width}px × ${variant.height}px`
+          ? `${variant.width} × ${variant.height}`
           : "";
 
       content += `
-        <div class="variant-card">
+        <article class="variant-card variant-${variantStatus}">
           <div class="variant-image-wrapper">
-            <img src="${safeUrl}" alt="${safeLabel}" class="img-variant" />
+            ${safeURL ? `<img src="${safeURL}" alt="${isReady ? safeLabel : "Source preview; variant not yet available"}" class="img-variant" />` : icon("image")}
           </div>
           <div class="variant-details">
+            <span class="badge badge-${variantStatus}">${icon(isReady ? "check" : isFailed ? "close" : "clock")} ${isReady ? "Ready" : isFailed ? "Failed" : "Pending"}</span>
             <div class="variant-title"><strong>${safeLabel}</strong></div>
             <div class="variant-meta text-muted">
-              ${safeMime ? `<span>${safeMime}</span>` : ""}
-              ${safeSize ? `<span>${safeSize}</span>` : ""}
               ${dimensions ? `<span>${dimensions}</span>` : ""}
+              ${mime ? `<span>${mime}</span>` : ""}
+              ${size ? `<span>${size}</span>` : ""}
+              ${!isReady ? `<span>${isFailed ? "Unavailable" : "Awaiting Variant"}</span>` : ""}
             </div>
           </div>
           <div class="variant-actions">
-            <a href="${safeUrl}" download="${safeDownloadName}" target="_blank" rel="noopener noreferrer" class="btn btn-secondary btn-sm">
-              Download
-            </a>
+            ${
+              isReady
+                ? `
+              <a href="${safeURL}" download="${safeDownloadName}" target="_blank" rel="noopener noreferrer"
+                class="btn btn-secondary" aria-label="Download ${safeLabel}" title="Download ${safeLabel}">${icon("download")}</a>
+            `
+                : `
+              <button type="button" class="btn btn-secondary" disabled aria-label="${safeLabel} download unavailable">${icon("download")}</button>
+            `
+            }
           </div>
-        </div>
+        </article>
       `;
     });
     content += `</div>`;
@@ -65,12 +98,7 @@ export function renderResults() {
 
   // Results Level Error Display
   if (error) {
-    const safeError = escapeHTML(error);
-    content += `
-      <div class="results-error">
-        <strong>Error fetching results:</strong> ${safeError}
-      </div>
-    `;
+    content += `<div class="results-error" role="alert"><strong>Error fetching results:</strong> ${escapeHTML(error)}</div>`;
   }
 
   // Convert the content string to DOM elements and replace the container's children.
