@@ -83,7 +83,7 @@ func saveImageToFile(path string, img image.Image) error {
 	case ".png":
 		return png.Encode(out, img)
 	case ".jpeg", ".jpg":
-		return jpeg.Encode(out, img, &jpeg.Options{Quality: 85})
+		return jpeg.Encode(out, img, &jpeg.Options{Quality: 100})
 	default:
 		return fmt.Errorf("unsupported target format: %s", ext)
 	}
