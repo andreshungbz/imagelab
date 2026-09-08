@@ -25,7 +25,8 @@ export function escapeHTML(str) {
   if (!str) return "";
   const div = document.createElement("div");
   div.textContent = str;
-  return div.innerHTML;
+  // Escape quotes to prevent breaking out of HTML attributes.
+  return div.innerHTML.replace(/"/g, "&quot;").replace(/'/g, "&#39;");
 }
 
 // getStepStatusIcon determines the status badge for a processing step.
