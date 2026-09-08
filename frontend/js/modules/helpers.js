@@ -1,3 +1,5 @@
+import { icon } from "./icons.js";
+
 // formatMimeType converts a MIME type to a human-readable format.
 export function formatMimeType(mimeType) {
   if (!mimeType) return "";
@@ -33,13 +35,13 @@ export function escapeHTML(str) {
 export function getStepStatusIcon(status) {
   switch (status) {
     case "completed":
-      return "✅";
+      return icon("check");
     case "active":
-      return "⏳";
+      return "";
     case "failed":
-      return "❌";
+      return icon("close");
     case "pending":
     default:
-      return "⚪";
+      return "";
   }
 }
