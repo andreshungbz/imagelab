@@ -54,6 +54,13 @@ export function setupHandlers() {
 
   // IMAGE INPUT SECTION HANDLERS
 
+  // Image Selection Button Handler
+  imageInputSection.addEventListener("click", (e) => {
+    if (e.target.closest('[data-action="choose-image"]')) {
+      imageInputSection.querySelector("#file-input")?.click();
+    }
+  });
+
   // Form Submission Handler
   imageInputSection.addEventListener("submit", (e) => {
     if (e.target.id === "upload-form") {
@@ -99,7 +106,7 @@ export function setupHandlers() {
 
   // Manually Start Polling Button Handler
   jobStatusSection.addEventListener("click", (e) => {
-    if (e.target.id === "btn-check-status") {
+    if (e.target.closest("#btn-check-status")) {
       emitter.emit("job:poll_start");
     }
   });
