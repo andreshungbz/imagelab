@@ -1,0 +1,129 @@
+/* Job Status Styles for the Application */
+#job-status {
+  display: flex;
+  flex-direction: column;
+}
+.job-status-empty {
+  flex: 1;
+  min-height: 275px;
+}
+
+.job-meta-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--space-3);
+  margin-bottom: var(--space-5);
+}
+
+.meta-item {
+  display: grid;
+  gap: var(--space-1);
+  min-width: 0;
+}
+.meta-item > span {
+  color: var(--color-text-muted);
+  font-size: var(--text-xs);
+}
+.meta-item strong {
+  font-weight: 500;
+  overflow-wrap: anywhere;
+}
+
+.job-progress {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 150px;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.job-steps-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.step-item {
+  position: relative;
+  display: grid;
+  grid-template-columns: 22px minmax(0, 1fr);
+  gap: 0 var(--space-3);
+  min-height: 48px;
+  font-size: var(--text-xs);
+}
+
+.step-item:not(:last-child)::before {
+  position: absolute;
+  top: 22px;
+  bottom: 0;
+  left: 10px;
+  border-left: 1px solid var(--color-border-accent);
+  content: "";
+}
+
+.step-icon {
+  z-index: 1;
+  display: grid;
+  grid-row: span 2;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border: 1.5px solid var(--color-border-accent);
+  border-radius: 50%;
+  background: var(--color-surface);
+  color: var(--color-text-muted);
+}
+
+.step-icon .icon {
+  width: 13px;
+  height: 13px;
+}
+.step-completed .step-icon {
+  border-color: var(--color-teal);
+  background: var(--color-teal);
+  color: white;
+}
+
+.step-active .step-icon {
+  border: 2px solid var(--color-lavender);
+  border-top-color: var(--color-primary);
+  animation: spin 1.5s linear infinite;
+}
+
+.step-failed .step-icon {
+  border-color: var(--color-danger);
+  background: var(--color-danger-bg);
+  color: var(--color-danger);
+}
+.step-pending .step-label {
+  color: var(--color-text-muted);
+}
+.step-time {
+  align-self: start;
+  padding-bottom: var(--space-2);
+  font-size: 0.6875rem;
+}
+.job-actions {
+  display: grid;
+  gap: var(--space-2);
+  text-align: center;
+}
+.job-actions p {
+  color: var(--color-text-muted);
+  font-size: 0.6875rem;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 480px) {
+  .job-progress {
+    grid-template-columns: 1fr;
+  }
+  .job-actions {
+    justify-items: center;
+  }
+}
