@@ -100,8 +100,8 @@ func (app *application) readJSON(w http.ResponseWriter, r *http.Request, dst any
 	return nil
 }
 
-// storeImage stores a file in the server's storage directory with a server-controlled filename.
-func storeImage(r io.ReadSeeker, dir, format string) (string, error) {
+// saveUploadedImage stores an image in the server's storage directory with a server-controlled filename.
+func saveUploadedImage(r io.ReadSeeker, dir, format string) (string, error) {
 	// Ensure we start writing from the beginning of the file.
 	_, err := r.Seek(0, io.SeekStart)
 	if err != nil {

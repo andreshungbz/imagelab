@@ -49,7 +49,7 @@ func (app *application) processImageHandler(w http.ResponseWriter, r *http.Reque
 	}
 
 	// Store the validated image using a server-controlled filename.
-	storedFilePath, err := storeImage(file, "storage/uploads", format)
+	storedFilePath, err := saveUploadedImage(file, "storage/uploads", format)
 	if err != nil {
 		app.serverErrorResponse(w, r, err)
 		return

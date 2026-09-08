@@ -66,8 +66,8 @@ func fitBounds(src image.Image, maxW, maxH int) image.Image {
 	return dst
 }
 
-// saveImageToFile encodes and writes the image struct to disk as JPEG or PNG based on file extension.
-func saveImageToFile(path string, img image.Image) error {
+// encodeAndSaveImage encodes and writes the image struct to disk as JPEG or PNG based on file extension.
+func encodeAndSaveImage(path string, img image.Image) error {
 	// Create the destination file on disk at the specified path.
 	out, err := os.Create(path)
 	if err != nil {
