@@ -11,36 +11,57 @@
   <body>
     <div class="container">
       <!-- Header -->
-      <header>
-        <div>
-          <div>Logo</div>
+      <header class="app-header">
+        <div class="brand">
+          <div class="brand-mark" aria-hidden="true">
+            <svg viewBox="0 0 24 24" class="icon">
+              <path
+                d="M9 3h6M10 3v6l-6 10a1.3 1.3 0 0 0 1.1 2h13.8a1.3 1.3 0 0 0 1.1-2L14 9V3M8 14h8"
+              />
+              <path d="M10 17h.01M14 18h.01" />
+            </svg>
+          </div>
           <h1>ImageLab</h1>
           <div class="tagline">Asynchronous Image Processing</div>
         </div>
         <div>
-          <div class="workspace">LOCAL Workspace</div>
+          <div class="workspace">LOCAL workspace</div>
         </div>
       </header>
 
       <main>
         <!-- Usage Information -->
         <section id="information">
-          <h2>Process Image Variants</h2>
+          <h2>Process An Image</h2>
           <p>
             Upload an image and generate optimized variants in the background.
           </p>
         </section>
 
-        <section id="image-upload">
+        <div id="image-upload" class="upload-layout">
           <!-- Image Upload Section -->
-          <section id="image-input"></section>
+          <section
+            id="image-input"
+            class="panel"
+            aria-labelledby="upload-heading"
+          ></section>
 
           <!-- Job Status Section -->
-          <section id="job-status"></section>
-        </section>
+          <section
+            id="job-status"
+            class="panel"
+            aria-labelledby="job-heading"
+            aria-live="polite"
+          ></section>
+        </div>
 
         <!-- Results Section -->
-        <section id="results"></section>
+        <section
+          id="results"
+          class="panel"
+          aria-labelledby="results-heading"
+          aria-live="polite"
+        ></section>
       </main>
     </div>
   </body>

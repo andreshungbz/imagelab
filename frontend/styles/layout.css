@@ -1,0 +1,145 @@
+/* Layout Styles for the Application */
+.container {
+  width: min(100% - 4rem, 1120px);
+  margin-inline: auto;
+}
+
+.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-5);
+  min-height: 88px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.brand-mark {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border: 1px solid var(--color-border-accent);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-muted);
+  color: var(--color-primary);
+}
+
+.brand-mark svg {
+  width: 26px;
+  height: 26px;
+}
+
+.brand h1 {
+  color: var(--color-navy);
+  font-size: 1.375rem;
+  font-weight: 650;
+  letter-spacing: -0.04em;
+}
+
+.tagline {
+  margin-left: var(--space-3);
+  color: var(--color-text-muted);
+  font-size: var(--text-xs);
+}
+
+.workspace {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-1) var(--space-3);
+  border: 1px solid var(--color-border-accent);
+  border-radius: 100px;
+  background: var(--color-surface);
+  color: var(--color-navy);
+  font-size: var(--text-xs);
+  white-space: nowrap;
+}
+
+.workspace::before {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--color-teal);
+  content: "";
+}
+
+main {
+  padding-block: var(--space-8) 3rem;
+}
+
+#information {
+  margin-bottom: var(--space-6);
+}
+
+#information h2 {
+  margin-bottom: var(--space-1);
+  color: var(--color-navy);
+  font-size: 1.625rem;
+  font-weight: 600;
+  letter-spacing: -0.035em;
+}
+
+#information p {
+  color: var(--color-text-muted);
+}
+
+.upload-layout {
+  display: grid;
+  grid-template-columns: 1.08fr 1fr;
+  gap: var(--space-4);
+  align-items: stretch;
+}
+
+.panel {
+  min-width: 0;
+  padding: var(--space-5);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-panel);
+}
+
+#results {
+  margin-top: var(--space-4);
+}
+
+@media (max-width: 800px) {
+  .tagline {
+    display: none;
+  }
+  .upload-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    width: calc(100% - 2rem);
+  }
+  .app-header {
+    min-height: 76px;
+    gap: var(--space-2);
+  }
+  .brand {
+    gap: var(--space-2);
+  }
+  .brand h1 {
+    font-size: 1.125rem;
+  }
+  .workspace {
+    padding-inline: var(--space-2);
+    font-size: 0.6875rem;
+  }
+  main {
+    padding-top: var(--space-6);
+  }
+  .panel {
+    padding: var(--space-4);
+  }
+}
