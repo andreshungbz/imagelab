@@ -68,6 +68,12 @@ func (app *application) processNextImageJob(ctx context.Context) error {
 		err = fmt.Errorf("simulated worker error")
 	}
 	if err != nil {
+		// Perform file and database cleanup for image variants.
+		if cleanupErr := app.models.ImageVariants.Cleanup(imgPayload.ImageID, imgPayload.SourcePath); cleanupErr != nil {
+			app.logger.Error("failed to cleanup variant resources", "image_id", imgPayload.ImageID, "error", cleanupErr)
+		}
+		app.logger.Info("image job failed. cleaning up", "job_id", job.PublicID, "error", err)
+
 		return app.models.Jobs.MarkFailed(ctx, job.ID, err.Error())
 	}
 	if err := app.models.Jobs.MarkCompleted(ctx, job.ID, result); err != nil {

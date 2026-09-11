@@ -238,3 +238,27 @@ func (m ImageVariantModel) GetAllByImageID(imageID int64) ([]*ImageVariant, erro
 
 	return variants, nil
 }
+
+// Cleanup removes all variant files from disk and deletes any database records created for the given image ID.
+func (m ImageVariantModel) Cleanup(imageID int64, sourcePath string) error {
+	// Remove the directory containing generated variant files.
+	outDir := filepath.Join("storage", "variants", fmt.Sprintf("%d", imageID))
+	if err := os.RemoveAll(outDir); err != nil && !os.IsNotExist(err) {
+		_ = err
+	}
+
+	// Remove the original source image file from the server storage.
+	if sourcePath != "" {
+		if err := os.Remove(sourcePath); err != nil && !os.IsNotExist(err) {
+			_ = err
+		}
+	}
+
+	// Delete parent image record, cascading to image variant records.
+	query := `DELETE FROM images WHERE id = $1`
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	_, err := m.DB.ExecContext(ctx, query, imageID)
+	return err
+}
