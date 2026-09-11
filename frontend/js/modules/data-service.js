@@ -10,7 +10,7 @@ export const DataService = {
   // uploadImage sends the image file to the server API
   async uploadImage(file) {
     try {
-      // Prepare image data and send POST request.
+      // Prepare image data and send POST request with an explicit timeout signal (e.g. 15 seconds).
       const formData = new FormData();
       formData.append("image", file);
       const res = await fetch(`${API_BASE}/v1/images`, {
@@ -37,18 +37,31 @@ export const DataService = {
       const data = await res.json();
       emitter.emit("upload:success", data);
     } catch (err) {
-      // Handle network failures, socket disconnects, and TCP timeout errors cleanly.
       const rawMsg = err.message || "";
-      const isTimeout =
+      const isTimeoutError =
+        err.name === "TimeoutError" ||
+        err.name === "AbortError" ||
         rawMsg.toLowerCase().includes("tcp") ||
-        rawMsg.toLowerCase().includes("timeout") ||
-        err instanceof TypeError;
+        rawMsg.toLowerCase().includes("timeout");
 
-      const userMessage = isTimeout
-        ? "Connection timed out while uploading to the server. Please check your internet connection speed and try again."
-        : rawMsg;
+      // Differentiate between an explicit I/O timeout and a generic server/connection offline error.
+      if (isTimeoutError) {
+        emitter.emit("upload:error", {
+          type: "timeout",
+          message:
+            "Connection timed out while uploading to the server. Please check your internet connection speed and try again.",
+        });
+      } else {
+        const userMessage =
+          err instanceof TypeError
+            ? "Unable to connect to the server. The server may be down. Please try again later."
+            : rawMsg;
 
-      emitter.emit("upload:error", userMessage);
+        emitter.emit("upload:error", {
+          type: "fetch_failed",
+          message: userMessage,
+        });
+      }
     }
   },
 
