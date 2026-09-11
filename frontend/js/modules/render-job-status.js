@@ -101,7 +101,8 @@ export function renderJobStatus() {
           publicID
             ? `
           <div class="job-actions">
-            <button type="button" id="btn-check-status" class="btn btn-secondary" ${isPolling ? "disabled" : ""}>
+            <button type="button" id="btn-check-status" class="btn btn-secondary"
+              ${isPolling || status === "completed" || status === "failed" ? "disabled" : ""}>
               ${icon("refresh")} ${isPolling ? "Polling…" : "Check status"}
             </button>
             <p>${isPolling ? "Status updates automatically." : "Check for the latest job status."}</p>
