@@ -4,85 +4,21 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"fmt"
 	"time"
+
+	"github.com/andreshungbz/imagelab/internal/data"
 )
-
-// startReportWorker starts a background goroutine that polls the jobs table for new report jobs to process.
-// func (app *application) startReportWorker(ctx context.Context) {
-// 	app.wg.Add(1)
-
-// 	go func() {
-// 		defer app.wg.Done()
-
-// 		ticker := time.NewTicker(app.config.workerPollInterval)
-// 		defer ticker.Stop()
-
-// 		// Until shutdown, process the next report job at the configured interval.
-// 		for {
-// 			select {
-// 			case <-ctx.Done():
-// 				app.logger.Info("report worker stopped")
-// 				return
-// 			case <-ticker.C:
-// 				err := app.processNextReportJob(ctx)
-// 				if err != nil && !errors.Is(err, sql.ErrNoRows) && !errors.Is(err, context.Canceled) {
-// 					app.logger.Error("report worker failed", "error", err)
-// 				}
-// 			}
-// 		}
-// 	}()
-// }
-
-// processNextReportJob claims and processes the next report job from the database.
-// func (app *application) processNextReportJob(ctx context.Context) error {
-// 	// Claim and log the next report job, handling errors.
-// 	job, err := app.models.Jobs.ClaimNext(ctx, "consumer_activity_report")
-// 	if err != nil {
-// 		return err
-// 	}
-// 	app.logger.Info("report job started", "job_id", job.PublicID,
-// 		"artificial_delay", app.config.reportDelay)
-
-// 	// Apply the artificial report delay if configured to be greater than 0.
-// 	if app.config.reportDelay > 0 {
-// 		timer := time.NewTimer(app.config.reportDelay)
-// 		defer timer.Stop()
-// 		select {
-// 		case <-ctx.Done():
-// 			return ctx.Err()
-// 		case <-timer.C:
-// 		}
-// 	}
-
-// 	// Generate the report, marking and logging the job as completed, or marking it as
-// 	// failed if an error occurs.
-// 	report, err := app.models.Reports.Generate(job.ConsumerID, job.Payload.From, job.Payload.To)
-// 	if err != nil {
-// 		return app.models.Jobs.MarkFailed(ctx, job.ID, err.Error())
-// 	}
-// 	result, err := json.Marshal(report)
-// 	if err != nil {
-// 		return app.models.Jobs.MarkFailed(ctx, job.ID, err.Error())
-// 	}
-// 	if err := app.models.Jobs.MarkCompleted(ctx, job.ID, result); err != nil {
-// 		return err
-// 	}
-// 	app.logger.Info("report job completed", "job_id", job.PublicID)
-
-// 	return nil
-// }
 
 // startImageWorker starts a background goroutine that polls the jobs table for new image jobs to process.
 func (app *application) startImageWorker(ctx context.Context) {
-	app.wg.Add(1)
-
-	go func() {
-		defer app.wg.Done()
-
+	// WaitGroup.Go automatically handles WaitGroup.Add and WaitGroup.Done.
+	app.wg.Go(func() {
+		// Setup the ticker to poll for new image jobs at the configured interval.
 		ticker := time.NewTicker(app.config.workerPollInterval)
 		defer ticker.Stop()
 
-		// Until shutdown, process the next image job at the configured interval.
+		// Until shutdown, process the next image job.
 		for {
 			select {
 			case <-ctx.Done():
@@ -95,7 +31,7 @@ func (app *application) startImageWorker(ctx context.Context) {
 				}
 			}
 		}
-	}()
+	})
 }
 
 // processNextImageJob claims and processes the next image job from the database.
@@ -105,12 +41,18 @@ func (app *application) processNextImageJob(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
-	app.logger.Info("image job started", "job_id", job.PublicID,
-		"artificial_delay", app.config.imageDelay)
+
+	// Assert that the payload is an ImagePayload.
+	imgPayload, ok := job.Payload.(data.ImagePayload)
+	if !ok {
+		return fmt.Errorf("unexpected payload structure for job type %q", job.JobType)
+	}
+
+	app.logger.Info("image job started", "job_id", job.PublicID, "artificial_delay", app.config.test_image_process_delay)
 
 	// Apply the artificial image delay if configured to be greater than 0.
-	if app.config.imageDelay > 0 {
-		timer := time.NewTimer(app.config.imageDelay)
+	if app.config.test_image_process_delay > 0 {
+		timer := time.NewTimer(app.config.test_image_process_delay)
 		defer timer.Stop()
 		select {
 		case <-ctx.Done():
@@ -119,7 +61,25 @@ func (app *application) processNextImageJob(ctx context.Context) error {
 		}
 	}
 
-	// TODO: Implement image processing.
+	// Generate image variants, marking the job as completed or failed appropriately.
+	result, err := app.models.ImageVariants.GenerateVariants(imgPayload.ImageID, imgPayload.SourcePath, imgPayload.Variants)
+	// Apply worker failure simulation if configured.
+	if app.config.test_worker_failure {
+		err = fmt.Errorf("simulated worker error")
+	}
+	if err != nil {
+		// Perform file and database cleanup for image variants.
+		if cleanupErr := app.models.ImageVariants.Cleanup(imgPayload.ImageID, imgPayload.SourcePath); cleanupErr != nil {
+			app.logger.Error("failed to cleanup variant resources", "image_id", imgPayload.ImageID, "error", cleanupErr)
+		}
+		app.logger.Info("image job failed. cleaning up", "job_id", job.PublicID, "error", err)
+
+		return app.models.Jobs.MarkFailed(ctx, job.ID, err.Error())
+	}
+	if err := app.models.Jobs.MarkCompleted(ctx, job.ID, result); err != nil {
+		return err
+	}
+	app.logger.Info("image job completed", "job_id", job.PublicID)
 
 	return nil
 }

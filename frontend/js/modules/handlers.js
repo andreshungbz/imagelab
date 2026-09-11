@@ -9,7 +9,7 @@ function handleFileSelected(file) {
   if (!ALLOWED_TYPES.includes(file.type.toLowerCase())) {
     emitter.emit(
       "upload:validation_error",
-      "Only JPEG and PNG images are supported.",
+      "Your image file format is not a supported. Please upload a JPEG or PNG image.",
     );
     return;
   }
@@ -17,7 +17,10 @@ function handleFileSelected(file) {
   // Validate maximum image size (10 MB).
   const MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024; // 10MB
   if (file.size > MAX_FILE_SIZE_BYTES) {
-    emitter.emit("upload:validation_error", "Image file size exceeds limit.");
+    emitter.emit(
+      "upload:validation_error",
+      "Your image file is too large. Please upload an image smaller than 10MB.",
+    );
     return;
   }
 
@@ -39,7 +42,10 @@ function handleFileSelected(file) {
   // Validate image load.
   img.onerror = () => {
     URL.revokeObjectURL(previewURL);
-    emitter.emit("upload:validation_error", "Failed to load image file.");
+    emitter.emit(
+      "upload:validation_error",
+      "Failed to load image file. Please try again.",
+    );
   };
 
   img.src = previewURL;

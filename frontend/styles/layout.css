@@ -61,12 +61,27 @@
   white-space: nowrap;
 }
 
+/* Base indicator dot */
 .workspace::before {
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: var(--color-teal);
+  background: #64748b; /* Default state while checking */
   content: "";
+}
+
+/* Higher specificity status states */
+.workspace.workspace-online::before {
+  background: #10b981; /* Green online dot */
+}
+
+.workspace.workspace-offline {
+  color: #64748b;
+  border-color: #e2e8f0;
+}
+
+.workspace.workspace-offline::before {
+  background: #9ca3af; /* Gray offline dot */
 }
 
 main {
@@ -125,6 +140,10 @@ main {
   .app-header {
     min-height: 76px;
     gap: var(--space-2);
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    padding-block: var(--space-3);
   }
   .brand {
     gap: var(--space-2);

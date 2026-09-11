@@ -100,8 +100,8 @@ func (app *application) readJSON(w http.ResponseWriter, r *http.Request, dst any
 	return nil
 }
 
-// storeImage stores a file in the server's storage directory with a server-controlled filename.
-func storeImage(r io.ReadSeeker, dir, format string) (string, error) {
+// saveUploadedImage stores an image in the server's storage directory with a server-controlled filename.
+func saveUploadedImage(r io.ReadSeeker, dir, format string) (string, error) {
 	// Ensure we start writing from the beginning of the file.
 	_, err := r.Seek(0, io.SeekStart)
 	if err != nil {
@@ -110,9 +110,9 @@ func storeImage(r io.ReadSeeker, dir, format string) (string, error) {
 
 	// Determine the file extension from the detected image format.
 	var extension string
-	switch format {
-	case "jpeg":
-		extension = ".jpg" // Normalize the .jpeg extension to .jpg for consistency.
+	switch strings.ToLower(format) {
+	case "jpeg", "jpg":
+		extension = ".jpeg"
 	case "png":
 		extension = ".png"
 	default:
@@ -124,8 +124,12 @@ func storeImage(r io.ReadSeeker, dir, format string) (string, error) {
 		return "", err
 	}
 
-	// Generate server-controlled filename that is a UUIDv4 string and the path.
-	storedFilename := uuid.NewString() + extension
+	// Generate server-controlled filename that is a UUIDv7 string and the path.
+	id, err := uuid.NewV7()
+	if err != nil {
+		return "", err
+	}
+	storedFilename := id.String() + extension
 
 	// Create the destination file.
 	path := filepath.Join(dir, storedFilename)
@@ -141,5 +145,5 @@ func storeImage(r io.ReadSeeker, dir, format string) (string, error) {
 		return "", err
 	}
 
-	return storedFilename, nil
+	return path, nil
 }

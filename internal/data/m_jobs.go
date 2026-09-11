@@ -10,15 +10,9 @@ import (
 	"github.com/lib/pq"
 )
 
-// ReportPayload represents the expected payload structure for a consumer activity report job.
-type ReportPayload struct {
-	From time.Time `json:"from"`
-	To   time.Time `json:"to"`
-}
-
 // ImagePayload represents the expected payload structure for an image processing job.
 type ImagePayload struct {
-	ImageID    string   `json:"image_id"`
+	ImageID    int64    `json:"image_id"`
 	SourcePath string   `json:"source_path"`
 	Variants   []string `json:"variants"`
 }
@@ -30,11 +24,12 @@ type Job struct {
 	ConsumerID   string          `json:"consumer_id"`
 	JobType      string          `json:"job_type"`
 	Status       string          `json:"status"`
-	Payload      ReportPayload   `json:"payload"`
+	Payload      any             `json:"payload"`
 	Result       json.RawMessage `json:"result,omitempty"`
 	ErrorMessage *string         `json:"error_message,omitempty"`
 	StartedAt    *time.Time      `json:"started_at,omitempty"`
-	CompletedAt  *time.Time      `json:"completed_at,omitempty"`
+	CompletedAt  *time.Time      `json:"completed_at"`
+	FailedAt     *time.Time      `json:"failed_at,omitempty"`
 	CreatedAt    time.Time       `json:"created_at"`
 }
 
@@ -78,28 +73,50 @@ func (m JobModel) Insert(job *Job) error {
 func (m JobModel) GetByPublicID(publicID string) (*Job, error) {
 	// Construct the query and context.
 	query := `SELECT id, public_id, consumer_id, job_type, status, payload,
-		COALESCE(result, 'null'::jsonb), error_message, started_at, completed_at, created_at
+		COALESCE(result, 'null'::jsonb), error_message, started_at, completed_at, failed_at, created_at
 		FROM jobs WHERE public_id = $1`
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
 	// Execute the query and scan the returned values into a new job struct,
 	// handling missing records and other errors as a catch-all. The payload field
-	// needs to be unmarshaled from JSON since ReportPayload is a Go struct. On the other
+	// needs to be unmarshaled from JSON since ImagePayload is a Go struct. On the other
 	// hand, the result field is already a json.RawMessage type, so it can be scanned directly.
 	var job Job
 	var payload []byte
 	err := m.DB.QueryRowContext(ctx, query, publicID).Scan(&job.ID, &job.PublicID,
 		&job.ConsumerID, &job.JobType, &job.Status, &payload, &job.Result,
-		&job.ErrorMessage, &job.StartedAt, &job.CompletedAt, &job.CreatedAt)
+		&job.ErrorMessage, &job.StartedAt, &job.CompletedAt, &job.FailedAt, &job.CreatedAt)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, ErrRecordNotFound
 		}
+
+		var pgErr *pq.Error
+		if errors.As(err, &pgErr) {
+			// 22P02 is the PostgreSQL error code for invalid_text_represntation or incorrect data type used.
+			if pgErr.Code == "22P02" {
+				return nil, ErrRecordNotFound
+			}
+		}
+
 		return nil, err
 	}
-	if err := json.Unmarshal(payload, &job.Payload); err != nil {
-		return nil, err
+
+	// Unmarshal the payload into the appropriate concrete struct based on JobType.
+	switch job.JobType {
+	case "process_image_variants":
+		var p ImagePayload
+		if err := json.Unmarshal(payload, &p); err != nil {
+			return nil, err
+		}
+		job.Payload = p
+	default:
+		var p map[string]any
+		if err := json.Unmarshal(payload, &p); err != nil {
+			return nil, err
+		}
+		job.Payload = p
 	}
 
 	return &job, nil
@@ -119,17 +136,30 @@ func (m JobModel) ClaimNext(ctx context.Context, jobType string) (*Job, error) {
 		ORDER BY created_at FOR UPDATE SKIP LOCKED LIMIT 1`
 
 	// Execute the query, scan the returned values into a new job struct, update job status to 'processing',
-	// and handle other errors as a catch-all. The payload field needs to be unmarshaled
-	// from JSON since ReportPayload is a Go struct.
+	// and handle other errors as a catch-all. The payload field needs to be unmarshaled to a Go struct.
 	var job Job
 	var payload []byte
 	if err := tx.QueryRowContext(ctx, query, jobType).Scan(&job.ID, &job.PublicID,
 		&job.ConsumerID, &job.JobType, &payload); err != nil {
 		return nil, err
 	}
-	if err := json.Unmarshal(payload, &job.Payload); err != nil {
-		return nil, err
+
+	// Unmarshal the payload into the appropriate concrete struct based on JobType.
+	switch job.JobType {
+	case "process_image_variants":
+		var p ImagePayload
+		if err := json.Unmarshal(payload, &p); err != nil {
+			return nil, err
+		}
+		job.Payload = p
+	default:
+		var p map[string]any
+		if err := json.Unmarshal(payload, &p); err != nil {
+			return nil, err
+		}
+		job.Payload = p
 	}
+
 	if _, err := tx.ExecContext(ctx,
 		`UPDATE jobs SET status = 'processing', started_at = now() WHERE id = $1`, job.ID); err != nil {
 		return nil, err
