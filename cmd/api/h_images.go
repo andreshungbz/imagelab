@@ -7,9 +7,12 @@ import (
 	_ "image/jpeg"
 	_ "image/png"
 	"net/http"
+	"os"
+	"strconv"
 
 	"github.com/andreshungbz/imagelab/internal/data"
 	"github.com/andreshungbz/imagelab/internal/validator"
+	"github.com/julienschmidt/httprouter"
 )
 
 // processImageHandler reads an image file from the request, validates it,
@@ -113,6 +116,38 @@ func (app *application) processImageHandler(w http.ResponseWriter, r *http.Reque
 	}
 }
 
+// getImageVariantHandler serves the requested image variant from the server storage.
 func (app *application) getImageVariantHandler(w http.ResponseWriter, r *http.Request) {
+	// Extract the route parameters from the request context.
+	params := httprouter.ParamsFromContext(r.Context())
 
+	// Parse and validate the image_id path parameter.
+	imageID, err := strconv.ParseInt(params.ByName("image_id"), 10, 64)
+	if err != nil || imageID < 1 {
+		app.notFoundResponse(w, r)
+		return
+	}
+
+	// Retrieve the requested image variant name.
+	variantName := params.ByName("image_variant")
+
+	// Query the database for the image variant record.
+	variant, err := app.models.ImageVariants.GetByImageIDAndName(imageID, variantName)
+	if err != nil {
+		if errors.Is(err, data.ErrRecordNotFound) {
+			app.notFoundResponse(w, r)
+			return
+		}
+		app.serverErrorResponse(w, r, err)
+		return
+	}
+
+	// Verify that the file actually exists on the server storage.
+	if _, err := os.Stat(variant.StoredFilename); os.IsNotExist(err) {
+		app.notFoundResponse(w, r)
+		return
+	}
+
+	// Serve the file directly.
+	http.ServeFile(w, r, variant.StoredFilename)
 }

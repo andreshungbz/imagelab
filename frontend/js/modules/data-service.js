@@ -86,7 +86,7 @@ export const DataService = {
       // Concurrently fetch each variant's binary data and create local ObjectURLs.
       const variantsWithBlobs = await Promise.all(
         variants.map(async (variant) => {
-          const res = await fetch(variant.url);
+          const res = await fetch(`${API_BASE}${variant.url}`);
           if (!res.ok) {
             throw new Error(`Failed to load image variant: ${variant.name}`);
           }

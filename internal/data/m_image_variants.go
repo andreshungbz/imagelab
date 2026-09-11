@@ -185,7 +185,7 @@ func (m ImageVariantModel) GetByImageIDAndName(imageID int64, name string) (*Ima
 		&v.CreatedAt,
 	)
 	if err != nil {
-		// image ID not found in the database.
+		// image ID or image variant name not found in the database.
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, ErrRecordNotFound
 		}
