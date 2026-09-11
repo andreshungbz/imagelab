@@ -195,50 +195,6 @@ func (m ImageVariantModel) GetByImageIDAndName(imageID int64, name string) (*Ima
 	return &v, nil
 }
 
-// GetAllByImageID returns all variants associated with an image.
-func (m ImageVariantModel) GetAllByImageID(imageID int64) ([]*ImageVariant, error) {
-	// Construct the query and context.
-	query := `
-		SELECT id, image_id, name, stored_filename, width, height, size_bytes, created_at
-		FROM image_variants
-		WHERE image_id = $1
-		ORDER BY id ASC`
-	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
-	defer cancel()
-
-	// Execute the query returning multiple rows.
-	rows, err := m.DB.QueryContext(ctx, query, imageID)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-
-	// Scan each row into an ImageVariant struct and append it to a slice.
-	var variants []*ImageVariant
-	for rows.Next() {
-		var v ImageVariant
-		err := rows.Scan(
-			&v.ID,
-			&v.ImageID,
-			&v.Name,
-			&v.StoredFilename,
-			&v.Width,
-			&v.Height,
-			&v.SizeBytes,
-			&v.CreatedAt,
-		)
-		if err != nil {
-			return nil, err
-		}
-		variants = append(variants, &v)
-	}
-	if err = rows.Err(); err != nil {
-		return nil, err
-	}
-
-	return variants, nil
-}
-
 // Cleanup removes all variant files from disk and deletes any database records created for the given image ID.
 func (m ImageVariantModel) Cleanup(imageID int64, sourcePath string) error {
 	// Remove the directory containing generated variant files.
