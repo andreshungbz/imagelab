@@ -62,6 +62,14 @@ export function renderJobStatus() {
       ["generatingVariants", "Generating Variants"],
       ["completed", "Complete"],
     ];
+
+    // Disable the Check Status button while polling, queuing, processing, or after terminal states.
+    const isButtonDisabled =
+      isPolling ||
+      status === "queued" ||
+      status === "completed" ||
+      status === "failed";
+
     content += `
       <div class="job-meta-card">
         <div class="meta-item">
@@ -111,7 +119,7 @@ export function renderJobStatus() {
             ? `
           <div class="job-actions">
             <button type="button" id="btn-check-status" class="btn btn-secondary"
-              ${isPolling || status === "completed" || status === "failed" ? "disabled" : ""}>
+              ${isButtonDisabled ? "disabled" : ""}>
               ${icon("refresh")} ${isPolling ? "Checking..." : "Check Status"}
             </button>
             <p>${isPolling ? "Status updates automatically." : "Check for the latest job status."}</p>
