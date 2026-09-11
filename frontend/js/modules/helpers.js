@@ -5,8 +5,8 @@ export function formatMimeType(mimeType) {
   if (!mimeType) return "";
 
   const map = {
-    "image/jpeg": "JPG",
-    "image/jpg": "JPG",
+    "image/jpeg": "JPEG",
+    "image/jpg": "JPEG",
     "image/png": "PNG",
   };
 
