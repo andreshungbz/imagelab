@@ -37,6 +37,7 @@ type config struct {
 	}
 
 	test_image_process_delay time.Duration // Artificial image processing delay
+	test_worker_failure      bool          // Simulate worker failure
 }
 
 // application holds the dependencies for the HTTP handlers, helpers, middleware, etc.
@@ -81,6 +82,7 @@ func main() {
 
 	// Testing flags
 	flag.DurationVar(&cfg.test_image_process_delay, "test-image-process-delay", 0, "Artificial image processing delay in seconds")
+	flag.BoolVar(&cfg.test_worker_failure, "test-worker-failure", false, "Simulate worker failure")
 
 	flag.Parse()
 
