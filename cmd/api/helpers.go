@@ -124,8 +124,12 @@ func saveUploadedImage(r io.ReadSeeker, dir, format string) (string, error) {
 		return "", err
 	}
 
-	// Generate server-controlled filename that is a UUIDv4 string and the path.
-	storedFilename := uuid.NewString() + extension
+	// Generate server-controlled filename that is a UUIDv7 string and the path.
+	id, err := uuid.NewV7()
+	if err != nil {
+		return "", err
+	}
+	storedFilename := id.String() + extension
 
 	// Create the destination file.
 	path := filepath.Join(dir, storedFilename)
