@@ -12,8 +12,7 @@ var ErrEditConflict = errors.New("edit conflict")
 
 // Models is a wrapper struct that holds references to the different model types.
 type Models struct {
-	Consumers ConsumerModel
-	// Reports   ReportModel
+	Consumers     ConsumerModel
 	Jobs          JobModel
 	Images        ImageModel
 	ImageVariants ImageVariantModel
@@ -22,8 +21,7 @@ type Models struct {
 // NewModels initializes the Models struct with the provided database connection.
 func NewModels(db *sql.DB) Models {
 	return Models{
-		Consumers: ConsumerModel{DB: db},
-		// Reports:   ReportModel{DB: db},
+		Consumers:     ConsumerModel{DB: db},
 		Jobs:          JobModel{DB: db},
 		Images:        ImageModel{DB: db},
 		ImageVariants: ImageVariantModel{DB: db},

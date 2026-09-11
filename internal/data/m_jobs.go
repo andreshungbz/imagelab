@@ -10,12 +10,6 @@ import (
 	"github.com/lib/pq"
 )
 
-// ReportPayload represents the expected payload structure for a consumer activity report job.
-type ReportPayload struct {
-	From time.Time `json:"from"`
-	To   time.Time `json:"to"`
-}
-
 // ImagePayload represents the expected payload structure for an image processing job.
 type ImagePayload struct {
 	ImageID    int64    `json:"image_id"`
@@ -85,7 +79,7 @@ func (m JobModel) GetByPublicID(publicID string) (*Job, error) {
 
 	// Execute the query and scan the returned values into a new job struct,
 	// handling missing records and other errors as a catch-all. The payload field
-	// needs to be unmarshaled from JSON since ReportPayload is a Go struct. On the other
+	// needs to be unmarshaled from JSON since ImagePayload is a Go struct. On the other
 	// hand, the result field is already a json.RawMessage type, so it can be scanned directly.
 	var job Job
 	var payload []byte

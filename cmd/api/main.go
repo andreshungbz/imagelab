@@ -22,11 +22,10 @@ var (
 
 // config stores the API server configuration.
 type config struct {
-	port int    // API server port
-	env  string // (development|staging|production)
-	// reportDelay        time.Duration // Artificial report generation delay
+	port               int           // API server port
+	env                string        // (development|staging|production)
 	imageDelay         time.Duration // Artificial image processing delay
-	workerPollInterval time.Duration // Interval for the report worker to poll for queued jobs
+	workerPollInterval time.Duration // Interval for the worker to poll for queued jobs
 	consumerID         string        // Consumer ID for testing purposes
 	db                 struct {
 		dsn          string        // Data source name
@@ -42,11 +41,10 @@ type config struct {
 // application holds the dependencies for the HTTP handlers, helpers, middleware, etc.
 // so that they are all accessible through dependency injection.
 type application struct {
-	config config
-	logger *slog.Logger
-	models data.Models    // Data models for the application
-	wg     sync.WaitGroup // Synchronization primitive to manage goroutines
-	// reportWorkerCancel context.CancelFunc // Worker cancellation function to stop the report worker gracefully
+	config            config
+	logger            *slog.Logger
+	models            data.Models        // Data models for the application
+	wg                sync.WaitGroup     // Synchronization primitive to manage goroutines
 	imageWorkerCancel context.CancelFunc // Worker cancellation function to stop the image worker gracefully
 }
 
@@ -69,7 +67,6 @@ func main() {
 	displayVersion := flag.Bool("version", false, "Display program version")
 
 	// Worker flags
-	// flag.DurationVar(&cfg.reportDelay, "report-delay", 0, "Artificial report-generation delay")
 	flag.DurationVar(&cfg.imageDelay, "image-delay", 0, "Artificial image processing delay")
 	flag.DurationVar(&cfg.workerPollInterval, "worker-poll-interval", 250*time.Millisecond, "Worker queue-check interval")
 
@@ -110,12 +107,6 @@ func main() {
 		logger: logger,
 		models: data.NewModels(db),
 	}
-
-	// Start the report worker (in a separate goroutine) with a cancellable context.
-	// workerCtx, cancelWorker := context.WithCancel(context.Background())
-	// app.reportWorkerCancel = cancelWorker
-	// defer cancelWorker()
-	// app.startReportWorker(workerCtx)
 
 	// Start the image worker (in a separate goroutine) with a cancellable context.
 	imageCtx, cancelImage := context.WithCancel(context.Background())

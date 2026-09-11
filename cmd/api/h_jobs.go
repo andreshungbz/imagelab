@@ -12,8 +12,7 @@ import (
 // getImageJobHandler retrieves a job from the database by its public ID.
 func (app *application) getImageJobHandler(w http.ResponseWriter, r *http.Request) {
 	// Retrieve the job from the database using the public ID from the URL, handling errors.
-	// Like createReportHandler, a data.ErrRecordNotFound error can occur if the provided
-	// job public ID does not exist in the database.
+	// A data.ErrRecordNotFound error can occur if the provided job public ID does not exist in the database.
 	job, err := app.models.Jobs.GetByPublicID((httprouter.ParamsFromContext(r.Context())).ByName("id"))
 	if err != nil {
 		if errors.Is(err, data.ErrRecordNotFound) {
