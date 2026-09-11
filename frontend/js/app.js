@@ -80,10 +80,15 @@ emitter.on("upload:success", (data) => {
 
 // upload:error is triggered when the initial POST request to upload the image fails.
 emitter.on("upload:error", (errorMessage) => {
-  state.upload.error = errorMessage;
+  // Keep upload input section clean; routing error exclusively to the processing job view.
+  state.upload.error = null;
 
   // Reset submitting flag.
   state.upload.isSubmitting = false;
+
+  // Populate job status & error.
+  state.job.status = "failed";
+  state.job.error = errorMessage;
 
   // Step Progress: Original Stored --> failed
   state.job.progress.originalStored.status = "failed";

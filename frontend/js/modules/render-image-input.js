@@ -9,7 +9,7 @@ export function renderImageInput() {
   if (!container) return;
   const { previewURL, metadata, isSubmitting, error } = state.upload;
 
-// Determine if the "Process Image" button should be disabled based on the current state.
+  // Determine if the "Process Image" button should be disabled based on the current state.
   const isProcessDisabled =
     !previewURL || isSubmitting || Boolean(state.job.publicID);
 
@@ -57,7 +57,7 @@ export function renderImageInput() {
           </div>
         </div>
       `
-      // If an error exists, display it below the form.
+        // If an error exists, display it below the form.
       }
       <div class="preview-actions">
         <button type="submit" id="btn-process-upload" class="btn btn-primary" ${isProcessDisabled ? "disabled" : ""}>

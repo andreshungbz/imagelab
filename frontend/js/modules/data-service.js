@@ -37,11 +37,16 @@ export const DataService = {
       const data = await res.json();
       emitter.emit("upload:success", data);
     } catch (err) {
-      // TypeError triggers on network failure (e.g., "Failed to fetch" when server is down).
-      const userMessage =
-        err instanceof TypeError
-          ? "Unable to connect to the server. The server may be down. Please try again later."
-          : err.message;
+      // Handle network failures, socket disconnects, and TCP timeout errors cleanly.
+      const rawMsg = err.message || "";
+      const isTimeout =
+        rawMsg.toLowerCase().includes("tcp") ||
+        rawMsg.toLowerCase().includes("timeout") ||
+        err instanceof TypeError;
+
+      const userMessage = isTimeout
+        ? "Connection timed out while uploading to the server. Please check your internet connection speed and try again."
+        : rawMsg;
 
       emitter.emit("upload:error", userMessage);
     }

@@ -18,8 +18,15 @@ export function renderJobStatus() {
     error,
   } = state.job;
 
-  // Determine if there is an active job based on the publicID or if an upload is in progress.
-  const hasJob = Boolean(publicID) || state.upload.isSubmitting;
+  // Determine if there is an active job or a failed step attempt.
+  const hasFailedStep = Object.values(progress).some(
+    (step) => step.status === "failed",
+  );
+  const hasJob =
+    Boolean(publicID) ||
+    state.upload.isSubmitting ||
+    status === "failed" ||
+    hasFailedStep;
   const knownStatuses = [
     "pending",
     "queued",
@@ -44,7 +51,7 @@ export function renderJobStatus() {
       <div class="empty-state job-status-empty">
         <div class="empty-icon">${icon("job")}</div>
         <strong>No Active Job</strong>
-        <p>${state.upload.previewURL ? "Your image is ready. Select \'Process Image\' to begin." : "Upload an image to create a processing job."}</p>
+        <p>${state.upload.previewURL ? "Your image is ready. Select 'Process Image' to begin." : "Upload an image to create a processing job."}</p>
       </div>
     `;
     // Otherwise, display the job details and progress.
@@ -59,7 +66,7 @@ export function renderJobStatus() {
       <div class="job-meta-card">
         <div class="meta-item">
           <span>Job ID</span>
-          <strong>${publicID ? escapeHTML(publicID) : "Awaiting Upload"}</strong>
+          <strong>${publicID ? escapeHTML(publicID) : "Upload Failed"}</strong>
         </div>
         <span class="badge badge-${statusClass}">
           ${icon(statusClass === "completed" ? "check" : statusClass === "failed" ? "close" : "clock")}
@@ -85,7 +92,9 @@ export function renderJobStatus() {
                   ? "Pending"
                   : stepStatus === "active"
                     ? "In progress"
-                    : "");
+                    : stepStatus === "failed"
+                      ? "Failed"
+                      : "");
               return `
               <li class="step-item step-${stepStatus}" ${stepStatus === "active" ? 'aria-current="step"' : ""}>
                 <span class="step-icon" aria-hidden="true">${getStepStatusIcon(stepStatus)}</span>
