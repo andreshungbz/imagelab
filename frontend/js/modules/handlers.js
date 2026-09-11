@@ -9,7 +9,7 @@ function handleFileSelected(file) {
   if (!ALLOWED_TYPES.includes(file.type.toLowerCase())) {
     emitter.emit(
       "upload:validation_error",
-      "Your image file is not a supported format. Please upload a JPEG or PNG image.",
+      "Your image file format is not a supported. Please upload a JPEG or PNG image.",
     );
     return;
   }
