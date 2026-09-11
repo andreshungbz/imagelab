@@ -13,11 +13,15 @@ export function renderResults() {
   const isProcessing =
     Boolean(state.job.publicID) &&
     ["pending", "queued", "processing"].includes(state.job.status);
-  
-  // Pending cards are source previews, never downloadable generated results.
+
+  // Determine if the job is completed but awaiting blob URLs.
+  const isCompletedAwaitingBlobs =
+    state.job.status === "completed" && variants.length === 0 && !error;
+
+  // Set preview placeholder if processing or awaiting blobs, otherwise set the variants.
   const displayedVariants = variants.length
     ? variants
-    : isProcessing
+    : isProcessing || isCompletedAwaitingBlobs
       ? ["Thumbnail", "Preview", "Display"].map((label) => ({
           label,
           status: "pending",
@@ -40,13 +44,21 @@ export function renderResults() {
         <p>Processed image variants will appear here.</p>
       </div>
     `;
-  // Otherwise, render the variant cards.
+    // Otherwise, render the variant cards.
   } else {
     content += `<div class="results-grid">`;
     displayedVariants.forEach((variant) => {
-      const label = variant.label || variant.name || "Variant";
+      // Variant Name
+      const name = variant.name
+        ? variant.name.charAt(0).toUpperCase() + variant.name.slice(1)
+        : "";
+      const label = name || "Variant";
       const safeLabel = escapeHTML(label);
+
+      // Variant Blob URL
       const displayURL = variant.localURL || variant.url;
+
+      // Ready Status
       const isReady =
         Boolean(displayURL) &&
         (!variant.status || ["ready", "completed"].includes(variant.status));
@@ -56,6 +68,8 @@ export function renderResults() {
         isReady ? displayURL : state.upload.previewURL,
       );
       const safeDownloadName = escapeHTML(variant.name || `${label}.png`);
+
+      // Format, Size, and Dimensions
       const mime = variant.mimeType ? formatMimeType(variant.mimeType) : "";
       const size = variant.sizeBytes ? formatBytes(variant.sizeBytes) : "";
       const dimensions =
