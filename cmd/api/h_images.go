@@ -74,6 +74,7 @@ func (app *application) processImageHandler(w http.ResponseWriter, r *http.Reque
 
 	// Insert the new image record into the database.
 	if err := app.models.Images.Insert(img); err != nil {
+		_ = os.Remove(storedFilePath) // Clean up the uploaded image if the new image record fails.
 		app.serverErrorResponse(w, r, err)
 		return
 	}
@@ -91,6 +92,7 @@ func (app *application) processImageHandler(w http.ResponseWriter, r *http.Reque
 		},
 	}
 	if err := app.models.Jobs.Insert(job); err != nil {
+		_ = os.Remove(storedFilePath) // Clean up the uploaded image if the new job record fails.
 		if errors.Is(err, data.ErrRecordNotFound) {
 			app.notFoundResponse(w, r) // Provided Consumer ID not found.
 			return
