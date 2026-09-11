@@ -29,6 +29,7 @@ type Job struct {
 	ErrorMessage *string         `json:"error_message,omitempty"`
 	StartedAt    *time.Time      `json:"started_at,omitempty"`
 	CompletedAt  *time.Time      `json:"completed_at"`
+	FailedAt     *time.Time      `json:"failed_at,omitempty"`
 	CreatedAt    time.Time       `json:"created_at"`
 }
 
@@ -72,7 +73,7 @@ func (m JobModel) Insert(job *Job) error {
 func (m JobModel) GetByPublicID(publicID string) (*Job, error) {
 	// Construct the query and context.
 	query := `SELECT id, public_id, consumer_id, job_type, status, payload,
-		COALESCE(result, 'null'::jsonb), error_message, started_at, completed_at, created_at
+		COALESCE(result, 'null'::jsonb), error_message, started_at, completed_at, failed_at, created_at
 		FROM jobs WHERE public_id = $1`
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
@@ -85,7 +86,7 @@ func (m JobModel) GetByPublicID(publicID string) (*Job, error) {
 	var payload []byte
 	err := m.DB.QueryRowContext(ctx, query, publicID).Scan(&job.ID, &job.PublicID,
 		&job.ConsumerID, &job.JobType, &job.Status, &payload, &job.Result,
-		&job.ErrorMessage, &job.StartedAt, &job.CompletedAt, &job.CreatedAt)
+		&job.ErrorMessage, &job.StartedAt, &job.CompletedAt, &job.FailedAt, &job.CreatedAt)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, ErrRecordNotFound

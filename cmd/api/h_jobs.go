@@ -40,6 +40,11 @@ func (app *application) getImageJobHandler(w http.ResponseWriter, r *http.Reques
 		"completed_at": job.CompletedAt,
 	}
 
+	// Conditionally add failed_at field if it is not nil.
+	if job.FailedAt != nil {
+		response["failed_at"] = job.FailedAt
+	}
+
 	// Conditionally add variants field if the result is not empty.
 	if len(job.Result) > 0 && string(job.Result) != "null" {
 		response["variants"] = job.Result

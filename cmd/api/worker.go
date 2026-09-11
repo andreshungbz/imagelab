@@ -63,6 +63,7 @@ func (app *application) processNextImageJob(ctx context.Context) error {
 
 	// Generate image variants, marking the job as completed or failed appropriately.
 	result, err := app.models.ImageVariants.GenerateVariants(imgPayload.ImageID, imgPayload.SourcePath, imgPayload.Variants)
+	err = fmt.Errorf("simulated worker error") // TEST: Worker Failure
 	if err != nil {
 		return app.models.Jobs.MarkFailed(ctx, job.ID, err.Error())
 	}
