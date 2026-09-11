@@ -24,7 +24,6 @@ var (
 type config struct {
 	port               int           // API server port
 	env                string        // (development|staging|production)
-	imageDelay         time.Duration // Artificial image processing delay
 	workerPollInterval time.Duration // Interval for the worker to poll for queued jobs
 	consumerID         string        // Consumer ID for testing purposes
 	db                 struct {
@@ -36,6 +35,8 @@ type config struct {
 	cors struct {
 		trustedOrigins []string
 	}
+
+	test_image_process_delay time.Duration // Artificial image processing delay
 }
 
 // application holds the dependencies for the HTTP handlers, helpers, middleware, etc.
@@ -66,8 +67,7 @@ func main() {
 	// Version flag
 	displayVersion := flag.Bool("version", false, "Display program version")
 
-	// Worker flags
-	flag.DurationVar(&cfg.imageDelay, "image-delay", 0, "Artificial image processing delay in seconds")
+	// Worker flag
 	flag.DurationVar(&cfg.workerPollInterval, "worker-poll-interval", 250*time.Millisecond, "Worker queue-check interval")
 
 	// Consumer flag
@@ -78,6 +78,9 @@ func main() {
 		cfg.cors.trustedOrigins = strings.Fields(val)
 		return nil
 	})
+
+	// Testing flags
+	flag.DurationVar(&cfg.test_image_process_delay, "test-image-process-delay", 0, "Artificial image processing delay in seconds")
 
 	flag.Parse()
 

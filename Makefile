@@ -120,4 +120,4 @@ test/delay/3s:
 		-port=${PORT} \
 		-cors-trusted-origins=${CORS_TRUSTED_ORIGINS} \
 		-consumer-id=${CONSUMER_ID} \
-		-image-delay=3s
+		-test-image-process-delay=3s
