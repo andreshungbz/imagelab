@@ -74,7 +74,7 @@ export const DataService = {
     } catch {
       emitter.emit(
         "job:network_error",
-        "Connection to the server failed. Click the 'Check Status' button to retry.",
+        "Unable to check status. Click the 'Check Status' button to try again.",
       );
     }
   },
