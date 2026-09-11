@@ -112,3 +112,12 @@ build/api:
 # ==================================================================================== #
 # TESTS
 # ==================================================================================== #
+
+.PHONY: test/delay/3s
+test/delay/3s:
+	go run ./cmd/api \
+		-db-dsn=${IMAGELAB_DB_DSN} \
+		-port=${PORT} \
+		-cors-trusted-origins=${CORS_TRUSTED_ORIGINS} \
+		-consumer-id=${CONSUMER_ID} \
+		-image-delay=3s

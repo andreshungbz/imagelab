@@ -67,7 +67,7 @@ func main() {
 	displayVersion := flag.Bool("version", false, "Display program version")
 
 	// Worker flags
-	flag.DurationVar(&cfg.imageDelay, "image-delay", 0, "Artificial image processing delay")
+	flag.DurationVar(&cfg.imageDelay, "image-delay", 0, "Artificial image processing delay in seconds")
 	flag.DurationVar(&cfg.workerPollInterval, "worker-poll-interval", 250*time.Millisecond, "Worker queue-check interval")
 
 	// Consumer flag

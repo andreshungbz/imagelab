@@ -39,6 +39,12 @@ func (app *application) getImageJobHandler(w http.ResponseWriter, r *http.Reques
 		"started_at":   job.StartedAt,
 		"completed_at": job.CompletedAt,
 	}
+
+	// Conditionally add variants field if the result is not empty.
+	if len(job.Result) > 0 && string(job.Result) != "null" {
+		response["variants"] = job.Result
+	}
+
 	if err := app.writeJSON(w, http.StatusOK, response, nil); err != nil {
 		app.serverErrorResponse(w, r, err)
 	}
