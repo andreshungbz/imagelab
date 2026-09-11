@@ -103,7 +103,7 @@ export function renderJobStatus() {
           <div class="job-actions">
             <button type="button" id="btn-check-status" class="btn btn-secondary"
               ${isPolling || status === "completed" || status === "failed" ? "disabled" : ""}>
-              ${icon("refresh")} ${isPolling ? "Polling…" : "Check status"}
+              ${icon("refresh")} ${isPolling ? "Checking..." : "Check Status"}
             </button>
             <p>${isPolling ? "Status updates automatically." : "Check for the latest job status."}</p>
           </div>
@@ -116,7 +116,7 @@ export function renderJobStatus() {
 
   // Network Reconnecting Indicator
   if (isReconnecting && networkErrorCount < maxNetworkRetries) {
-    content += `<div class="job-status-warning">Connection unstable. Retrying (${networkErrorCount}/${maxNetworkRetries})…</div>`;
+    content += `<div class="job-status-warning">We're having connection issues. Retrying (${networkErrorCount}/${maxNetworkRetries})...</div>`;
   }
 
   // Job Level Error Display

@@ -40,7 +40,7 @@ export const DataService = {
       // TypeError triggers on network failure (e.g., "Failed to fetch" when server is down).
       const userMessage =
         err instanceof TypeError
-          ? "Unable to connect to the server. The server may be down."
+          ? "Unable to connect to the server. The server may be down. Please try again later."
           : err.message;
 
       emitter.emit("upload:error", userMessage);
@@ -51,11 +51,6 @@ export const DataService = {
   async pollJobStatus(statusURL) {
     try {
       const res = await fetch(`${API_BASE}${statusURL}`);
-      // Handle HTTP level errors (500, 503, 404) as transport/server availability issues.
-      if (!res.ok) {
-        throw new Error(`Server temporarily unreachable (${res.status})`);
-      }
-
       const data = await res.json();
       switch (data.status) {
         case "completed":
@@ -64,7 +59,8 @@ export const DataService = {
         case "failed":
           emitter.emit(
             "job:failed",
-            data.error || "Job failed during processing",
+            data.error ||
+              "The server failed to process your image. Please upload another image and try again.",
           );
           break;
         case "queued":
@@ -75,8 +71,11 @@ export const DataService = {
             emitter.emit("job:updated", data);
           }
       }
-    } catch (err) {
-      emitter.emit("job:network_error", err.message);
+    } catch {
+      emitter.emit(
+        "job:network_error",
+        "Connection to the server failed. Click the 'Check Status' button to retry.",
+      );
     }
   },
 

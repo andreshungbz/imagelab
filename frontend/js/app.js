@@ -174,7 +174,7 @@ emitter.on("job:failed", (errorMessage) => {
 });
 
 // job:network_error is triggered when polling fails due to network issues.
-emitter.on("job:network_error", (message) => {
+emitter.on("job:network_error", (errorMessage) => {
   // Increment network error count and set reconnecting flag.
   state.job.networkErrorCount += 1;
   state.job.isReconnecting = true;
@@ -184,7 +184,7 @@ emitter.on("job:network_error", (message) => {
     clearInterval(state.job.pollTimerID);
     state.job.isPolling = false;
     state.job.pollTimerID = null;
-    state.job.error = "Connection lost. Click 'Check Status' to retry.";
+    state.job.error = errorMessage;
   }
 
   render();
