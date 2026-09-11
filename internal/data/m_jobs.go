@@ -91,6 +91,15 @@ func (m JobModel) GetByPublicID(publicID string) (*Job, error) {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, ErrRecordNotFound
 		}
+
+		var pgErr *pq.Error
+		if errors.As(err, &pgErr) {
+			// 22P02 is the PostgreSQL error code for invalid_text_represntation or incorrect data type used.
+			if pgErr.Code == "22P02" {
+				return nil, ErrRecordNotFound
+			}
+		}
+
 		return nil, err
 	}
 
