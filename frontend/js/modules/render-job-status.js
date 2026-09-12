@@ -19,14 +19,14 @@ export function renderJobStatus() {
   } = state.job;
 
   // Determine if there is an active job or a failed step attempt.
+  // Ignore state.upload.isSubmitting if an upload error exists to prevent visual layout flicker on offline fetch errors.
   const hasFailedStep = Object.values(progress).some(
     (step) => step.status === "failed",
   );
+  const isUploading = state.upload.isSubmitting && !state.upload.error;
   const hasJob =
-    Boolean(publicID) ||
-    state.upload.isSubmitting ||
-    status === "failed" ||
-    hasFailedStep;
+    Boolean(publicID) || isUploading || status === "failed" || hasFailedStep;
+
   const knownStatuses = [
     "pending",
     "queued",
