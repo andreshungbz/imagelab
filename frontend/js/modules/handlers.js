@@ -110,10 +110,16 @@ export function setupHandlers() {
 
   // JOB STATUS SECTION HANDLERS
 
-  // Manually Start Polling Button Handler
+  // Job Status Action Buttons Handler
   jobStatusSection.addEventListener("click", (e) => {
+    // Manually Start Polling Button Handler
     if (e.target.closest("#btn-check-status")) {
       emitter.emit("job:poll_start");
+    }
+
+    // Cancel Polling Link Handler
+    if (e.target.closest("#btn-cancel-polling")) {
+      emitter.emit("job:poll_stop");
     }
   });
 }

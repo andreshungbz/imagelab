@@ -6,6 +6,23 @@ import { render } from "./modules/render.js";
 import { setupHandlers } from "./modules/handlers.js";
 
 // ==================================================================================== #
+// HELPER FUNCTIONS
+// ==================================================================================== #
+
+// stopPollingAndAbort stops the polling timer and aborts pending fetch requests.
+function stopPollingAndAbort() {
+  if (state.job.pollTimerID) {
+    clearInterval(state.job.pollTimerID);
+    state.job.pollTimerID = null;
+  }
+  if (state.job.abortController) {
+    state.job.abortController.abort();
+    state.job.abortController = null;
+  }
+  state.job.isPolling = false;
+}
+
+// ==================================================================================== #
 // IMAGE FILE SELECTION & VALIDATION EVENTS
 // ==================================================================================== #
 
@@ -109,11 +126,15 @@ emitter.on("upload:error", (errorPayload) => {
 // JOB POLLING & STEP PROGRESSION EVENTS
 // ==================================================================================== #
 
-// job:poll_start is triggered after the 202 Accepted was received for a job.
+// job:poll_start is triggered after the 202 Accepted was received for a job or manual check.
 emitter.on("job:poll_start", () => {
-  if (state.job.pollTimerID) {
-    clearInterval(state.job.pollTimerID);
-  }
+  // Cancel previous polling timer and active requests if starting a new polling session.
+  stopPollingAndAbort();
+
+  // Create a new AbortController instance for this polling session.
+  state.job.abortController = new AbortController();
+  const signal = state.job.abortController.signal;
+
   state.job.isPolling = true;
 
   // Reset job network flags.
@@ -122,12 +143,18 @@ emitter.on("job:poll_start", () => {
   state.job.error = null;
 
   // Trigger immediate initial check before setting up interval.
-  DataService.pollJobStatus(state.job.statusURL);
+  DataService.pollJobStatus(state.job.statusURL, signal);
 
   // Periodically check for job status updates on the server.
   state.job.pollTimerID = setInterval(() => {
-    DataService.pollJobStatus(state.job.statusURL);
+    DataService.pollJobStatus(state.job.statusURL, signal);
   }, state.job.pollingInterval);
+});
+
+// job:poll_stop is triggered when user manually cancels polling via the cancel link.
+emitter.on("job:poll_stop", () => {
+  stopPollingAndAbort();
+  render();
 });
 
 // job:updated is triggered when the job moves from queued to processing status.
@@ -144,10 +171,8 @@ emitter.on("job:updated", (jobData) => {
 
 // job:completed is triggered when the job has successfully completed.
 emitter.on("job:completed", (jobData) => {
-  // Stop polling inetrval.
-  clearInterval(state.job.pollTimerID);
-  state.job.isPolling = false;
-  state.job.pollTimerID = null;
+  // Stop polling interval and abort pending status fetch.
+  stopPollingAndAbort();
 
   // Reset job network state.
   state.job.networkErrorCount = 0;
@@ -172,10 +197,8 @@ emitter.on("job:completed", (jobData) => {
 
 // job:failed is triggered when the job fails on the server.
 emitter.on("job:failed", (errorMessage) => {
-  // Stop polling inetrval.
-  clearInterval(state.job.pollTimerID);
-  state.job.isPolling = false;
-  state.job.pollTimerID = null;
+  // Stop polling interval and abort pending status fetch.
+  stopPollingAndAbort();
 
   // Populate job state with failure details.
   state.job.status = "failed";
@@ -195,9 +218,7 @@ emitter.on("job:network_error", (errorMessage) => {
 
   // Halt polling and notify user only after exceeding maximum network retries.
   if (state.job.networkErrorCount >= state.job.maxNetworkRetries) {
-    clearInterval(state.job.pollTimerID);
-    state.job.isPolling = false;
-    state.job.pollTimerID = null;
+    stopPollingAndAbort();
     state.job.error = errorMessage;
   }
 
@@ -222,8 +243,13 @@ emitter.on("variants:error", (errorMessage) => {
 });
 
 // ==================================================================================== #
-// APP INITIALIZATION
+// PAGE LIFECYCLE & APP INITIALIZATION
 // ==================================================================================== #
+
+// Abort active polling when the page unloads or navigates away.
+window.addEventListener("beforeunload", () => {
+  stopPollingAndAbort();
+});
 
 setupHandlers();
 render();

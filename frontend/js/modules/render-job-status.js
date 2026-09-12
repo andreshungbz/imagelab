@@ -122,7 +122,13 @@ export function renderJobStatus() {
               ${isButtonDisabled ? "disabled" : ""}>
               ${icon("refresh")} ${isPolling ? "Checking..." : "Check Status"}
             </button>
-            <p>${isPolling ? "Status updates automatically." : "Check for the latest job status."}</p>
+            <p>
+              ${
+                isPolling
+                  ? `Status updates automatically. <button type="button" id="btn-cancel-polling" class="btn-link">Cancel</button>`
+                  : "Check for the latest job status."
+              }
+            </p>
           </div>
         `
             : ""

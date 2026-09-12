@@ -66,9 +66,9 @@ export const DataService = {
   },
 
   // pollJobStatus polls the server for status updates on a processing job.
-  async pollJobStatus(statusURL) {
+  async pollJobStatus(statusURL, signal) {
     try {
-      const res = await fetch(`${API_BASE}${statusURL}`);
+      const res = await fetch(`${API_BASE}${statusURL}`, { signal });
       const data = await res.json();
       switch (data.status) {
         case "completed":
@@ -89,7 +89,10 @@ export const DataService = {
             emitter.emit("job:updated", data);
           }
       }
-    } catch {
+    } catch (err) {
+      // Ignore DOMException errors caused by intentional abort calls.
+      if (err.name === "AbortError") return;
+
       emitter.emit(
         "job:network_error",
         "Unable to check status. Click the 'Check Status' button to try again.",

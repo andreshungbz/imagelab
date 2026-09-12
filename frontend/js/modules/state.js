@@ -47,6 +47,7 @@ export const state = {
     isPolling: false,
     pollingInterval: 1000,
     pollTimerID: null,
+    abortController: null,
 
     // Network
     networkErrorCount: 0,
@@ -78,9 +79,13 @@ export function resetState() {
     });
   }
 
-  // Stop polling.
+  // Stop polling and abort any pending requests.
   if (state.job.pollTimerID) {
     clearInterval(state.job.pollTimerID);
+  }
+  if (state.job.abortController) {
+    state.job.abortController.abort();
+    state.job.abortController = null;
   }
 
   // Reset Upload Section.
