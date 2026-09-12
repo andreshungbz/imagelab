@@ -18,8 +18,15 @@ export function renderJobStatus() {
     error,
   } = state.job;
 
-  // Determine if there is an active job based on the publicID or if an upload is in progress.
-  const hasJob = Boolean(publicID) || state.upload.isSubmitting;
+  // Determine if there is an active job or a failed step attempt.
+  // Ignore state.upload.isSubmitting if an upload error exists to prevent visual layout flicker on offline fetch errors.
+  const hasFailedStep = Object.values(progress).some(
+    (step) => step.status === "failed",
+  );
+  const isUploading = state.upload.isSubmitting && !state.upload.error;
+  const hasJob =
+    Boolean(publicID) || isUploading || status === "failed" || hasFailedStep;
+
   const knownStatuses = [
     "pending",
     "queued",
@@ -44,7 +51,7 @@ export function renderJobStatus() {
       <div class="empty-state job-status-empty">
         <div class="empty-icon">${icon("job")}</div>
         <strong>No Active Job</strong>
-        <p>${state.upload.previewURL ? "Your image is ready. Select \'Process Image\' to begin." : "Upload an image to create a processing job."}</p>
+        <p>${state.upload.previewURL ? "Your image is ready. Select 'Process Image' to begin." : "Upload an image to create a processing job."}</p>
       </div>
     `;
     // Otherwise, display the job details and progress.
@@ -55,11 +62,19 @@ export function renderJobStatus() {
       ["generatingVariants", "Generating Variants"],
       ["completed", "Complete"],
     ];
+
+    // Disable the Check Status button while polling, queuing, processing, or after terminal states.
+    const isButtonDisabled =
+      isPolling ||
+      status === "queued" ||
+      status === "completed" ||
+      status === "failed";
+
     content += `
       <div class="job-meta-card">
         <div class="meta-item">
           <span>Job ID</span>
-          <strong>${publicID ? escapeHTML(publicID) : "Awaiting Upload"}</strong>
+          <strong>${publicID ? escapeHTML(publicID) : "Upload Failed"}</strong>
         </div>
         <span class="badge badge-${statusClass}">
           ${icon(statusClass === "completed" ? "check" : statusClass === "failed" ? "close" : "clock")}
@@ -85,7 +100,9 @@ export function renderJobStatus() {
                   ? "Pending"
                   : stepStatus === "active"
                     ? "In progress"
-                    : "");
+                    : stepStatus === "failed"
+                      ? "Failed"
+                      : "");
               return `
               <li class="step-item step-${stepStatus}" ${stepStatus === "active" ? 'aria-current="step"' : ""}>
                 <span class="step-icon" aria-hidden="true">${getStepStatusIcon(stepStatus)}</span>
@@ -102,7 +119,7 @@ export function renderJobStatus() {
             ? `
           <div class="job-actions">
             <button type="button" id="btn-check-status" class="btn btn-secondary"
-              ${isPolling || status === "completed" || status === "failed" ? "disabled" : ""}>
+              ${isButtonDisabled ? "disabled" : ""}>
               ${icon("refresh")} ${isPolling ? "Checking..." : "Check Status"}
             </button>
             <p>${isPolling ? "Status updates automatically." : "Check for the latest job status."}</p>

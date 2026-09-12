@@ -79,14 +79,28 @@ emitter.on("upload:success", (data) => {
 });
 
 // upload:error is triggered when the initial POST request to upload the image fails.
-emitter.on("upload:error", (errorMessage) => {
-  state.upload.error = errorMessage;
-
+emitter.on("upload:error", (errorPayload) => {
   // Reset submitting flag.
   state.upload.isSubmitting = false;
 
-  // Step Progress: Original Stored --> failed
-  state.job.progress.originalStored.status = "failed";
+  const isPayloadObject =
+    typeof errorPayload === "object" && errorPayload !== null;
+  const errorType = isPayloadObject ? errorPayload.type : "fetch_failed";
+  const errorMessage = isPayloadObject ? errorPayload.message : errorPayload;
+
+  if (errorType === "timeout") {
+    // Show I/O timeout errors exclusively in the Processing Job section.
+    state.upload.error = null;
+    state.job.status = "failed";
+    state.job.error = errorMessage;
+    state.job.progress.originalStored.status = "failed";
+  } else {
+    // Show standard connection/fetch errors exclusively in the Upload Image input section.
+    state.upload.error = errorMessage;
+    state.job.status = "";
+    state.job.error = null;
+    state.job.progress.originalStored.status = "pending";
+  }
 
   render();
 });
