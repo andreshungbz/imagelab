@@ -18,8 +18,7 @@ export function renderJobStatus() {
     error,
   } = state.job;
 
-  // Determine if there is an active job or a failed step attempt.
-  // Ignore state.upload.isSubmitting if an upload error exists to prevent visual layout flicker on offline fetch errors.
+  // Determine different conditions based on the state variables.
   const hasFailedStep = Object.values(progress).some(
     (step) => step.status === "failed",
   );
@@ -27,6 +26,7 @@ export function renderJobStatus() {
   const hasJob =
     Boolean(publicID) || isUploading || status === "failed" || hasFailedStep;
 
+  // Create the status label.
   const knownStatuses = [
     "pending",
     "queued",
@@ -38,12 +38,11 @@ export function renderJobStatus() {
   const statusLabel =
     statusClass.charAt(0).toUpperCase() + statusClass.slice(1);
 
-  // Start building the content for the job status section.
+  // Initial section header..
   let content = `
     <div class="section-header">
       <h3 id="job-heading">${icon("settings")} Processing Job</h3>
-    </div>
-  `;
+    </div>`;
 
   // If there is no active job, display an empty state message.
   if (!hasJob) {
@@ -52,10 +51,9 @@ export function renderJobStatus() {
         <div class="empty-icon">${icon("job")}</div>
         <strong>No Active Job</strong>
         <p>${state.upload.previewURL ? "Your image is ready. Select 'Process Image' to begin." : "Upload an image to create a processing job."}</p>
-      </div>
-    `;
-    // Otherwise, display the job details and progress.
+      </div>`;
   } else {
+    // Otherwise, display the job details and progress.
     const steps = [
       ["uploadAccepted", "Upload Accepted"],
       ["originalStored", "Original Stored"],
@@ -63,13 +61,12 @@ export function renderJobStatus() {
       ["completed", "Complete"],
     ];
 
-    // Disable the Check Status button while polling, queuing, processing, or after terminal states.
+    // Disable the Check Status button while polling, queuing, or in terminal states.
     const isButtonDisabled =
       isPolling ||
       status === "queued" ||
       status === "completed" ||
       status === "failed";
-
     content += `
       <div class="job-meta-card">
         <div class="meta-item">
@@ -108,13 +105,12 @@ export function renderJobStatus() {
                 <span class="step-icon" aria-hidden="true">${getStepStatusIcon(stepStatus)}</span>
                 <span class="step-label">${label}<span class="sr-only">: ${stepStatus}</span></span>
                 <span class="step-time text-muted">${escapeHTML(time)}</span>
-              </li>
-            `;
+              </li>`;
             })
             .join("")}
         </ol>
         ${
-          // If a publicID exists, show the "Check status" button; otherwise, don't show it.
+          // If a publicID exists, show the "Check status" button. Otherwise, don't show it.
           publicID
             ? `
           <div class="job-actions">
@@ -129,12 +125,10 @@ export function renderJobStatus() {
                   : "Check for the latest job status."
               }
             </p>
-          </div>
-        `
+          </div>`
             : ""
         }
-      </div>
-    `;
+      </div>`;
   }
 
   // Network Reconnecting Indicator

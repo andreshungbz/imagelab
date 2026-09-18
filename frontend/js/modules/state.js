@@ -1,9 +1,9 @@
-// state holds all the data that may be retrieved from data service layer.
+// state holds all the necessary data for UI rendering and data retrieval.
 export const state = {
   // Image Upload Section
   upload: {
     file: null,
-    previewURL: null, // local browser preview via URL.createObjectURL()
+    previewURL: null, // Local browser preview via URL.createObjectURL()
     metadata: {
       originalName: "",
       sizeBytes: 0,
@@ -45,7 +45,7 @@ export const state = {
 
     // Polling
     isPolling: false,
-    pollingInterval: 1000,
+    pollingInterval: 1000, // Short polling interval
     pollTimerID: null,
     abortController: null,
 
@@ -112,7 +112,7 @@ export function resetState() {
   state.job.networkErrorCount = 0;
   state.job.isReconnecting = false;
 
-  // Reset Job Progress Steps
+  // Reset Job Progress Steps.
   Object.keys(state.job.progress).forEach((step) => {
     state.job.progress[step].status = "pending";
     state.job.progress[step].timestamp = null;

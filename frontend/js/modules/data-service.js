@@ -7,10 +7,10 @@ const API_BASE = `http://${API_HOST}:4000`;
 
 // DataService is the layer that interacts with the server API to interact with the database.
 export const DataService = {
-  // uploadImage sends the image file to the server API
+  // uploadImage sends the image file to the server API.
   async uploadImage(file) {
     try {
-      // Prepare image data and send POST request with an explicit timeout signal (e.g. 15 seconds).
+      // Prepare image data and send POST request.
       const formData = new FormData();
       formData.append("image", file);
       const res = await fetch(`${API_BASE}/v1/images`, {
@@ -21,7 +21,6 @@ export const DataService = {
       // Check for HTTP response errors.
       if (!res.ok) {
         let errorMessage = `Server returned an error (${res.status}). Please try again.`;
-
         try {
           const errorData = await res.json();
           errorMessage =
@@ -29,7 +28,6 @@ export const DataService = {
         } catch {
           // Body was non-JSON or empty; retain status code message.
         }
-
         throw new Error(errorMessage);
       }
 
@@ -37,6 +35,7 @@ export const DataService = {
       const data = await res.json();
       emitter.emit("upload:success", data);
     } catch (err) {
+      // Handle various error types.
       const rawMsg = err.message || "";
       const isTimeoutError =
         err.name === "TimeoutError" ||
@@ -65,9 +64,10 @@ export const DataService = {
     }
   },
 
-  // pollJobStatus polls the server for status updates on a processing job.
+  // pollJobStatus periodically asks the server for job status updates via short polling.
   async pollJobStatus(statusURL, signal) {
     try {
+      // Send a GET request to the particular job's status URL.
       const res = await fetch(`${API_BASE}${statusURL}`, { signal });
       const data = await res.json();
       switch (data.status) {
@@ -77,8 +77,7 @@ export const DataService = {
         case "failed":
           emitter.emit(
             "job:failed",
-            data.error ||
-              "The server failed to process your image. Please upload another image and try again.",
+            "The server failed to process your image. Please upload another image and try again.",
           );
           break;
         case "queued":
@@ -92,7 +91,6 @@ export const DataService = {
     } catch (err) {
       // Ignore DOMException errors caused by intentional abort calls.
       if (err.name === "AbortError") return;
-
       emitter.emit(
         "job:network_error",
         "Unable to check status. Click the 'Check Status' button to try again.",
@@ -100,7 +98,7 @@ export const DataService = {
     }
   },
 
-  // fetchVariantBlobs downloads binary image data for all variants and creates local ObjectURLs.
+  // fetchVariantBlobs downloads binary image data for all variants from the server.
   async fetchVariantBlobs(variants) {
     try {
       // Concurrently fetch each variant's binary data and create local ObjectURLs.

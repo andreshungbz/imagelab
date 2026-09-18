@@ -2,7 +2,7 @@ import { state } from "./state.js";
 import { formatMimeType, formatBytes, escapeHTML } from "./helpers.js";
 import { icon } from "./icons.js";
 
-// renderResults renders the resulting generated image variants and their statuses.
+// renderResults generates the HTML for the results section.
 export function renderResults() {
   // Get the container element and necessary state values.
   const container = document.querySelector("#results");
@@ -18,7 +18,7 @@ export function renderResults() {
   const isCompletedAwaitingBlobs =
     state.job.status === "completed" && variants.length === 0 && !error;
 
-  // Set preview placeholder if processing or awaiting blobs, otherwise set the variants.
+  // Set results placeholder if processing or awaiting blobs, otherwise set the variants.
   const displayedVariants = variants.length
     ? variants
     : isProcessing || isCompletedAwaitingBlobs
@@ -28,12 +28,11 @@ export function renderResults() {
         }))
       : [];
 
-  // Start building the content for the results section.
+  // Initial section header.
   let content = `
     <div class="section-header">
       <h3 id="results-heading">${icon("image")} Generated Image Variants</h3>
-    </div>
-  `;
+    </div>`;
 
   // If there are no displayed variants, show an empty state message.
   if (!displayedVariants.length) {
@@ -42,11 +41,13 @@ export function renderResults() {
         <div class="empty-icon">${icon("image")}</div>
         <strong>No Images Generated Yet</strong>
         <p>Processed image variants will appear here.</p>
-      </div>
-    `;
-    // Otherwise, render the variant cards.
+      </div>`;
   } else {
+    // Otherwise, render the variant cards.
+
+    // Grid start
     content += `<div class="results-grid">`;
+
     displayedVariants.forEach((variant) => {
       // Variant Name
       const name = variant.name
@@ -97,16 +98,16 @@ export function renderResults() {
               isReady
                 ? `
               <a href="${safeURL}" download="${safeDownloadName}" target="_blank" rel="noopener noreferrer"
-                class="btn btn-secondary" aria-label="Download ${safeLabel}" title="Download ${safeLabel}">${icon("download")}</a>
-            `
+                class="btn btn-secondary" aria-label="Download ${safeLabel}" title="Download ${safeLabel}">${icon("download")}</a>`
                 : `
-              <button type="button" class="btn btn-secondary" disabled aria-label="${safeLabel} download unavailable">${icon("download")}</button>
-            `
+              <button type="button" class="btn btn-secondary" disabled aria-label="${safeLabel} download unavailable">${icon("download")}</button>`
             }
           </div>
         </article>
       `;
     });
+
+    // Grid end
     content += `</div>`;
   }
 

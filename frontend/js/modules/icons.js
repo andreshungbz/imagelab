@@ -15,6 +15,7 @@ const paths = {
   close: '<path d="m6 6 12 12M18 6 6 18"/>',
 };
 
+// icon returns an SVG icon by name.
 export function icon(name) {
   return `<svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">${paths[name] || paths.image}</svg>`;
 }

@@ -22,7 +22,7 @@ export function renderImageInput() {
       <input type="file" id="file-input" name="image" accept="image/jpeg,image/png"
         aria-label="Choose Image" hidden ${isSubmitting ? "disabled" : ""} />
       ${
-        // If a preview URL is available, show the image preview and metadata; otherwise, show the dropzone.
+        // If a preview URL is available, show the image preview and metadata. Otherwise, show the dropzone.
         previewURL
           ? `
         <div class="preview-card">
@@ -40,8 +40,7 @@ export function renderImageInput() {
               ${icon("image")} Choose Another Image
             </button>
           </div>
-        </div>
-      `
+        </div>`
           : `
         <div id="dropzone" class="dropzone-area">
           <div class="dropzone-content">
@@ -55,9 +54,7 @@ export function renderImageInput() {
             </div>
             <small>JPEG or PNG · Maximum 10 MB</small>
           </div>
-        </div>
-      `
-        // If an error exists, display it below the form.
+        </div>`
       }
       <div class="preview-actions">
         <button type="submit" id="btn-process-upload" class="btn btn-primary" ${isProcessDisabled ? "disabled" : ""}>

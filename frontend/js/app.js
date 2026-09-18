@@ -39,8 +39,8 @@ emitter.on("upload:selected", ({ file, previewURL, metadata }) => {
   state.job.status = "pending";
 
   // Step Progress: Upload Accepted --> completed
-  state.job.progress.uploadAccepted.status = "completed";
   state.job.progress.uploadAccepted.timestamp = new Date().toLocaleTimeString();
+  state.job.progress.uploadAccepted.status = "completed";
 
   render();
 });
@@ -76,7 +76,6 @@ emitter.on("upload:process", () => {
 // upload:success is triggered when the image upload succeeds and the server
 // returns a 202 Accepted response with the process_image_variants job.
 emitter.on("upload:success", (data) => {
-  console.log(data);
   // Reset submitting flag.
   state.upload.isSubmitting = false;
 
@@ -87,8 +86,8 @@ emitter.on("upload:success", (data) => {
   state.job.statusURL = data.status_url;
 
   // Step Progress: Original Stored --> completed, Generating Variants --> active
-  state.job.progress.originalStored.status = "completed";
   state.job.progress.originalStored.timestamp = new Date().toLocaleTimeString();
+  state.job.progress.originalStored.status = "completed";
   state.job.progress.generatingVariants.status = "active";
 
   render();
@@ -128,13 +127,13 @@ emitter.on("upload:error", (errorPayload) => {
 
 // job:poll_start is triggered after the 202 Accepted was received for a job or manual check.
 emitter.on("job:poll_start", () => {
-  // Cancel previous polling timer and active requests if starting a new polling session.
   stopPollingAndAbort();
 
   // Create a new AbortController instance for this polling session.
   state.job.abortController = new AbortController();
   const signal = state.job.abortController.signal;
 
+  // Set polling flag.
   state.job.isPolling = true;
 
   // Reset job network flags.

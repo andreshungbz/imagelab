@@ -14,7 +14,7 @@ function handleFileSelected(file) {
     return;
   }
 
-  // Validate maximum image size (10 MB).
+  // Validate maximum image size.
   const MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024; // 10MB
   if (file.size > MAX_FILE_SIZE_BYTES) {
     emitter.emit(
@@ -60,7 +60,7 @@ export function setupHandlers() {
 
   // IMAGE INPUT SECTION HANDLERS
 
-  // Image Selection Button Handler
+  // File Input Area Click Handler
   imageInputSection.addEventListener("click", (e) => {
     if (e.target.closest('[data-action="choose-image"]')) {
       imageInputSection.querySelector("#file-input")?.click();
@@ -82,11 +82,11 @@ export function setupHandlers() {
     }
   });
 
-  // Drag & Drop Handlers
+  // File Input Drag & Drop Handlers
   imageInputSection.addEventListener("dragover", (e) => {
     const dropzone = e.target.closest("#dropzone");
     if (dropzone) {
-      e.preventDefault(); // Prevent the browser from opening the file.
+      e.preventDefault(); // Enables dropping and drop cursor.
       dropzone.classList.add("drag-active");
     }
   });
@@ -99,7 +99,7 @@ export function setupHandlers() {
   imageInputSection.addEventListener("drop", (e) => {
     const dropzone = e.target.closest("#dropzone");
     if (dropzone) {
-      e.preventDefault();
+      e.preventDefault(); // Prevent the browser from opening the file in a new tab.
       dropzone.classList.remove("drag-active");
 
       if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {

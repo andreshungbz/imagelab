@@ -3,13 +3,11 @@ import { icon } from "./icons.js";
 // formatMimeType converts a MIME type to a human-readable format.
 export function formatMimeType(mimeType) {
   if (!mimeType) return "";
-
   const map = {
     "image/jpeg": "JPEG",
     "image/jpg": "JPEG",
     "image/png": "PNG",
   };
-
   return map[mimeType.toLowerCase()] || "";
 }
 
@@ -22,7 +20,7 @@ export function formatBytes(bytes) {
   return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
 }
 
-// escapeHTML sanitizes untrusted display values to prevent XSS.
+// escapeHTML sanitizes untrusted display values to prevent XSS attacks.
 export function escapeHTML(str) {
   if (!str) return "";
   const div = document.createElement("div");
