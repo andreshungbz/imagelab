@@ -22,6 +22,13 @@ function stopPollingAndAbort() {
   state.job.isPolling = false;
 }
 
+// resetNetworkState resets the job network tracking flags and errors.
+function resetNetworkState() {
+  state.job.networkErrorCount = 0;
+  state.job.isReconnecting = false;
+  state.job.error = null;
+}
+
 // ==================================================================================== #
 // IMAGE FILE SELECTION & VALIDATION EVENTS
 // ==================================================================================== #
@@ -128,6 +135,7 @@ emitter.on("upload:error", (errorPayload) => {
 // job:poll_start is triggered after the 202 Accepted was received for a job or manual check.
 emitter.on("job:poll_start", () => {
   stopPollingAndAbort();
+  resetNetworkState();
 
   // Create a new AbortController instance for this polling session.
   state.job.abortController = new AbortController();
@@ -135,11 +143,6 @@ emitter.on("job:poll_start", () => {
 
   // Set polling flag.
   state.job.isPolling = true;
-
-  // Reset job network flags.
-  state.job.networkErrorCount = 0;
-  state.job.isReconnecting = false;
-  state.job.error = null;
 
   // Trigger immediate initial check before setting up interval.
   DataService.pollJobStatus(state.job.statusURL, signal);
@@ -158,25 +161,15 @@ emitter.on("job:poll_stop", () => {
 
 // job:updated is triggered when the job moves from queued to processing status.
 emitter.on("job:updated", (jobData) => {
+  resetNetworkState();
   state.job.status = jobData.status;
-
-  // Reset job network state.
-  state.job.networkErrorCount = 0;
-  state.job.isReconnecting = false;
-  state.job.error = null;
-
   render();
 });
 
 // job:completed is triggered when the job has successfully completed.
 emitter.on("job:completed", (jobData) => {
-  // Stop polling interval and abort pending status fetch.
   stopPollingAndAbort();
-
-  // Reset job network state.
-  state.job.networkErrorCount = 0;
-  state.job.isReconnecting = false;
-  state.job.error = null;
+  resetNetworkState();
 
   // Step Progress: Generating Variants --> completed, Completed --> completed
   const now = new Date().toLocaleTimeString();
@@ -187,8 +180,6 @@ emitter.on("job:completed", (jobData) => {
   state.job.status = "completed";
 
   render();
-
-  // Fetch binary blob data for all variants returned in job results.
   if (jobData.variants && jobData.variants.length > 0) {
     DataService.fetchVariantBlobs(jobData.variants);
   }
@@ -196,7 +187,6 @@ emitter.on("job:completed", (jobData) => {
 
 // job:failed is triggered when the job fails on the server.
 emitter.on("job:failed", (errorMessage) => {
-  // Stop polling interval and abort pending status fetch.
   stopPollingAndAbort();
 
   // Populate job state with failure details.
