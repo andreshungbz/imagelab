@@ -1,8 +1,5 @@
 {
   pkgs,
-  lib,
-  config,
-  inputs,
   ...
 }:
 let
@@ -20,6 +17,7 @@ in
     gnumake
     go-migrate-pg
     jq
+    just
   ];
 
   # https://devenv.sh/languages/
