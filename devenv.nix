@@ -35,7 +35,7 @@ in
 
     python = {
       enable = true;
-      directory = "./measurement";
+      directory = "./python";
       venv.enable = true;
       uv = {
         enable = true;
