@@ -8,6 +8,10 @@ import httpx
 
 from measurement.db import fetch_job_metrics
 
+# ANSI Color Codes
+PURPLE = "\033[38;5;135m"
+RESET = "\033[0m"
+
 
 async def measure_job(
     client: httpx.AsyncClient,
@@ -123,10 +127,27 @@ async def main_async():
     valid_results.sort(key=lambda x: x.get("job_num", 0))
 
     # Print header.
-    print("=" * 143)
-    print(f"Running ImageLab Measurements (Count: {args.count})")
-    print("=" * 143)
-    fmt = "{:<5} | {:<36} | {:<11} | {:<10} | {:<19} | {:<12} | {:<13} | {:<15}"
+    print(f"{PURPLE}{'=' * 142}{RESET}")
+    print(f"ImageLab Measurements (Images Count: {args.count})")
+    print(f"{PURPLE}{'=' * 142}{RESET}")
+    sep = f" {PURPLE}|{RESET} "
+    fmt = (
+        "{:>5}"
+        + sep
+        + "{:<36}"
+        + sep
+        + "{:>11}"
+        + sep
+        + "{:>10}"
+        + sep
+        + "{:>19}"
+        + sep
+        + "{:>12}"
+        + sep
+        + "{:>13}"
+        + sep
+        + "{:>15}"
+    )
     header = fmt.format(
         "Job #",
         "Public ID",
@@ -138,7 +159,7 @@ async def main_async():
         "Detection Delay",
     )
     print(header)
-    print("-" * len(header))
+    print(f"{PURPLE}{'-' * 142}{RESET}")
 
     # Print results.
     for r in valid_results:
@@ -157,7 +178,7 @@ async def main_async():
             )
         )
 
-    print("=" * 143)
+    print(f"{PURPLE}{'=' * 142}{RESET}")
 
 
 def main():
