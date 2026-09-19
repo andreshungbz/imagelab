@@ -27,10 +27,10 @@ help:
 .PHONY: run
 run:
 	go run ./cmd/api \
-		-db-dsn=${IMAGELAB_DB_DSN} \
-		-port=${PORT} \
-		-cors-trusted-origins=${CORS_TRUSTED_ORIGINS} \
-		-consumer-id=${CONSUMER_ID}
+		-db-dsn=$${IMAGELAB_DB_DSN} \
+		-port=$${PORT} \
+		-cors-trusted-origins=$${CORS_TRUSTED_ORIGINS} \
+		-consumer-id=$${CONSUMER_ID}
 
 # ==================================================================================== #
 # DATABASE MIGRATIONS
@@ -39,37 +39,37 @@ run:
 ## db/psql: Connect to the database using psql
 .PHONY: db/psql
 db/psql:
-	psql ${IMAGELAB_DB_DSN}
+	psql $${IMAGELAB_DB_DSN}
 
 ## db/migrations/new name=$1: Create a new database migration
 .PHONY: db/migrations/new
 db/migrations/new:
-	@echo 'Creating migration files for ${name}...'
-	migrate create -seq -ext=.sql -dir=./migrations ${name}
+	@echo 'Creating migration files for $${name}...'
+	migrate create -seq -ext=.sql -dir=./migrations $${name}
 
 ## db/migrations/up: Apply all up database migrations
 .PHONY: db/migrations/up
 db/migrations/up:
 	@echo 'Running up migrations...'
-	migrate -path ./migrations -database ${IMAGELAB_DB_DSN} up
+	migrate -path ./migrations -database $${IMAGELAB_DB_DSN} up
 
 ## db/migrations/down: Apply all down database migrations
 .PHONY: db/migrations/down
 db/migrations/down:
 	@echo 'Reverting all migrations...'
-	migrate -path ./migrations -database ${IMAGELAB_DB_DSN} down
+	migrate -path ./migrations -database $${IMAGELAB_DB_DSN} down
 
 ## db/migrations/goto version=$1: Go to the specified migration version
 .PHONY: db/migrations/goto
 db/migrations/goto:
-	@echo 'Going to schema migration version ${version}...'
-	migrate -path ./migrations -database ${IMAGELAB_DB_DSN} goto ${version}
+	@echo 'Going to schema migration version $${version}...'
+	migrate -path ./migrations -database $${IMAGELAB_DB_DSN} goto $${version}
 
 ## db/migrations/fix version=$1: Force the schema_migrations table version
 .PHONY: db/migrations/fix
 db/migrations/fix:
-	@echo 'Forcing schema migrations version to ${version}...'
-	migrate -path ./migrations -database ${IMAGELAB_DB_DSN} force ${version}
+	@echo 'Forcing schema migrations version to $${version}...'
+	migrate -path ./migrations -database $${IMAGELAB_DB_DSN} force $${version}
 
 # ==================================================================================== #
 # QUALITY CONTROL
@@ -116,19 +116,19 @@ build/api:
 .PHONY: test/delay/3s
 test/delay/3s:
 	go run ./cmd/api \
-		-db-dsn=${IMAGELAB_DB_DSN} \
-		-port=${PORT} \
-		-cors-trusted-origins=${CORS_TRUSTED_ORIGINS} \
-		-consumer-id=${CONSUMER_ID} \
+		-db-dsn=$${IMAGELAB_DB_DSN} \
+		-port=$${PORT} \
+		-cors-trusted-origins=$${CORS_TRUSTED_ORIGINS} \
+		-consumer-id=$${CONSUMER_ID} \
 		-test-image-process-delay=3s
 
 .PHONY: test/worker/failure/3s
 test/worker/failure/3s:
 	go run ./cmd/api \
-		-db-dsn=${IMAGELAB_DB_DSN} \
-		-port=${PORT} \
-		-cors-trusted-origins=${CORS_TRUSTED_ORIGINS} \
-		-consumer-id=${CONSUMER_ID} \
+		-db-dsn=$${IMAGELAB_DB_DSN} \
+		-port=$${PORT} \
+		-cors-trusted-origins=$${CORS_TRUSTED_ORIGINS} \
+		-consumer-id=$${CONSUMER_ID} \
 		-test-image-process-delay=3s \
 		-test-worker-failure=true
 
@@ -140,14 +140,14 @@ test/worker/failure/3s:
 measure/baseline:
 	uv run --directory ./python measurement \
 		--count 1 \
-		--api-url="http://localhost:${PORT}" \
-		--db-dsn="${IMAGELAB_DB_DSN}" \
+		--api-url="http://localhost:$${PORT}" \
+		--db-dsn="$${IMAGELAB_DB_DSN}" \
 		--image-path="src/measurement/pittsburgh.jpg"
 
 .PHONY: measure/concurrent
 measure/concurrent:
 	uv run --directory ./python measurement \
 		--count 5 \
-		--api-url="http://localhost:${PORT}" \
-		--db-dsn="${IMAGELAB_DB_DSN}" \
+		--api-url="http://localhost:$${PORT}" \
+		--db-dsn="$${IMAGELAB_DB_DSN}" \
 		--image-path="src/measurement/pittsburgh.jpg"
