@@ -131,3 +131,23 @@ test/worker/failure/3s:
 		-consumer-id=${CONSUMER_ID} \
 		-test-image-process-delay=3s \
 		-test-worker-failure=true
+
+# ==================================================================================== #
+# MEASUREMENTS
+# ==================================================================================== #
+
+.PHONY: measure/baseline
+measure/baseline:
+	uv run --directory ./python measurement \
+		--count 1 \
+		--api-url="http://localhost:${PORT}" \
+		--db-dsn="${IMAGELAB_DB_DSN}" \
+		--image-path="src/measurement/pittsburgh.jpg"
+
+.PHONY: measure/concurrent
+measure/concurrent:
+	uv run --directory ./python measurement \
+		--count 5 \
+		--api-url="http://localhost:${PORT}" \
+		--db-dsn="${IMAGELAB_DB_DSN}" \
+		--image-path="src/measurement/pittsburgh.jpg"
