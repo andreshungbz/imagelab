@@ -32,6 +32,16 @@ in
       enable = true;
       npm.enable = true;
     };
+
+    python = {
+      enable = true;
+      directory = "./measurement";
+      venv.enable = true;
+      uv = {
+        enable = true;
+        sync.enable = true;
+      };
+    };
   };
 
   # https://devenv.sh/scripts/

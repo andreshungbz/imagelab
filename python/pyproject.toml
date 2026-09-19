@@ -1,0 +1,19 @@
+[project]
+name = "measurement"
+version = "0.1.0"
+description = "Program for conducting required measurements for ImageLab."
+authors = [
+    { name = "Andres Hung", email = "2018118240@ub.edu.bz" }
+]
+requires-python = ">=3.14"
+dependencies = [
+    "httpx>=0.28.1",
+    "psycopg[binary]>=3.3.6",
+]
+
+[project.scripts]
+measurement = "measurement.main:main"
+
+[build-system]
+requires = ["uv_build>=0.12.11,<0.13.0"]
+build-backend = "uv_build"
