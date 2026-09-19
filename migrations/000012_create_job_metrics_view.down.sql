@@ -1,0 +1,5 @@
+BEGIN;
+
+DROP VIEW IF EXISTS v_job_metrics;
+
+COMMIT;
