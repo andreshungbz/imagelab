@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS
          */
         id uuid PRIMARY KEY DEFAULT uuidv7 (),
         -- Every job is mandatorily associated with a consumer. 
-        consumer_id uuid NOT NULL REFERENCES consumers (id),
+        consumer_id uuid NOT NULL REFERENCES consumers (id) ON DELETE CASCADE,
         job_type text NOT NULL,
         -- A newly created job has a queued status by default.
         status job_status NOT NULL DEFAULT 'queued',
