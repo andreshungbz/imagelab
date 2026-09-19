@@ -18,6 +18,7 @@ in
     go-migrate-pg
     jq
     just
+    just-lsp
   ];
 
   # https://devenv.sh/languages/
@@ -47,6 +48,8 @@ in
   # https://devenv.sh/scripts/
   scripts.version.exec = ''
     go version
+    python3 --version
+    uv --version
   '';
 
   # https://devenv.sh/basics/
