@@ -15,9 +15,9 @@ ECHO_PREFIX := "[just]"
 # HELPERS
 # ==================================================================================== #
 
-# Print this help message
+# Print recipe list
 default:
-    @just --list
+    @just --list --unsorted
 
 # ==================================================================================== #
 # DEVELOPMENT
@@ -103,6 +103,7 @@ build-api:
 # TESTS
 # ==================================================================================== #
 
+# Run the API server with a 3s image process delay
 test-delay-3s:
     go run ./cmd/api \
       -db-dsn="$IMAGELAB_DB_DSN" \
@@ -111,6 +112,7 @@ test-delay-3s:
       -consumer-id="$CONSUMER_ID" \
       -test-image-process-delay=3s
 
+# Run the API server with a 3s image process delay and simulated worker failure
 test-worker-failure-3s:
     go run ./cmd/api \
       -db-dsn="$IMAGELAB_DB_DSN" \
@@ -124,6 +126,7 @@ test-worker-failure-3s:
 # MEASUREMENTS
 # ==================================================================================== #
 
+# Take measurements of a single image processing job
 measure-baseline:
     uv run --directory ./python measurement \
       --count 1 \
@@ -131,6 +134,7 @@ measure-baseline:
       --db-dsn="$IMAGELAB_DB_DSN" \
       --image-path="src/measurement/pittsburgh.jpg"
 
+# Take measurements of 5 concurrent image processing jobs
 measure-concurrent:
     uv run --directory ./python measurement \
       --count 5 \
