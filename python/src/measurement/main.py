@@ -116,8 +116,11 @@ async def main_async():
         # Execute all tasks concurrently and gather results.
         results = await asyncio.gather(*tasks)
 
-    # Sort results by job number.
-    results.sort(key=lambda x: x.get("job_num", 0))
+    # Filter out empty results from failed jobs and sort by job number.
+    valid_results = [r for r in results if r]
+    if not valid_results:
+        return
+    valid_results.sort(key=lambda x: x.get("job_num", 0))
 
     # Print header.
     print("=" * 143)
@@ -138,7 +141,7 @@ async def main_async():
     print("-" * len(header))
 
     # Print results.
-    for r in results:
+    for r in valid_results:
         if not r:
             continue
         print(
