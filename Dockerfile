@@ -15,4 +15,4 @@ COPY . .
 
 EXPOSE 4000
 
-CMD ["sh", "-c", "cp .envrc.docker .envrc && make db/migrations/up && make run"]
+CMD ["sh", "-c", "cp .envrc.docker .envrc && make db/migrations/up && make test/delay/3s"]

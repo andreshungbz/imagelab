@@ -42,6 +42,34 @@ services:
     networks:
       - imagelab_network
 
+  measure:
+    image: ghcr.io/astral-sh/uv:python3.14-trixie
+    container_name: imagelab_measure
+    working_dir: /app/python
+    volumes:
+      - .:/app
+    environment:
+      - UV_LINK_MODE=copy
+    depends_on:
+      api:
+        condition: service_started
+      postgres:
+        condition: service_healthy
+    networks:
+      - imagelab_network
+    profiles:
+      - tools
+    entrypoint: ["sh", "-c"]
+    command:
+      - |
+        cp .envrc.docker .envrc
+        export $(cat .envrc | xargs)
+        uv run measurement \
+          --count 5 \
+          --api-url="http://api:$${PORT}" \
+          --db-dsn="$${IMAGELAB_DB_DSN}" \
+          --image-path="src/measurement/pittsburgh.jpg"
+
 networks:
   imagelab_network:
     name: imagelab_network
