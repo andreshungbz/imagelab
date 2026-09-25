@@ -127,9 +127,9 @@ async def main_async():
     valid_results.sort(key=lambda x: x.get("job_num", 0))
 
     # Print header.
-    print(f"{PURPLE}{'=' * 142}{RESET}")
+    print(f"{PURPLE}{'=' * 143}{RESET}")
     print(f"ImageLab Measurements (Images Count: {args.count})")
-    print(f"{PURPLE}{'=' * 142}{RESET}")
+    print(f"{PURPLE}{'=' * 143}{RESET}")
     sep = f" {PURPLE}|{RESET} "
     fmt = (
         "{:>5}"
@@ -159,7 +159,7 @@ async def main_async():
         "Detection Delay",
     )
     print(header)
-    print(f"{PURPLE}{'-' * 142}{RESET}")
+    print(f"{PURPLE}{'-' * 143}{RESET}")
 
     # Print results.
     for r in valid_results:
@@ -178,7 +178,7 @@ async def main_async():
             )
         )
 
-    print(f"{PURPLE}{'=' * 142}{RESET}")
+    print(f"{PURPLE}{'=' * 143}{RESET}")
 
 
 def main():
