@@ -14,6 +14,8 @@ Check-in documentation can be found in the `/docs` directory.
 | **School**         | University of Belize                                                                               |
 | **Due Date**       | September 30, 2026                                                                                 |
 
+Final Presentation can be found as a PowerPoint file in the `/docs` directory or as a Google Slides presentation [here](https://docs.google.com/presentation/d/1sG8_3x4rZIWZ4SkDSI0SGAGYmicCrL6UGiMXfcc2ikc/edit?usp=sharing).
+
 ## Running the Project
 
 > [!NOTE]
