@@ -6,6 +6,7 @@
 storage/
 
 # Editor artifacts
+.vscode/
 .zed/
 
 # Compiled binaries
