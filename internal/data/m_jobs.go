@@ -188,3 +188,8 @@ func (m JobModel) MarkFailed(ctx context.Context, id, message string) error {
 		id, message)
 	return err
 }
+
+// Terminal checks if a job is in a terminal state (completed or failed).
+func (m JobModel) Terminal(job *Job) bool {
+	return job.Status == "completed" || job.Status == "failed"
+}
