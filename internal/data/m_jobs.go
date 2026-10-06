@@ -24,6 +24,7 @@ type Job struct {
 	ConsumerID   string          `json:"consumer_id"`
 	JobType      string          `json:"job_type"`
 	Status       string          `json:"status"`
+	Version      int             `json:"version"`
 	Payload      any             `json:"payload"`
 	Result       json.RawMessage `json:"result,omitempty"`
 	ErrorMessage *string         `json:"error_message,omitempty"`
@@ -72,7 +73,7 @@ func (m JobModel) Insert(job *Job) error {
 // GetByPublicID reads a job record from the database based on the provided public ID.
 func (m JobModel) GetByPublicID(publicID string) (*Job, error) {
 	// Construct the query and context.
-	query := `SELECT id, public_id, consumer_id, job_type, status, payload,
+	query := `SELECT id, public_id, consumer_id, job_type, status, version, payload,
 		COALESCE(result, 'null'::jsonb), error_message, started_at, completed_at, failed_at, created_at
 		FROM jobs WHERE public_id = $1`
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
@@ -85,7 +86,7 @@ func (m JobModel) GetByPublicID(publicID string) (*Job, error) {
 	var job Job
 	var payload []byte
 	err := m.DB.QueryRowContext(ctx, query, publicID).Scan(&job.ID, &job.PublicID,
-		&job.ConsumerID, &job.JobType, &job.Status, &payload, &job.Result,
+		&job.ConsumerID, &job.JobType, &job.Status, &job.Version, &payload, &job.Result,
 		&job.ErrorMessage, &job.StartedAt, &job.CompletedAt, &job.FailedAt, &job.CreatedAt)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {

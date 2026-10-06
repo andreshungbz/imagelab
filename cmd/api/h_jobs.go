@@ -35,6 +35,7 @@ func (app *application) getImageJobHandler(w http.ResponseWriter, r *http.Reques
 		"id":           job.PublicID,
 		"image_id":     imgPayload.ImageID,
 		"status":       job.Status,
+		"version":      job.Version,
 		"queued_at":    job.CreatedAt,
 		"started_at":   job.StartedAt,
 		"completed_at": job.CompletedAt,
