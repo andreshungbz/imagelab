@@ -162,7 +162,7 @@ func (m JobModel) ClaimNext(ctx context.Context, jobType string) (*Job, error) {
 	}
 
 	if _, err := tx.ExecContext(ctx,
-		`UPDATE jobs SET status = 'processing', started_at = now() WHERE id = $1`, job.ID); err != nil {
+		`UPDATE jobs SET status = 'processing', version = version + 1, started_at = now() WHERE id = $1`, job.ID); err != nil {
 		return nil, err
 	}
 	if err := tx.Commit(); err != nil {
@@ -176,7 +176,7 @@ func (m JobModel) ClaimNext(ctx context.Context, jobType string) (*Job, error) {
 // MarkCompleted updates the status of a job to "completed" in the database and sets its result.
 func (m JobModel) MarkCompleted(ctx context.Context, id string, result []byte) error {
 	_, err := m.DB.ExecContext(ctx,
-		`UPDATE jobs SET status = 'completed', result = $2, completed_at = now() WHERE id = $1`,
+		`UPDATE jobs SET status = 'completed', version = version + 1, result = $2, completed_at = now() WHERE id = $1`,
 		id, result)
 	return err
 }
@@ -184,7 +184,7 @@ func (m JobModel) MarkCompleted(ctx context.Context, id string, result []byte) e
 // MarkFailed updates the status of a job to "failed" in the database and sets its error message.
 func (m JobModel) MarkFailed(ctx context.Context, id, message string) error {
 	_, err := m.DB.ExecContext(ctx,
-		`UPDATE jobs SET status = 'failed', error_message = $2, failed_at = now() WHERE id = $1`,
+		`UPDATE jobs SET status = 'failed', version = version + 1, error_message = $2, failed_at = now() WHERE id = $1`,
 		id, message)
 	return err
 }
