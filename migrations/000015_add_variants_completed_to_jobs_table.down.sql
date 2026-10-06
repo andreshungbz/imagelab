@@ -1,0 +1,6 @@
+BEGIN;
+
+ALTER TABLE jobs
+DROP COLUMN IF EXISTS variants_completed;
+
+COMMIT;

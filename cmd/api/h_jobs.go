@@ -32,13 +32,15 @@ func (app *application) getImageJobHandler(w http.ResponseWriter, r *http.Reques
 
 	// Send a JSON response of the retrieved job, handling any errors.
 	response := envelope{
-		"id":           job.PublicID,
-		"image_id":     imgPayload.ImageID,
-		"status":       job.Status,
-		"version":      job.Version,
-		"queued_at":    job.CreatedAt,
-		"started_at":   job.StartedAt,
-		"completed_at": job.CompletedAt,
+		"id":                 job.PublicID,
+		"image_id":           imgPayload.ImageID,
+		"status":             job.Status,
+		"version":            job.Version,
+		"stage":              job.Stage,
+		"variants_completed": job.VariantsCompleted,
+		"queued_at":          job.CreatedAt,
+		"started_at":         job.StartedAt,
+		"completed_at":       job.CompletedAt,
 	}
 
 	// Conditionally add failed_at field if it is not nil.

@@ -19,19 +19,21 @@ type ImagePayload struct {
 
 // Job represents a record in the jobs table of the database.
 type Job struct {
-	ID           string          `json:"-"`
-	PublicID     string          `json:"id"`
-	ConsumerID   string          `json:"consumer_id"`
-	JobType      string          `json:"job_type"`
-	Status       string          `json:"status"`
-	Version      int             `json:"version"`
-	Payload      any             `json:"payload"`
-	Result       json.RawMessage `json:"result,omitempty"`
-	ErrorMessage *string         `json:"error_message,omitempty"`
-	StartedAt    *time.Time      `json:"started_at,omitempty"`
-	CompletedAt  *time.Time      `json:"completed_at"`
-	FailedAt     *time.Time      `json:"failed_at,omitempty"`
-	CreatedAt    time.Time       `json:"created_at"`
+	ID                string          `json:"-"`
+	PublicID          string          `json:"id"`
+	ConsumerID        string          `json:"consumer_id"`
+	JobType           string          `json:"job_type"`
+	Status            string          `json:"status"`
+	Version           int             `json:"version"`
+	Stage             string          `json:"stage"`
+	VariantsCompleted int             `json:"variants_completed"`
+	Payload           any             `json:"payload"`
+	Result            json.RawMessage `json:"result,omitempty"`
+	ErrorMessage      *string         `json:"error_message,omitempty"`
+	StartedAt         *time.Time      `json:"started_at,omitempty"`
+	CompletedAt       *time.Time      `json:"completed_at"`
+	FailedAt          *time.Time      `json:"failed_at,omitempty"`
+	CreatedAt         time.Time       `json:"created_at"`
 }
 
 // JobModel wraps a sql.DB connection pool used to interact with the database.
@@ -48,7 +50,7 @@ func (m JobModel) Insert(job *Job) error {
 
 	// Construct the query and context.
 	query := `INSERT INTO jobs (consumer_id, job_type, payload)
-		VALUES ($1, $2, $3) RETURNING id, public_id, status, created_at`
+		VALUES ($1, $2, $3) RETURNING id, public_id, status, version, stage, variants_completed, created_at`
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
@@ -56,7 +58,7 @@ func (m JobModel) Insert(job *Job) error {
 	// handling consumer ID foreign key violations (non-existent consumer) and
 	// other errors as a catch-all.
 	err = m.DB.QueryRowContext(ctx, query, job.ConsumerID, job.JobType, payload).Scan(
-		&job.ID, &job.PublicID, &job.Status, &job.CreatedAt,
+		&job.ID, &job.PublicID, &job.Status, &job.Version, &job.Stage, &job.VariantsCompleted, &job.CreatedAt,
 	)
 	if err != nil {
 		var pgErr *pq.Error
@@ -73,7 +75,7 @@ func (m JobModel) Insert(job *Job) error {
 // GetByPublicID reads a job record from the database based on the provided public ID.
 func (m JobModel) GetByPublicID(publicID string) (*Job, error) {
 	// Construct the query and context.
-	query := `SELECT id, public_id, consumer_id, job_type, status, version, payload,
+	query := `SELECT id, public_id, consumer_id, job_type, status, version, stage, variants_completed, payload,
 		COALESCE(result, 'null'::jsonb), error_message, started_at, completed_at, failed_at, created_at
 		FROM jobs WHERE public_id = $1`
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
@@ -86,7 +88,7 @@ func (m JobModel) GetByPublicID(publicID string) (*Job, error) {
 	var job Job
 	var payload []byte
 	err := m.DB.QueryRowContext(ctx, query, publicID).Scan(&job.ID, &job.PublicID,
-		&job.ConsumerID, &job.JobType, &job.Status, &job.Version, &payload, &job.Result,
+		&job.ConsumerID, &job.JobType, &job.Status, &job.Version, &job.Stage, &job.VariantsCompleted, &payload, &job.Result,
 		&job.ErrorMessage, &job.StartedAt, &job.CompletedAt, &job.FailedAt, &job.CreatedAt)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
@@ -132,7 +134,7 @@ func (m JobModel) ClaimNext(ctx context.Context, jobType string) (*Job, error) {
 	defer tx.Rollback()
 
 	// Construct the query.
-	query := `SELECT id, public_id, consumer_id, job_type, payload FROM jobs
+	query := `SELECT id, public_id, consumer_id, job_type, version, stage, variants_completed, payload FROM jobs
 		WHERE status = 'queued' AND job_type = $1
 		ORDER BY created_at FOR UPDATE SKIP LOCKED LIMIT 1`
 
@@ -141,7 +143,7 @@ func (m JobModel) ClaimNext(ctx context.Context, jobType string) (*Job, error) {
 	var job Job
 	var payload []byte
 	if err := tx.QueryRowContext(ctx, query, jobType).Scan(&job.ID, &job.PublicID,
-		&job.ConsumerID, &job.JobType, &payload); err != nil {
+		&job.ConsumerID, &job.JobType, &job.Version, &job.Stage, &job.VariantsCompleted, &payload); err != nil {
 		return nil, err
 	}
 
@@ -169,6 +171,7 @@ func (m JobModel) ClaimNext(ctx context.Context, jobType string) (*Job, error) {
 		return nil, err
 	}
 	job.Status = "processing"
+	job.Version++
 
 	return &job, nil
 }
@@ -192,4 +195,12 @@ func (m JobModel) MarkFailed(ctx context.Context, id, message string) error {
 // Terminal checks if a job is in a terminal state (completed or failed).
 func (m JobModel) Terminal(job *Job) bool {
 	return job.Status == "completed" || job.Status == "failed"
+}
+
+// UpdateProgress updates the job's stage and variants_completed count, incremending version for intermediate updates.
+func (m JobModel) UpdateProgress(ctx context.Context, id string, stage string, variantsCompleted int) error {
+	_, err := m.DB.ExecContext(ctx,
+		`UPDATE jobs SET stage = $2, variants_completed = $3, version = version + 1 WHERE id = $1`,
+		id, stage, variantsCompleted)
+	return err
 }
