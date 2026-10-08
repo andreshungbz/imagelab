@@ -176,11 +176,11 @@ func (m JobModel) ClaimNext(ctx context.Context, jobType string) (*Job, error) {
 	return &job, nil
 }
 
-// MarkCompleted updates the status of a job to "completed" in the database and sets its result.
-func (m JobModel) MarkCompleted(ctx context.Context, id string, result []byte) error {
+// MarkCompleted updates the status of a job to "completed" in the database.
+func (m JobModel) MarkCompleted(ctx context.Context, id string) error {
 	_, err := m.DB.ExecContext(ctx,
-		`UPDATE jobs SET status = 'completed', version = version + 1, result = $2, completed_at = now() WHERE id = $1`,
-		id, result)
+		`UPDATE jobs SET status = 'completed', version = version + 1, completed_at = now() WHERE id = $1`,
+		id)
 	return err
 }
 
@@ -197,10 +197,12 @@ func (m JobModel) Terminal(job *Job) bool {
 	return job.Status == "completed" || job.Status == "failed"
 }
 
-// UpdateProgress updates the job's stage and variants_completed count, incremending version for intermediate updates.
-func (m JobModel) UpdateProgress(ctx context.Context, id string, stage string, variantsCompleted int) error {
+// UpdateProgress updates the job's progress and appends a completed variant to the result.
+func (m JobModel) UpdateProgress(ctx context.Context, id string, stage string, variantsCompleted int, result []byte) error {
 	_, err := m.DB.ExecContext(ctx,
-		`UPDATE jobs SET stage = $2, variants_completed = $3, version = version + 1 WHERE id = $1`,
-		id, stage, variantsCompleted)
+		`UPDATE jobs SET stage = $2, variants_completed = $3,
+			result = COALESCE(result, '[]'::jsonb) || jsonb_build_array($4::jsonb),
+			version = version + 1 WHERE id = $1`,
+		id, stage, variantsCompleted, result)
 	return err
 }

@@ -3,12 +3,21 @@ package main
 import (
 	"context"
 	"database/sql"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"time"
 
 	"github.com/andreshungbz/imagelab/internal/data"
 )
+
+// Create a struct representing the expected job result structure.
+type variantResult struct {
+	Name   string `json:"name"`
+	Width  int    `json:"width"`
+	Height int    `json:"height"`
+	URL    string `json:"url"`
+}
 
 // startImageWorker starts a background goroutine that polls the jobs table for new image jobs to process.
 func (app *application) startImageWorker(ctx context.Context) {
@@ -61,24 +70,71 @@ func (app *application) processNextImageJob(ctx context.Context) error {
 		}
 	}
 
-	// Generate image variants, marking the job as completed or failed appropriately.
-	result, err := app.models.ImageVariants.GenerateVariants(imgPayload.ImageID, imgPayload.SourcePath, imgPayload.Variants)
+	// Generate image variants, updating the job and database as they are completed.
+	results := make([]variantResult, 0, len(imgPayload.Variants))
+	for _, name := range imgPayload.Variants {
+		// Generate the individual variant.
+		v, err := app.models.ImageVariants.GenerateVariant(imgPayload.ImageID, imgPayload.SourcePath, name)
+		if err != nil {
+			break
+		}
+
+		// Construct the variant result and append it to the results slice.
+		result := variantResult{
+			Name:   v.Name,
+			Width:  v.Width,
+			Height: v.Height,
+			URL:    fmt.Sprintf("/v1/images/%d/variants/%s", imgPayload.ImageID, v.Name),
+		}
+		results = append(results, result)
+
+		// Update job's result in the database.
+		variantJSON, marshalErr := json.Marshal(result)
+		if marshalErr != nil {
+			err = marshalErr
+			break
+		}
+		if err = app.models.Jobs.UpdateProgress(ctx, job.ID, fmt.Sprintf("%s_ready", name), len(results), variantJSON); err != nil {
+			break
+		}
+
+		// Update in-memory job struct.
+		job.Version++
+		job.Stage = name
+		job.VariantsCompleted = len(results)
+		job.Result, err = json.Marshal(results)
+		if err != nil {
+			break
+		}
+
+		time.Sleep(3 * time.Second)
+	}
+
 	// Apply worker failure simulation if configured.
 	if app.config.test_worker_failure {
 		err = fmt.Errorf("simulated worker error")
 	}
+
+	// Job Failure
 	if err != nil {
-		// Perform file and database cleanup for image variants.
+		// File and database cleanup (image variants).
 		if cleanupErr := app.models.ImageVariants.Cleanup(imgPayload.ImageID, imgPayload.SourcePath); cleanupErr != nil {
 			app.logger.Error("failed to cleanup variant resources", "image_id", imgPayload.ImageID, "error", cleanupErr)
 		}
 		app.logger.Info("image job failed. cleaning up", "job_id", job.PublicID, "error", err)
 
+		job.Status = "failed"
+		job.Version++
 		return app.models.Jobs.MarkFailed(ctx, job.ID, err.Error())
 	}
-	if err := app.models.Jobs.MarkCompleted(ctx, job.ID, result); err != nil {
+
+	// Job Completion
+	job.Status = "completed"
+	job.Version++
+	if err := app.models.Jobs.MarkCompleted(ctx, job.ID); err != nil {
 		return err
 	}
+
 	app.logger.Info("image job completed", "job_id", job.PublicID)
 
 	return nil
