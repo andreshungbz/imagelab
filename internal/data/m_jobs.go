@@ -36,6 +36,11 @@ type Job struct {
 	CreatedAt         time.Time       `json:"created_at"`
 }
 
+// Terminal checks if a job is in a terminal state (completed or failed).
+func (j Job) Terminal() bool {
+	return j.Status == "completed" || j.Status == "failed"
+}
+
 // JobModel wraps a sql.DB connection pool used to interact with the database.
 type JobModel struct {
 	DB *sql.DB
@@ -190,11 +195,6 @@ func (m JobModel) MarkFailed(ctx context.Context, id, message string) error {
 		`UPDATE jobs SET status = 'failed', version = version + 1, error_message = $2, failed_at = now() WHERE id = $1`,
 		id, message)
 	return err
-}
-
-// Terminal checks if a job is in a terminal state (completed or failed).
-func (m JobModel) Terminal(job *Job) bool {
-	return job.Status == "completed" || job.Status == "failed"
 }
 
 // UpdateProgress updates the job's progress and appends a completed variant to the result.
