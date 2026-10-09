@@ -8,7 +8,9 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
+	"time"
 
 	"github.com/google/uuid"
 )
@@ -146,4 +148,62 @@ func saveUploadedImage(r io.ReadSeeker, dir, format string) (string, error) {
 	}
 
 	return path, nil
+}
+
+// getQueryString retrieves a string value from URL query parameters, returning a default value if absent.
+func getQueryString(qs map[string][]string, key string, defaultValue string) string {
+	values, ok := qs[key]
+	if !ok || len(values) == 0 {
+		return defaultValue
+	}
+	return values[0]
+}
+
+// longPollingParams holds parsed parameter values for versioned long-polling observation endpoints.
+type longPollingParams struct {
+	after    int // Minimum job version threshold
+	hasAfter bool
+	wait     time.Duration // Holding duration for long polling (1s to 20s)
+	hasWait  bool
+}
+
+// readLongPollingParams extracts, parses, and validates the "after" and "wait" query parameters.
+func (app *application) readLongPollingParams(qs map[string][]string) (longPollingParams, error) {
+	var params longPollingParams
+
+	// Parse "after" parameter.
+	afterStr := getQueryString(qs, "after", "")
+	if afterStr != "" {
+		parsedAfter, err := strconv.Atoi(afterStr)
+		// "after" must be a non-negative integer.
+		if err != nil || parsedAfter < 0 {
+			return params, errors.New("'after' parameter must be a non-negative integer")
+		}
+		params.after = parsedAfter
+		params.hasAfter = true
+	}
+
+	// Parse "wait" parameter.
+	waitStr := getQueryString(qs, "wait", "")
+	if waitStr != "" {
+		params.hasWait = true
+
+		// Reject "wait" without "after".
+		if !params.hasAfter {
+			return params, errors.New("'wait' parameter requires 'after' parameter")
+		}
+
+		// "wait" must be an integer between 1 and 20 seconds.
+		parsedWait, err := strconv.Atoi(waitStr)
+		if err != nil || parsedWait < 1 || parsedWait > 20 {
+			return params, errors.New("'wait' parameter must be an integer from 1 to 20")
+		}
+
+		params.wait = time.Duration(parsedWait) * time.Second
+	} else if params.hasAfter {
+		// Default to 20s wait duration when "after" is supplied without "wait".
+		params.wait = 20 * time.Second
+	}
+
+	return params, nil
 }

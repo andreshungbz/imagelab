@@ -36,8 +36,9 @@ type config struct {
 		trustedOrigins []string
 	}
 
-	test_image_process_delay time.Duration // Artificial image processing delay
-	test_worker_failure      bool          // Simulate worker failure
+	test_image_process_delay        time.Duration // Artificial image processing delay
+	test_worker_failure             bool          // Simulate worker failure
+	test_lp_db_observation_interval time.Duration // DB recheck frequency during long-poll holding (ticker)
 }
 
 // application holds the dependencies for the HTTP handlers, helpers, middleware, etc.
@@ -83,6 +84,7 @@ func main() {
 	// Testing flags
 	flag.DurationVar(&cfg.test_image_process_delay, "test-image-process-delay", 0, "Artificial image processing delay in seconds")
 	flag.BoolVar(&cfg.test_worker_failure, "test-worker-failure", false, "Simulate worker failure")
+	flag.DurationVar(&cfg.test_lp_db_observation_interval, "test-lp-db-observation-interval", 200*time.Millisecond, "Internal DB recheck interval during long polling")
 
 	flag.Parse()
 
