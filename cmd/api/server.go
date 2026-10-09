@@ -16,11 +16,13 @@ import (
 func (app *application) serve() error {
 	// HTTP Server Configuration
 	srv := &http.Server{
-		Addr:         fmt.Sprintf(":%d", app.config.port),
-		Handler:      app.routes(),
-		IdleTimeout:  time.Minute,
-		ReadTimeout:  5 * time.Second,
-		WriteTimeout: 10 * time.Second,
+		Addr:        fmt.Sprintf(":%d", app.config.port),
+		Handler:     app.routes(),
+		IdleTimeout: time.Minute,
+		ReadTimeout: 5 * time.Second,
+		// WAIT-03: A WriteTimeout of 35 should account for server handler hold time, browser timeout, and network latency.
+		// Server Handler Wait (20s) < Browser Timeout (30s) < Server Write Timeout (35s)
+		WriteTimeout: 35 * time.Second,
 		ErrorLog:     slog.NewLogLogger(app.logger.Handler(), slog.LevelError),
 	}
 
