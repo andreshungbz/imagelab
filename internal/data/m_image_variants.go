@@ -3,7 +3,6 @@ package data
 import (
 	"context"
 	"database/sql"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"image"
@@ -99,35 +98,6 @@ func (m ImageVariantModel) GenerateVariant(imageID int64, sourcePath string, var
 	return variant, nil
 }
 
-// GenerateVariants generates each requested variant and constructs the JSON-serializable job result.
-func (m ImageVariantModel) GenerateVariants(imageID int64, sourcePath string, variants []string) ([]byte, error) {
-	// Create an anonymous struct representing the expected job result structure.
-	type variantResult struct {
-		Name   string `json:"name"`
-		Width  int    `json:"width"`
-		Height int    `json:"height"`
-		URL    string `json:"url"`
-	}
-
-	// Generate all variants and collect the results.
-	results := make([]variantResult, 0, len(variants))
-	for _, name := range variants {
-		v, err := m.GenerateVariant(imageID, sourcePath, name)
-		if err != nil {
-			return nil, err
-		}
-
-		results = append(results, variantResult{
-			Name:   v.Name,
-			Width:  v.Width,
-			Height: v.Height,
-			URL:    fmt.Sprintf("/v1/images/%d/variants/%s", imageID, v.Name),
-		})
-	}
-
-	return json.Marshal(results)
-}
-
 // Insert writes a new image variant record to the database.
 func (m ImageVariantModel) Insert(variant *ImageVariant) error {
 	// Construct the query and context.
@@ -193,28 +163,4 @@ func (m ImageVariantModel) GetByImageIDAndName(imageID int64, name string) (*Ima
 	}
 
 	return &v, nil
-}
-
-// Cleanup removes all variant files from disk and deletes any database records created for the given image ID.
-func (m ImageVariantModel) Cleanup(imageID int64, sourcePath string) error {
-	// Remove the directory containing generated variant files.
-	outDir := filepath.Join("storage", "variants", fmt.Sprintf("%d", imageID))
-	if err := os.RemoveAll(outDir); err != nil && !os.IsNotExist(err) {
-		_ = err
-	}
-
-	// Remove the original source image file from the server storage.
-	if sourcePath != "" {
-		if err := os.Remove(sourcePath); err != nil && !os.IsNotExist(err) {
-			_ = err
-		}
-	}
-
-	// Delete parent image record, cascading to image variant records.
-	query := `DELETE FROM images WHERE id = $1`
-	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
-	defer cancel()
-
-	_, err := m.DB.ExecContext(ctx, query, imageID)
-	return err
 }
