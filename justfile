@@ -150,3 +150,50 @@ measure-sp-five:
       --api-url="http://localhost:$PORT" \
       --db-dsn="$IMAGELAB_DB_DSN" \
       --image-path="src/measurement/pittsburgh.jpg"
+
+# ==================================================================================== #
+# EXPERIMENTAL CONTROLS (EXP-01 – EXP-03)
+# ==================================================================================== #
+
+# Run Condition A: Quiet job with 30s delay and 0 updates
+exp-cond-a:
+    go run ./cmd/api \
+      -db-dsn="$IMAGELAB_DB_DSN" \
+      -port="$PORT" \
+      -cors-trusted-origins="$CORS_TRUSTED_ORIGINS" \
+      -consumer-id="$CONSUMER_ID" \
+      -exp-quiet-delay-enabled=true \
+      -exp-quiet-delay-duration=30s
+
+# Run Condition B: Standard variant processing (Baseline 1s delay per variant)
+exp-cond-b:
+    go run ./cmd/api \
+      -db-dsn="$IMAGELAB_DB_DSN" \
+      -port="$PORT" \
+      -cors-trusted-origins="$CORS_TRUSTED_ORIGINS" \
+      -consumer-id="$CONSUMER_ID" \
+
+# Run Condition C1: Slow simulated updates (Updates every 2s for 10s)
+exp-cond-c1:
+    go run ./cmd/api \
+      -db-dsn="$IMAGELAB_DB_DSN" \
+      -port="$PORT" \
+      -cors-trusted-origins="$CORS_TRUSTED_ORIGINS" \
+      -consumer-id="$CONSUMER_ID" \
+      -exp-simulation-phase-enabled=true \
+      -exp-simulation-interval=2s \
+      -exp-simulation-total-duration=10s
+
+# Run Condition C2 / C3: Fast simulated updates (Updates every 200ms for 10s)
+exp-cond-c2:
+    go run ./cmd/api \
+      -db-dsn="$IMAGELAB_DB_DSN" \
+      -port="$PORT" \
+      -cors-trusted-origins="$CORS_TRUSTED_ORIGINS" \
+      -consumer-id="$CONSUMER_ID" \
+      -exp-simulation-phase-enabled=true \
+      -exp-simulation-interval=200ms \
+      -exp-simulation-total-duration=10s
+
+# Alias for Condition C3 (Same server config as C2; network latency is injected on client/browser)
+exp-cond-c3: exp-cond-c2
