@@ -139,14 +139,13 @@ func (app *application) processNextImageJob(ctx context.Context) error {
 
 	// Job Failure
 	if err != nil {
-		// File and database cleanup (image variants).
-		if cleanupErr := app.models.ImageVariants.Cleanup(imgPayload.ImageID, imgPayload.SourcePath); cleanupErr != nil {
-			app.logger.Error("failed to cleanup variant resources", "image_id", imgPayload.ImageID, "error", cleanupErr)
-		}
-		app.logger.Info("image job failed. cleaning up", "job_id", job.PublicID, "error", err)
+		app.logger.Info("image job failed; preserving partial progress", "job_id", job.PublicID, "error", err)
 
+		// Update in-memory struct state.
 		job.Status = "failed"
 		job.Version++
+
+		// PROG-03: Mark job failed in DB while preserving existing variants and DB progress.
 		return app.models.Jobs.MarkFailed(ctx, job.ID, err.Error())
 	}
 
