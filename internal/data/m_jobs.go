@@ -189,6 +189,22 @@ func (m JobModel) MarkCompleted(ctx context.Context, id string) error {
 	return err
 }
 
+// MarkCompletedWithProgress updates the final progress stage, result array, and sets status to
+// "completed" in a single atomic transaction/version increment (PROG-02).
+func (m JobModel) MarkCompletedWithProgress(ctx context.Context, id string, stage string, variantsCompleted int, result []byte) error {
+	query := `
+        UPDATE jobs 
+        SET stage = $2, 
+            variants_completed = $3,
+            result = COALESCE(result, '[]'::jsonb) || jsonb_build_array($4::jsonb),
+            status = 'completed', 
+            completed_at = now(),
+            version = version + 1 
+        WHERE id = $1`
+	_, err := m.DB.ExecContext(ctx, query, id, stage, variantsCompleted, result)
+	return err
+}
+
 // MarkFailed updates the status of a job to "failed" in the database and sets its error message.
 func (m JobModel) MarkFailed(ctx context.Context, id, message string) error {
 	_, err := m.DB.ExecContext(ctx,

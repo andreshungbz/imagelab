@@ -72,7 +72,8 @@ func (app *application) processNextImageJob(ctx context.Context) error {
 
 	// Generate image variants, updating the job and database as they are completed.
 	results := make([]variantResult, 0, len(imgPayload.Variants))
-	for _, name := range imgPayload.Variants {
+	totalVariants := len(imgPayload.Variants)
+	for i, name := range imgPayload.Variants {
 		// Apply the artificial individual image variant process delay if configured to be greater than 0.
 		if app.config.test_individual_image_process_delay > 0 {
 			timer := time.NewTimer(app.config.test_individual_image_process_delay)
@@ -105,8 +106,20 @@ func (app *application) processNextImageJob(ctx context.Context) error {
 			err = marshalErr
 			break
 		}
-		if err = app.models.Jobs.UpdateProgress(ctx, job.ID, fmt.Sprintf("%s_ready", name), len(results), variantJSON); err != nil {
-			break
+
+		stageName := fmt.Sprintf("%s_ready", name)
+		isLastVariant := (i == totalVariants-1)
+		if isLastVariant {
+			// Job Completion
+			// PROG-02: The last variant milestone shares one transaction with the completed status.
+			if err = app.models.Jobs.MarkCompletedWithProgress(ctx, job.ID, stageName, len(results), variantJSON); err != nil {
+				break
+			}
+		} else {
+			// Intermediate progress milestone update.
+			if err = app.models.Jobs.UpdateProgress(ctx, job.ID, stageName, len(results), variantJSON); err != nil {
+				break
+			}
 		}
 
 		// Update in-memory job struct.
@@ -137,14 +150,6 @@ func (app *application) processNextImageJob(ctx context.Context) error {
 		return app.models.Jobs.MarkFailed(ctx, job.ID, err.Error())
 	}
 
-	// Job Completion
-	job.Status = "completed"
-	job.Version++
-	if err := app.models.Jobs.MarkCompleted(ctx, job.ID); err != nil {
-		return err
-	}
-
 	app.logger.Info("image job completed", "job_id", job.PublicID)
-
 	return nil
 }
