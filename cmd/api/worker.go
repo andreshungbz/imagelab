@@ -73,6 +73,17 @@ func (app *application) processNextImageJob(ctx context.Context) error {
 	// Generate image variants, updating the job and database as they are completed.
 	results := make([]variantResult, 0, len(imgPayload.Variants))
 	for _, name := range imgPayload.Variants {
+		// Apply the artificial individual image variant process delay if configured to be greater than 0.
+		if app.config.test_individual_image_process_delay > 0 {
+			timer := time.NewTimer(app.config.test_individual_image_process_delay)
+			defer timer.Stop()
+			select {
+			case <-ctx.Done():
+				return ctx.Err()
+			case <-timer.C:
+			}
+		}
+
 		// Generate the individual variant.
 		v, err := app.models.ImageVariants.GenerateVariant(imgPayload.ImageID, imgPayload.SourcePath, name)
 		if err != nil {
@@ -106,8 +117,6 @@ func (app *application) processNextImageJob(ctx context.Context) error {
 		if err != nil {
 			break
 		}
-
-		time.Sleep(3 * time.Second)
 	}
 
 	// Apply worker failure simulation if configured.
