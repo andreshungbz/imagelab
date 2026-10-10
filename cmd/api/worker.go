@@ -57,11 +57,11 @@ func (app *application) processNextImageJob(ctx context.Context) error {
 		return fmt.Errorf("unexpected payload structure for job type %q", job.JobType)
 	}
 
-	app.logger.Info("image job started", "job_id", job.PublicID, "artificial_delay", app.config.test_image_process_delay)
+	app.logger.Info("image job started", "job_id", job.PublicID, "artificial_delay", app.config.test_job_start_delay)
 
-	// Apply the artificial image delay if configured to be greater than 0.
-	if app.config.test_image_process_delay > 0 {
-		timer := time.NewTimer(app.config.test_image_process_delay)
+	// Apply the artificial job start delay if configured to be greater than 0.
+	if app.config.test_job_start_delay > 0 {
+		timer := time.NewTimer(app.config.test_job_start_delay)
 		defer timer.Stop()
 		select {
 		case <-ctx.Done():
@@ -111,7 +111,7 @@ func (app *application) processNextImageJob(ctx context.Context) error {
 	}
 
 	// Apply worker failure simulation if configured.
-	if app.config.test_worker_failure {
+	if app.config.test_simulated_worker_failure {
 		err = fmt.Errorf("simulated worker error")
 	}
 

@@ -36,8 +36,8 @@ type config struct {
 		trustedOrigins []string
 	}
 
-	test_image_process_delay        time.Duration // Artificial image processing delay
-	test_worker_failure             bool          // Simulate worker failure
+	test_job_start_delay            time.Duration // Artificial delay before a worker starts processing a job
+	test_simulated_worker_failure   bool          // Simulate worker failure
 	test_lp_db_observation_interval time.Duration // DB recheck frequency during long-poll holding (ticker)
 }
 
@@ -82,8 +82,8 @@ func main() {
 	})
 
 	// Testing flags
-	flag.DurationVar(&cfg.test_image_process_delay, "test-image-process-delay", 0, "Artificial image processing delay in seconds")
-	flag.BoolVar(&cfg.test_worker_failure, "test-worker-failure", false, "Simulate worker failure")
+	flag.DurationVar(&cfg.test_job_start_delay, "test-job-start-delay", 0, "Artificial delay before a worker starts processing a job")
+	flag.BoolVar(&cfg.test_simulated_worker_failure, "test-simulated-worker-failure", false, "Simulate job failure by worker")
 	flag.DurationVar(&cfg.test_lp_db_observation_interval, "test-lp-db-observation-interval", 200*time.Millisecond, "Internal DB recheck interval during long polling")
 
 	flag.Parse()

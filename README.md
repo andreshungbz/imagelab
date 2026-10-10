@@ -94,7 +94,7 @@ Use any HTTP server application such as [nginx](https://nginx.org/en/), [Apache]
 With the API server running, run the `measure/baseline` and `measure/concurrent` Makefile rules to run the 1-count and 5-count measurements, respectively. For clearer delineations, run the API server with the 3-second image processing delay. The results will be printed to the terminal. To manually provide a count, run the `uv` command manually from the project root.
 
 ```
-make test/delay/3s
+make test/delay-3s
 ```
 
 ```
