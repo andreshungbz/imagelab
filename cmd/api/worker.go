@@ -124,7 +124,7 @@ func (app *application) processNextImageJob(ctx context.Context) error {
 
 		// Update in-memory job struct.
 		job.Version++
-		job.Stage = name
+		job.Stage = stageName
 		job.VariantsCompleted = len(results)
 		job.Result, err = json.Marshal(results)
 		if err != nil {
