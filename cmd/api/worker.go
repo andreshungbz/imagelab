@@ -57,20 +57,86 @@ func (app *application) processNextImageJob(ctx context.Context) error {
 		return fmt.Errorf("unexpected payload structure for job type %q", job.JobType)
 	}
 
-	app.logger.Info("image job started", "job_id", job.PublicID, "artificial_delay", app.config.test_job_start_delay)
+	app.logger.Info("image job started",
+		"job_id", job.PublicID,
+		"exp_quiet_delay", app.config.exp_quiet_delay_enabled,
+		"exp_simulation_phase", app.config.exp_simulation_phase_enabled,
+	)
 
-	// Apply the artificial job start delay if configured to be greater than 0.
-	if app.config.test_job_start_delay > 0 {
-		timer := time.NewTimer(app.config.test_job_start_delay)
-		defer timer.Stop()
+	// ====================================================================================
+	// EXP-01, EXP-02, EXP-03: Simulated Update Phase (Conditions C1, C2, C3)
+	// ====================================================================================
+	if app.config.exp_simulation_phase_enabled {
+		app.logger.Info("starting experimental simulation phase",
+			"job_id", job.PublicID,
+			"interval", app.config.exp_simulation_interval,
+			"duration", app.config.exp_simulation_total_duration,
+		)
+
+		simTicker := time.NewTicker(app.config.exp_simulation_interval)
+		defer simTicker.Stop()
+		simEndTime := time.Now().Add(app.config.exp_simulation_total_duration)
+		simStep := 0
+
+		for time.Now().Before(simEndTime) {
+			select {
+			case <-ctx.Done():
+				return ctx.Err()
+			case <-simTicker.C:
+				simStep++
+
+				// EXP-02: Persist simulated progress step and increment version in DB.
+				if err := app.models.Jobs.UpdateSimulatedProgress(ctx, job.ID, simStep); err != nil {
+					return fmt.Errorf("failed to update simulated progress: %w", err)
+				}
+
+				// EXP-02: Log actual commit time (milliseconds) rather than assuming ideal timer intervals.
+				commitTime := time.Now().UnixMilli()
+
+				// Update in-memory struct state
+				job.Version++
+				job.SimulatedProgress = simStep
+
+				app.logger.Info("simulated progress commit",
+					"job_id", job.PublicID,
+					"version", job.Version,
+					"simulated_progress", simStep,
+					"commit_time_ms", commitTime,
+				)
+			}
+		}
+		simTicker.Stop()
+	}
+
+	// ====================================================================================
+	// EXP-01: 30-Second Quiet Delay (Condition A)
+	// ====================================================================================
+	if app.config.exp_quiet_delay_enabled {
+		app.logger.Info("starting quiet delay phase", "job_id", job.PublicID, "duration", app.config.exp_quiet_delay_duration)
+		timer := time.NewTimer(app.config.exp_quiet_delay_duration)
 		select {
 		case <-ctx.Done():
+			timer.Stop()
+			return ctx.Err()
+		case <-timer.C:
+			// 30 seconds pass without emitting DB progress
+		}
+	}
+
+	// Artificial baseline job start delay (if configured separately)
+	if app.config.test_job_start_delay > 0 {
+		timer := time.NewTimer(app.config.test_job_start_delay)
+		select {
+		case <-ctx.Done():
+			timer.Stop()
 			return ctx.Err()
 		case <-timer.C:
 		}
 	}
 
-	// Generate image variants, updating the job and database as they are completed.
+	// ====================================================================================
+	// EXP-03:Real Image Variant Generation
+	// ====================================================================================
 	results := make([]variantResult, 0, len(imgPayload.Variants))
 	totalVariants := len(imgPayload.Variants)
 	for i, name := range imgPayload.Variants {
@@ -111,7 +177,7 @@ func (app *application) processNextImageJob(ctx context.Context) error {
 		isLastVariant := (i == totalVariants-1)
 		if isLastVariant {
 			// Job Completion
-			// PROG-02: The last variant milestone shares one transaction with the completed status.
+			// PROG-02, EXP-03: The last variant milestone shares one transaction with the completed status.
 			if err = app.models.Jobs.MarkCompletedWithProgress(ctx, job.ID, stageName, len(results), variantJSON); err != nil {
 				break
 			}
