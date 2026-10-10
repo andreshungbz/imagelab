@@ -127,7 +127,7 @@ test-delay-3s-simulated-worker-failure:
 # ==================================================================================== #
 
 # Take measurements of a single image processing job
-measure-baseline:
+measure-sp-one:
     uv run --directory ./python measurement \
       --count 1 \
       --api-url="http://localhost:$PORT" \
@@ -135,7 +135,7 @@ measure-baseline:
       --image-path="src/measurement/pittsburgh.jpg"
 
 # Take measurements of 5 concurrent image processing jobs
-measure-concurrent:
+measure-sp-five:
     uv run --directory ./python measurement \
       --count 5 \
       --api-url="http://localhost:$PORT" \

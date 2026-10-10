@@ -136,16 +136,16 @@ test/delay-3s/simulated-worker-failure:
 # MEASUREMENTS
 # ==================================================================================== #
 
-.PHONY: measure/baseline
-measure/baseline:
+.PHONY: measure/sp/one
+measure/sp/one:
 	uv run --directory ./python measurement \
 		--count 1 \
 		--api-url="http://localhost:${PORT}" \
 		--db-dsn="${IMAGELAB_DB_DSN}" \
 		--image-path="src/measurement/pittsburgh.jpg"
 
-.PHONY: measure/concurrent
-measure/concurrent:
+.PHONY: measure/sp/five
+measure/sp/five:
 	uv run --directory ./python measurement \
 		--count 5 \
 		--api-url="http://localhost:${PORT}" \
