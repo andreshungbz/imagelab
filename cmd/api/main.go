@@ -40,6 +40,13 @@ type config struct {
 	test_job_start_delay                time.Duration // Artificial delay before a worker starts processing a job
 	test_individual_image_process_delay time.Duration // Artificial delay for processing each image variant
 	test_lp_db_observation_interval     time.Duration // DB recheck frequency during long-poll holding (ticker)
+
+	// EXP-01: Disabled-by-default experimental controls
+	exp_quiet_delay_enabled       bool          // EXP-01: Condition A quiet 30s delay
+	exp_quiet_delay_duration      time.Duration // EXP-01: Quiet delay duration (default 30s)
+	exp_simulation_phase_enabled  bool          // EXP-01: Simulated update phase enabled
+	exp_simulation_interval       time.Duration // EXP-01: Simulated phase update frequency (e.g., 2s for C1, 200ms for C2/C3)
+	exp_simulation_total_duration time.Duration // EXP-01: Simulated phase total duration (default 10s)
 }
 
 // application holds the dependencies for the HTTP handlers, helpers, middleware, etc.
@@ -87,6 +94,13 @@ func main() {
 	flag.DurationVar(&cfg.test_job_start_delay, "test-job-start-delay", 0, "Artificial delay before a worker starts processing a job")
 	flag.DurationVar(&cfg.test_individual_image_process_delay, "test-individual-image-process-delay", 0, "Artificial delay for processing each image variant")
 	flag.DurationVar(&cfg.test_lp_db_observation_interval, "test-lp-db-observation-interval", 200*time.Millisecond, "Internal DB recheck interval during long polling")
+
+	// EXP-01 Experimental control flags (disabled by default)
+	flag.BoolVar(&cfg.exp_quiet_delay_enabled, "exp-quiet-delay-enabled", false, "EXP-01: Enable quiet delay phase (Condition A)")
+	flag.DurationVar(&cfg.exp_quiet_delay_duration, "exp-quiet-delay-duration", 30*time.Second, "EXP-01: Quiet delay duration")
+	flag.BoolVar(&cfg.exp_simulation_phase_enabled, "exp-simulation-phase-enabled", false, "EXP-01: Enable 10-second simulated update phase (Conditions C1-C3)")
+	flag.DurationVar(&cfg.exp_simulation_interval, "exp-simulation-interval", 2*time.Second, "EXP-01: Simulated update ticker interval (e.g., 2s for C1, 200ms for C2/C3)")
+	flag.DurationVar(&cfg.exp_simulation_total_duration, "exp-simulation-total-duration", 10*time.Second, "EXP-01: Total duration for simulated phase")
 
 	flag.Parse()
 
