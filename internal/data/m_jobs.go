@@ -27,6 +27,7 @@ type Job struct {
 	Version           int             `json:"version"`
 	Stage             string          `json:"stage"`
 	VariantsCompleted int             `json:"variants_completed"`
+	SimulatedProgress int             `json:"simulated_progress"`
 	Payload           any             `json:"payload"`
 	Result            json.RawMessage `json:"result,omitempty"`
 	ErrorMessage      *string         `json:"error_message,omitempty"`
@@ -55,7 +56,7 @@ func (m JobModel) Insert(job *Job) error {
 
 	// Construct the query and context.
 	query := `INSERT INTO jobs (consumer_id, job_type, payload)
-		VALUES ($1, $2, $3) RETURNING id, public_id, status, version, stage, variants_completed, created_at`
+		VALUES ($1, $2, $3) RETURNING id, public_id, status, version, stage, variants_completed, simulated_progress, created_at`
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
@@ -63,7 +64,7 @@ func (m JobModel) Insert(job *Job) error {
 	// handling consumer ID foreign key violations (non-existent consumer) and
 	// other errors as a catch-all.
 	err = m.DB.QueryRowContext(ctx, query, job.ConsumerID, job.JobType, payload).Scan(
-		&job.ID, &job.PublicID, &job.Status, &job.Version, &job.Stage, &job.VariantsCompleted, &job.CreatedAt,
+		&job.ID, &job.PublicID, &job.Status, &job.Version, &job.Stage, &job.VariantsCompleted, &job.SimulatedProgress, &job.CreatedAt,
 	)
 	if err != nil {
 		var pgErr *pq.Error
@@ -80,7 +81,7 @@ func (m JobModel) Insert(job *Job) error {
 // GetByPublicID reads a job record from the database based on the provided public ID.
 func (m JobModel) GetByPublicID(publicID string) (*Job, error) {
 	// Construct the query and context.
-	query := `SELECT id, public_id, consumer_id, job_type, status, version, stage, variants_completed, payload,
+	query := `SELECT id, public_id, consumer_id, job_type, status, version, stage, variants_completed, simulated_progress, payload,
 		COALESCE(result, 'null'::jsonb), error_message, started_at, completed_at, failed_at, created_at
 		FROM jobs WHERE public_id = $1`
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
@@ -93,7 +94,7 @@ func (m JobModel) GetByPublicID(publicID string) (*Job, error) {
 	var job Job
 	var payload []byte
 	err := m.DB.QueryRowContext(ctx, query, publicID).Scan(&job.ID, &job.PublicID,
-		&job.ConsumerID, &job.JobType, &job.Status, &job.Version, &job.Stage, &job.VariantsCompleted, &payload, &job.Result,
+		&job.ConsumerID, &job.JobType, &job.Status, &job.Version, &job.Stage, &job.VariantsCompleted, &job.SimulatedProgress, &payload, &job.Result,
 		&job.ErrorMessage, &job.StartedAt, &job.CompletedAt, &job.FailedAt, &job.CreatedAt)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
@@ -220,5 +221,16 @@ func (m JobModel) UpdateProgress(ctx context.Context, id string, stage string, v
 			result = COALESCE(result, '[]'::jsonb) || jsonb_build_array($4::jsonb),
 			version = version + 1 WHERE id = $1`,
 		id, stage, variantsCompleted, result)
+	return err
+}
+
+// UpdateSimulatedProgress increments the simulated_progress field and updates the version in PostgreSQL (EXP-02).
+func (m JobModel) UpdateSimulatedProgress(ctx context.Context, id string, step int) error {
+	query := `
+        UPDATE jobs 
+        SET simulated_progress = $2, 
+            version = version + 1 
+        WHERE id = $1`
+	_, err := m.DB.ExecContext(ctx, query, id, step)
 	return err
 }

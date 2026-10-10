@@ -142,6 +142,7 @@ func (app *application) writeJobSnapshotResponse(w http.ResponseWriter, r *http.
 		"version":            job.Version,
 		"stage":              job.Stage,
 		"variants_completed": job.VariantsCompleted,
+		"simulated_progress": job.SimulatedProgress,
 		"queued_at":          job.CreatedAt,
 		"started_at":         job.StartedAt,
 		"completed_at":       job.CompletedAt,
