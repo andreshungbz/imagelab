@@ -74,7 +74,7 @@ func (app *application) getImageJobHandler(w http.ResponseWriter, r *http.Reques
 	defer timer.Stop()
 	defer ticker.Stop()
 
-	// WAIT-01: The data.JobModel.MarkCompleted/MarkFailed/UpdateProgress methods which increment the job version,
+	// WAIT-01: The data.JobModel.MarkCompletedWithProgress/MarkFailed/UpdateProgress methods which increment the job version,
 	//          alongside this long polling handler, form the Counter + Version waiting approach.
 	// WAIT-01: The signals from the ticker and timer signals are captured and they check the persisted state.
 	// WAIT-01: Because the ticker continually polls the database, any change committed between request arrival

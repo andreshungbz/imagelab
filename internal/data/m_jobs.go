@@ -182,14 +182,6 @@ func (m JobModel) ClaimNext(ctx context.Context, jobType string) (*Job, error) {
 	return &job, nil
 }
 
-// MarkCompleted updates the status of a job to "completed" in the database.
-func (m JobModel) MarkCompleted(ctx context.Context, id string) error {
-	_, err := m.DB.ExecContext(ctx,
-		`UPDATE jobs SET status = 'completed', version = version + 1, completed_at = now() WHERE id = $1`,
-		id)
-	return err
-}
-
 // MarkCompletedWithProgress updates the final progress stage, result array, and sets status to
 // "completed" in a single atomic transaction/version increment (PROG-02).
 func (m JobModel) MarkCompletedWithProgress(ctx context.Context, id string, stage string, variantsCompleted int, result []byte) error {
