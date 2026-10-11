@@ -84,8 +84,8 @@ func (app *application) getImageJobHandler(w http.ResponseWriter, r *http.Reques
 		select {
 		// Holds the request until a committed change.
 		// VER-03: With a ticker implementation, this observer only checks committed changes to the job version.
-		//         With multiple observers, each has its own ticker and queries the database independently.
-		//         Given that the ticker fires at the configured interval, only the latest job state is read, coalescing notifications.
+		// VER-03: With multiple observers, each has its own ticker and queries the database independently.
+		// VER-03: Given that the ticker fires at the configured interval, only the latest job state is read, coalescing notifications.
 		// WAIT-01: On wake-up/tick, recheck the job version.
 		case <-ticker.C:
 			latestJob, err := app.models.Jobs.GetByPublicID(jobID)
