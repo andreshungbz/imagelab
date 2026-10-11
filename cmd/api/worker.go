@@ -45,7 +45,7 @@ func (app *application) startImageWorker(ctx context.Context) {
 
 // processNextImageJob claims and processes the next image job from the database.
 func (app *application) processNextImageJob(ctx context.Context) error {
-	// Claim and log the next image job, handling errors.
+	// Claim the next image job, handling errors.
 	job, err := app.models.Jobs.ClaimNext(ctx, "process_image_variants")
 	if err != nil {
 		return err
@@ -64,8 +64,9 @@ func (app *application) processNextImageJob(ctx context.Context) error {
 	)
 
 	// ====================================================================================
-	// EXP-01, EXP-02, EXP-03: Simulated Update Phase (Conditions C1, C2, C3)
+	// Simulated Update Phase (Conditions C1, C2, C3)
 	// ====================================================================================
+
 	if app.config.exp_simulation_phase_enabled {
 		app.logger.Info("starting experimental simulation phase",
 			"job_id", job.PublicID,
@@ -77,7 +78,6 @@ func (app *application) processNextImageJob(ctx context.Context) error {
 		defer simTicker.Stop()
 		simEndTime := time.Now().Add(app.config.exp_simulation_total_duration)
 		simStep := 0
-
 		for time.Now().Before(simEndTime) {
 			select {
 			case <-ctx.Done():
@@ -93,7 +93,7 @@ func (app *application) processNextImageJob(ctx context.Context) error {
 				// EXP-02: Log actual commit time (milliseconds) rather than assuming ideal timer intervals.
 				commitTime := time.Now().UnixMilli()
 
-				// Update in-memory struct state
+				// Update in-memory struct state.
 				job.Version++
 				job.SimulatedProgress = simStep
 
@@ -109,8 +109,9 @@ func (app *application) processNextImageJob(ctx context.Context) error {
 	}
 
 	// ====================================================================================
-	// EXP-01: 30-Second Quiet Delay (Condition A)
+	// Quiet Delay Phase (Condition A)
 	// ====================================================================================
+
 	if app.config.exp_quiet_delay_enabled {
 		app.logger.Info("starting quiet delay phase", "job_id", job.PublicID, "duration", app.config.exp_quiet_delay_duration)
 		timer := time.NewTimer(app.config.exp_quiet_delay_duration)
@@ -119,11 +120,15 @@ func (app *application) processNextImageJob(ctx context.Context) error {
 			timer.Stop()
 			return ctx.Err()
 		case <-timer.C:
-			// 30 seconds pass without emitting DB progress
+			// Waits for the configured duration (default 30s) without any database updates.
 		}
 	}
 
-	// Artificial baseline job start delay (if configured separately)
+	// ====================================================================================
+	// EXP-03: Real Image Variant Generation
+	// ====================================================================================
+
+	// Apply artificial job start delay if configured.
 	if app.config.test_job_start_delay > 0 {
 		timer := time.NewTimer(app.config.test_job_start_delay)
 		select {
@@ -134,13 +139,11 @@ func (app *application) processNextImageJob(ctx context.Context) error {
 		}
 	}
 
-	// ====================================================================================
-	// EXP-03:Real Image Variant Generation
-	// ====================================================================================
+	// Generate image variants and update job progress after each variant is processed.
 	results := make([]variantResult, 0, len(imgPayload.Variants))
 	totalVariants := len(imgPayload.Variants)
 	for i, name := range imgPayload.Variants {
-		// Apply the artificial individual image variant process delay if configured to be greater than 0.
+		// Apply artificial individual image variant process delay if configured.
 		if app.config.test_individual_image_process_delay > 0 {
 			timer := time.NewTimer(app.config.test_individual_image_process_delay)
 			defer timer.Stop()
@@ -157,7 +160,7 @@ func (app *application) processNextImageJob(ctx context.Context) error {
 			break
 		}
 
-		// Construct the variant result and append it to the results slice.
+		// Construct the variant result entry and append it to the results slice.
 		result := variantResult{
 			Name:   v.Name,
 			Width:  v.Width,
@@ -166,18 +169,17 @@ func (app *application) processNextImageJob(ctx context.Context) error {
 		}
 		results = append(results, result)
 
-		// Update job's result in the database.
+		// Update job's result JSON field in the database.
+		stageName := fmt.Sprintf("%s_ready", name)
+		isLastVariant := (i == totalVariants-1)
 		variantJSON, marshalErr := json.Marshal(result)
 		if marshalErr != nil {
 			err = marshalErr
 			break
 		}
-
-		stageName := fmt.Sprintf("%s_ready", name)
-		isLastVariant := (i == totalVariants-1)
 		if isLastVariant {
 			// Job Completion
-			// PROG-02, EXP-03: The last variant milestone shares one transaction with the completed status.
+			// PROG-02: The last variant milestone shares one transaction with the completed status.
 			if err = app.models.Jobs.MarkCompletedWithProgress(ctx, job.ID, stageName, len(results), variantJSON); err != nil {
 				break
 			}
@@ -204,14 +206,13 @@ func (app *application) processNextImageJob(ctx context.Context) error {
 	}
 
 	// Job Failure
+	// PROG-03: Mark job failed in DB while preserving existing variants and DB progress.
 	if err != nil {
-		app.logger.Info("image job failed; preserving partial progress", "job_id", job.PublicID, "error", err)
-
 		// Update in-memory struct state.
 		job.Status = "failed"
 		job.Version++
 
-		// PROG-03: Mark job failed in DB while preserving existing variants and DB progress.
+		app.logger.Info("image job failed", "job_id", job.PublicID, "error", err)
 		return app.models.Jobs.MarkFailed(ctx, job.ID, err.Error())
 	}
 

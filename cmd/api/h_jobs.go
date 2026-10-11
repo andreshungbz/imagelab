@@ -45,7 +45,7 @@ func (app *application) getImageJobHandler(w http.ResponseWriter, r *http.Reques
 	}
 
 	// LONG POLLING (API-02): If "after" exceeds current version, return a 400 Bad Request.
-	if job.Version < lpParams.after {
+	if lpParams.after > job.Version {
 		app.badRequestResponse(w, r, errors.New("'after' parameter exceeds current job version"))
 		return
 	}
@@ -103,12 +103,10 @@ func (app *application) getImageJobHandler(w http.ResponseWriter, r *http.Reques
 		case <-timer.C:
 			// Final authoritative check before sending a 204 No Content.
 			latestJob, err := app.models.Jobs.GetByPublicID(jobID)
-			// On an unexpected server/database failure, return a 500 Internal Server Error response.
 			if err != nil {
 				app.serverErrorResponse(w, r, err)
 				return
 			}
-			// If the job has transitioned to a terminal state or has a version greater than "after", return a 200 OK with the job snapshot.
 			if latestJob.Terminal() || latestJob.Version > lpParams.after {
 				app.writeJobSnapshotResponse(w, r, latestJob)
 				return
@@ -118,7 +116,8 @@ func (app *application) getImageJobHandler(w http.ResponseWriter, r *http.Reques
 			w.WriteHeader(http.StatusNoContent)
 			return
 
-		// WAIT-02: Holds until client connection cancellation. This request-context cancellation ends observation, not the worker's job.
+		// Holds until client connection cancellation.
+		// WAIT-02: This request-context cancellation ends observation, not the worker's job.
 		case <-r.Context().Done():
 			return
 		}
