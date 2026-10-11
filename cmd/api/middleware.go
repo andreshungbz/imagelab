@@ -25,7 +25,7 @@ func (app *application) recoverPanic(next http.Handler) http.Handler {
 // requestLogger logs the HTTP request's method and URL path.
 func (app *application) requestLogger(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		app.logger.Info("Request received", "method", r.Method, "path", r.URL.Path)
+		app.logger.Info("client request", "method", r.Method, "path", r.URL.Path)
 		next.ServeHTTP(w, r)
 	})
 }
