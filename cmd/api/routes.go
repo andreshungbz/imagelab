@@ -32,6 +32,10 @@ func (app *application) routes() http.Handler {
 	// GLOBAL MIDDLEWARE
 
 	return app.requestLogger( // First middleware
-		app.enableCORS(router), // Last middleware
+		app.recoverPanic(
+			app.enableCORS(
+				app.gzip(router), // Last middleware
+			),
+		),
 	)
 }
