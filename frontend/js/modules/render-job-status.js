@@ -8,15 +8,6 @@ export function renderJobStatus() {
   const container = document.querySelector("#job-status");
   if (!container) return;
 
-  // Prevent re-rendering and closing the select element if the user currently has it open/focused.
-  const activeEl = document.activeElement;
-  if (
-    activeEl &&
-    (activeEl.id === "poll-mode-select" || activeEl.id === "wait-select")
-  ) {
-    return;
-  }
-
   const {
     publicID,
     status,
@@ -40,7 +31,143 @@ export function renderJobStatus() {
   const hasJob =
     Boolean(publicID) || isUploading || status === "failed" || hasFailedStep;
 
-  // Create the status label.
+  // Calculate variant progress.
+  const completedVariantsCount = state.results.image_variants
+    ? state.results.image_variants.length
+    : 0;
+  const targetVariantsTotal =
+    state.results.targetTotal || Math.max(completedVariantsCount, 3);
+  const calculatedPercentage =
+    status === "completed"
+      ? 100
+      : Math.min(
+          100,
+          Math.round((completedVariantsCount / targetVariantsTotal) * 100),
+        );
+
+  const isActivelyProcessing =
+    status === "processing" || status === "queued" || state.upload.isSubmitting;
+
+  const isButtonDisabled =
+    (isPolling && !error) ||
+    status === "queued" ||
+    status === "completed" ||
+    status === "failed";
+
+  // Check if job status structure is already rendered in the DOM.
+  const existingJobMeta = container.querySelector(".job-meta-card");
+  const existingSelectMode = container.querySelector("#poll-mode-select");
+
+  if (existingJobMeta && existingSelectMode && hasJob) {
+    // Update controls only if mode/wait changed externally.
+    if (existingSelectMode.value !== pollingMode) {
+      existingSelectMode.value = pollingMode;
+    }
+
+    const modeControlGroup = container.querySelector(".mode-control");
+    let existingWaitSelect = container.querySelector("#wait-select");
+
+    if (pollingMode === "long") {
+      if (!existingWaitSelect) {
+        const waitSelectHTML = `
+          <label for="wait-select" class="sr-only">Wait Duration</label>
+          <select id="wait-select" class="form-select-sm" aria-label="Select long poll wait duration">
+            <option value="20" ${longPollWait === 20 ? "selected" : ""}>Wait 20s</option>
+            <option value="10" ${longPollWait === 10 ? "selected" : ""}>Wait 10s</option>
+            <option value="1" ${longPollWait === 1 ? "selected" : ""}>Wait 1s</option>
+          </select>`;
+        modeControlGroup.insertAdjacentHTML("afterbegin", waitSelectHTML);
+      } else if (parseInt(existingWaitSelect.value, 10) !== longPollWait) {
+        existingWaitSelect.value = String(longPollWait);
+      }
+    } else if (existingWaitSelect) {
+      // Remove wait-select when switching back to short polling.
+      const waitLabel = container.querySelector("label[for='wait-select']");
+      if (waitLabel) waitLabel.remove();
+      existingWaitSelect.remove();
+    }
+
+    // Update status badge.
+    const knownStatuses = [
+      "pending",
+      "queued",
+      "processing",
+      "completed",
+      "failed",
+    ];
+    const statusClass = knownStatuses.includes(status) ? status : "pending";
+    const statusLabel =
+      statusClass.charAt(0).toUpperCase() + statusClass.slice(1);
+    const badgeEl = container.querySelector(".job-meta-card .badge");
+    if (badgeEl) {
+      badgeEl.className = `badge badge-${statusClass}`;
+      badgeEl.innerHTML = `${icon(statusClass === "completed" ? "check" : statusClass === "failed" ? "close" : "clock")} ${state.upload.isSubmitting ? "Uploading" : statusLabel}`;
+    }
+
+    // Update Last Observed Version & Simulated Progress.
+    const versionEl = container.querySelector(".job-meta-subrow strong");
+    if (versionEl) {
+      versionEl.textContent = escapeHTML(String(version || 0));
+    }
+
+    // Update Variant Progress Bar & Percentage.
+    const countEl = container.querySelector(".variant-progress-count");
+    if (countEl) {
+      countEl.textContent = `${completedVariantsCount} / ${targetVariantsTotal} variants (${calculatedPercentage}%)`;
+    }
+    const fillEl = container.querySelector(".variant-progress-fill");
+    if (fillEl) {
+      fillEl.style.width = `${calculatedPercentage}%`;
+      fillEl.className = `variant-progress-fill ${isActivelyProcessing ? "is-animating" : ""}`;
+    }
+
+    // Update Step Items.
+    const steps = [
+      ["uploadAccepted", "Upload Accepted"],
+      ["originalStored", "Original Stored"],
+      ["generatingVariants", "Generating Variants"],
+      ["completed", "Complete"],
+    ];
+
+    const stepItems = container.querySelectorAll(".step-item");
+    steps.forEach(([key, label], idx) => {
+      const itemEl = stepItems[idx];
+      if (!itemEl) return;
+      const step = progress[key];
+      const stepStatus = ["pending", "active", "completed", "failed"].includes(
+        step.status,
+      )
+        ? step.status
+        : "pending";
+
+      itemEl.className = `step-item step-${stepStatus}`;
+      const iconEl = itemEl.querySelector(".step-icon");
+      if (iconEl) iconEl.innerHTML = getStepStatusIcon(stepStatus);
+
+      const timeEl = itemEl.querySelector(".step-time");
+      if (timeEl) {
+        timeEl.textContent =
+          step.timestamp ||
+          (stepStatus === "pending"
+            ? "Pending"
+            : stepStatus === "active"
+              ? "In progress"
+              : stepStatus === "failed"
+                ? "Failed"
+                : "");
+      }
+    });
+
+    // Update Actions / Buttons.
+    const btnCheck = container.querySelector("#btn-check-status");
+    if (btnCheck) {
+      btnCheck.disabled = isButtonDisabled;
+      btnCheck.innerHTML = `${icon("refresh")} ${isPolling && !error ? "Checking..." : error ? "Try Again" : "Check Status"}`;
+    }
+
+    return;
+  }
+
   const knownStatuses = [
     "pending",
     "queued",
@@ -92,34 +219,6 @@ export function renderJobStatus() {
       ["generatingVariants", "Generating Variants"],
       ["completed", "Complete"],
     ];
-
-    // Dynamically calculate variant progress using total variants count.
-    const completedVariantsCount = state.results.image_variants
-      ? state.results.image_variants.length
-      : 0;
-    const targetVariantsTotal =
-      state.results.targetTotal || Math.max(completedVariantsCount, 3);
-    const calculatedPercentage =
-      status === "completed"
-        ? 100
-        : Math.min(
-            100,
-            Math.round((completedVariantsCount / targetVariantsTotal) * 100),
-          );
-
-    // Determine if animated pulse shimmer should be active.
-    const isActivelyProcessing =
-      status === "processing" ||
-      status === "queued" ||
-      state.upload.isSubmitting;
-
-    // Check Status acts as "Try Again" when an error is present.
-    // Disable ONLY while actively polling without errors, queuing, or in terminal states.
-    const isButtonDisabled =
-      (isPolling && !error) ||
-      status === "queued" ||
-      status === "completed" ||
-      status === "failed";
 
     content += `
       <div class="job-meta-card">
