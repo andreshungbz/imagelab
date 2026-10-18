@@ -7,6 +7,16 @@ export function renderJobStatus() {
   // Get the container element and necessary state values.
   const container = document.querySelector("#job-status");
   if (!container) return;
+
+  // Prevent re-rendering and closing the select element if the user currently has it open/focused.
+  const activeEl = document.activeElement;
+  if (
+    activeEl &&
+    (activeEl.id === "poll-mode-select" || activeEl.id === "wait-select")
+  ) {
+    return;
+  }
+
   const {
     publicID,
     status,
