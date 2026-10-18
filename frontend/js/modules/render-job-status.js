@@ -173,11 +173,58 @@ export function renderJobStatus() {
       }
     });
 
-    // 7. Update Actions / Buttons.
-    const btnCheck = container.querySelector("#btn-check-status");
-    if (btnCheck) {
-      btnCheck.disabled = isButtonDisabled;
-      btnCheck.innerHTML = `${icon("refresh")} ${isPolling && !error ? "Checking..." : error ? "Try Again" : "Check Status"}`;
+    // 7. Update Actions / Check Status Button & Error Text.
+    let jobActionsContainer = container.querySelector(".job-actions");
+    const jobProgressContainer = container.querySelector(".job-progress");
+
+    if (publicID) {
+      if (!jobActionsContainer && jobProgressContainer) {
+        // Render actions container if it didn't exist yet
+        const actionsHTML = `
+          <div class="job-actions">
+            <button type="button" id="btn-check-status" class="btn btn-secondary">
+              ${icon("refresh")} Check Status
+            </button>
+            <p></p>
+          </div>`;
+        jobProgressContainer.insertAdjacentHTML("beforeend", actionsHTML);
+        jobActionsContainer = container.querySelector(".job-actions");
+      }
+
+      if (jobActionsContainer) {
+        const btnCheck = jobActionsContainer.querySelector("#btn-check-status");
+        if (btnCheck) {
+          btnCheck.disabled = isButtonDisabled;
+          btnCheck.innerHTML = `${icon("refresh")} ${isPolling && !error ? "Checking..." : error ? "Try Again" : "Check Status"}`;
+        }
+
+        const hintText = jobActionsContainer.querySelector("p");
+        if (hintText) {
+          hintText.className = error ? "text-danger" : "";
+          hintText.innerHTML = error
+            ? escapeHTML(error)
+            : isPolling
+              ? `<button type="button" id="btn-cancel-polling" class="btn-link">Cancel</button>`
+              : `Click to check status.`;
+        }
+      }
+    } else if (jobActionsContainer) {
+      jobActionsContainer.remove();
+    }
+
+    // 8. Network Reconnecting Indicator
+    let warningEl = container.querySelector(".job-status-warning");
+    if (isReconnecting && networkErrorCount < maxNetworkRetries) {
+      if (!warningEl) {
+        container.insertAdjacentHTML(
+          "beforeend",
+          `<div class="job-status-warning">We're having connection issues. Retrying (${networkErrorCount}/${maxNetworkRetries})...</div>`,
+        );
+      } else {
+        warningEl.textContent = `We're having connection issues. Retrying (${networkErrorCount}/${maxNetworkRetries})...`;
+      }
+    } else if (warningEl) {
+      warningEl.remove();
     }
 
     return;
@@ -309,7 +356,6 @@ export function renderJobStatus() {
             .join("")}
         </ol>
         ${
-          // If a publicID exists, show the "Check Status" button. Otherwise, don't show it.
           publicID
             ? `
           <div class="job-actions">
