@@ -31,6 +31,15 @@ run:
       -cors-trusted-origins="$CORS_TRUSTED_ORIGINS" \
       -consumer-id="$CONSUMER_ID"
 
+# Remove the ./bin and ./storage directories and reset the database
+cleanup:
+    @echo "{{ ECHO_PREFIX }} Resetting database..."
+    migrate -path ./migrations -database "$IMAGELAB_DB_DSN" down
+    migrate -path ./migrations -database "$IMAGELAB_DB_DSN" up
+    @echo "{{ ECHO_PREFIX }} Cleaning up..."
+    rm -rf ./bin
+    rm -rf ./storage
+
 # ==================================================================================== #
 # DATABASE MIGRATIONS
 # ==================================================================================== #
