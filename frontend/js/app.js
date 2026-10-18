@@ -55,6 +55,7 @@ emitter.on("upload:selected", ({ file, previewURL, metadata }) => {
 
 // upload:validation_error is triggered when client-side validation fails (size, format).
 emitter.on("upload:validation_error", (errorMessage) => {
+  resetState();
   state.upload.error = errorMessage;
 
   // Step Progress: Upload Accepted --> failed
