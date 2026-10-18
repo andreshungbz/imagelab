@@ -65,6 +65,12 @@
   border-bottom: 1px dashed var(--color-border-accent, #e5e7eb);
 }
 
+.meta-items-group {
+  display: flex;
+  align-items: center;
+  gap: var(--space-6);
+}
+
 .text-right {
   text-align: right;
 }

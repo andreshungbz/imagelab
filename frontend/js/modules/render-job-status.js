@@ -92,19 +92,21 @@ export function renderJobStatus() {
       </div>
 
       <div class="job-meta-subrow">
-        <div class="meta-item">
-          <span>Observed Version</span>
-          <strong>${escapeHTML(String(version || 0))}</strong>
+        <div class="meta-items-group">
+          <div class="meta-item">
+            <span>Observed Version</span>
+            <strong>${escapeHTML(String(version || 0))}</strong>
+          </div>
+          ${
+            simulatedProgress > 0
+              ? `
+            <div class="meta-item">
+              <span>Simulated Progress</span>
+              <strong>${simulatedProgress}</strong>
+            </div>`
+              : ""
+          }
         </div>
-        ${
-          simulatedProgress > 0 && status === "processing"
-            ? `
-          <div class="meta-item text-right">
-            <span>Simulated Progress</span>
-            <strong>${simulatedProgress}</strong>
-          </div>`
-            : ""
-        }
       </div>
 
       <div class="job-progress">
