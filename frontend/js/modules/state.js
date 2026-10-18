@@ -23,6 +23,11 @@ export const state = {
     statusURL: "",
     error: null,
 
+    pollingMode: "short", // 'short' | 'long'
+    version: 0,
+    simulatedProgress: 0,
+    observationToken: 0,
+
     // Progress steps
     progress: {
       uploadAccepted: {
@@ -88,6 +93,9 @@ export function resetState() {
     state.job.abortController = null;
   }
 
+  // Invalidate any in-flight observation loops.
+  state.job.observationToken += 1;
+
   // Reset Upload Section.
   state.upload.file = null;
   state.upload.previewURL = null;
@@ -107,6 +115,8 @@ export function resetState() {
   state.job.status = "";
   state.job.statusURL = "";
   state.job.error = null;
+  state.job.version = 0;
+  state.job.simulatedProgress = 0;
   state.job.isPolling = false;
   state.job.pollTimerID = null;
   state.job.networkErrorCount = 0;
