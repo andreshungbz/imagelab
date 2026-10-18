@@ -151,6 +151,16 @@ test/image-process-delay-3s:
 		-consumer-id=${CONSUMER_ID} \
 		-test-individual-image-process-delay=3s
 
+.PHONY: test/image-process-delay-3s-simulated-worker-failure
+test/image-process-delay-3s-simulated-worker-failure:
+	go run ./cmd/api \
+		-db-dsn=${IMAGELAB_DB_DSN} \
+		-port=${PORT} \
+		-cors-trusted-origins=${CORS_TRUSTED_ORIGINS} \
+		-consumer-id=${CONSUMER_ID} \
+		-test-individual-image-process-delay=3s \
+		-test-simulated-worker-failure=true
+
 # ==================================================================================== #
 # MEASUREMENTS
 # ==================================================================================== #

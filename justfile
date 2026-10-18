@@ -112,7 +112,7 @@ build-api:
 # TESTS
 # ==================================================================================== #
 
-# Run the API server with a 3s image process delay
+# Run the API server with a 3s worker start delay
 test-delay-3s:
     go run ./cmd/api \
       -db-dsn="$IMAGELAB_DB_DSN" \
@@ -121,7 +121,7 @@ test-delay-3s:
       -consumer-id="$CONSUMER_ID" \
       -test-job-start-delay=3s
 
-# Run the API server with a 3s image process delay and simulated worker failure
+# Run the API server with a 3s worker start delay and simulated worker failure
 test-delay-3s-simulated-worker-failure:
     go run ./cmd/api \
       -db-dsn="$IMAGELAB_DB_DSN" \
@@ -138,6 +138,16 @@ test-image-process-delay-3s:
       -port="$PORT" \
       -cors-trusted-origins="$CORS_TRUSTED_ORIGINS" \
       -consumer-id="$CONSUMER_ID" \
+      -test-individual-image-process-delay=3s
+
+# Run the API server with a 3s image process delay and simulated worker failure
+test-image-process-delay-3s-simulated-worker-failure:
+    go run ./cmd/api \
+      -db-dsn="$IMAGELAB_DB_DSN" \
+      -port="$PORT" \
+      -cors-trusted-origins="$CORS_TRUSTED_ORIGINS" \
+      -consumer-id="$CONSUMER_ID" \
+      -test-simulated-worker-failure=true \
       -test-individual-image-process-delay=3s
 
 # ==================================================================================== #
