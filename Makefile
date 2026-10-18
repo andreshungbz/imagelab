@@ -182,6 +182,7 @@ exp/cond-a:
 		-db-dsn=${IMAGELAB_DB_DSN} \
 		-port=${PORT} \
 		-cors-trusted-origins=${CORS_TRUSTED_ORIGINS} \
+		-test-individual-image-process-delay=3s \
 		-consumer-id=${CONSUMER_ID} \
 		-exp-quiet-delay-enabled=true \
 		-exp-quiet-delay-duration=30s
@@ -193,7 +194,8 @@ exp/cond-b:
 		-db-dsn=${IMAGELAB_DB_DSN} \
 		-port=${PORT} \
 		-cors-trusted-origins=${CORS_TRUSTED_ORIGINS} \
-		-consumer-id=${CONSUMER_ID}
+		-consumer-id=${CONSUMER_ID} \
+		-test-individual-image-process-delay=3s
 
 # Run Condition C1: Slow simulated updates (Updates every 2s for 10s)
 .PHONY: exp/cond-c1
@@ -203,6 +205,7 @@ exp/cond-c1:
 		-port=${PORT} \
 		-cors-trusted-origins=${CORS_TRUSTED_ORIGINS} \
 		-consumer-id=${CONSUMER_ID} \
+		-test-individual-image-process-delay=3s \
 		-exp-simulation-phase-enabled=true \
 		-exp-simulation-interval=2s \
 		-exp-simulation-total-duration=10s
@@ -215,6 +218,7 @@ exp/cond-c2:
 		-port=${PORT} \
 		-cors-trusted-origins=${CORS_TRUSTED_ORIGINS} \
 		-consumer-id=${CONSUMER_ID} \
+		-test-individual-image-process-delay=3s \
 		-exp-simulation-phase-enabled=true \
 		-exp-simulation-interval=200ms \
 		-exp-simulation-total-duration=10s
