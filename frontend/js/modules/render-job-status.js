@@ -94,7 +94,7 @@ export function renderJobStatus() {
       <div class="job-meta-subrow">
         <div class="meta-items-group">
           <div class="meta-item">
-            <span>Observed Version</span>
+            <span>Last Observed Version</span>
             <strong>${escapeHTML(String(version || 0))}</strong>
           </div>
           ${
