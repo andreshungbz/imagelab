@@ -71,6 +71,26 @@ export function renderJobStatus() {
       ["completed", "Complete"],
     ];
 
+    // Dynamically calculate variant progress using total variants count.
+    const completedVariantsCount = state.results.image_variants
+      ? state.results.image_variants.length
+      : 0;
+    const targetVariantsTotal =
+      state.results.targetTotal || Math.max(completedVariantsCount, 3);
+    const calculatedPercentage =
+      status === "completed"
+        ? 100
+        : Math.min(
+            100,
+            Math.round((completedVariantsCount / targetVariantsTotal) * 100),
+          );
+
+    // Determine if animated pulse shimmer should be active.
+    const isActivelyProcessing =
+      status === "processing" ||
+      status === "queued" ||
+      state.upload.isSubmitting;
+
     // Check Status acts as "Try Again" when an error is present.
     // Disable ONLY while actively polling without errors, queuing, or in terminal states.
     const isButtonDisabled =
@@ -106,6 +126,19 @@ export function renderJobStatus() {
             </div>`
               : ""
           }
+        </div>
+      </div>
+
+      <div class="variant-progress-container">
+        <div class="variant-progress-header">
+          <span>Variant Generation Progress</span>
+          <span class="variant-progress-count">${completedVariantsCount} / ${targetVariantsTotal} variants (${calculatedPercentage}%)</span>
+        </div>
+        <div class="variant-progress-bar" role="progressbar" aria-valuenow="${calculatedPercentage}" aria-valuemin="0" aria-valuemax="100">
+          <div className="variant-progress-fill ${isActivelyProcessing ? "is-animating" : ""}"
+            class="variant-progress-fill ${isActivelyProcessing ? "is-animating" : ""}" 
+            style="width: ${calculatedPercentage}%">
+          </div>
         </div>
       </div>
 
