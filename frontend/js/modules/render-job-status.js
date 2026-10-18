@@ -31,9 +31,9 @@ export function renderJobStatus() {
   const hasJob =
     Boolean(publicID) || isUploading || status === "failed" || hasFailedStep;
 
-  // Calculate variant progress.
+  // Calculate variant progress based strictly on completed local variant blobs.
   const completedVariantsCount = state.results.image_variants
-    ? state.results.image_variants.length
+    ? state.results.image_variants.filter((v) => Boolean(v.localURL)).length
     : 0;
   const targetVariantsTotal =
     state.results.targetTotal || Math.max(completedVariantsCount, 3);
@@ -125,7 +125,7 @@ export function renderJobStatus() {
       versionEl.textContent = escapeHTML(String(version || 0));
     }
 
-    // 5. Update Variant Progress Bar & Percentage.
+    // 5. Update Variant Progress Bar & Percentage based on local variants.
     const countEl = container.querySelector(".variant-progress-count");
     if (countEl) {
       countEl.textContent = `${completedVariantsCount} / ${targetVariantsTotal} variants (${calculatedPercentage}%)`;
@@ -179,7 +179,7 @@ export function renderJobStatus() {
 
     if (publicID) {
       if (!jobActionsContainer && jobProgressContainer) {
-        // Render actions container if it didn't exist yet
+        // Render actions container if it didn't exist yet.
         const actionsHTML = `
           <div class="job-actions">
             <button type="button" id="btn-check-status" class="btn btn-secondary">
