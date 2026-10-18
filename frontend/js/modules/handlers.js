@@ -82,29 +82,52 @@ export function setupHandlers() {
     }
   });
 
-  // File Input Drag & Drop Handlers
-  imageInputSection.addEventListener("dragover", (e) => {
-    const dropzone = e.target.closest("#dropzone");
+  // Helper to resolve dropzone container across filled and empty preview states.
+  const getDropzoneEl = (target) =>
+    target.closest("#dropzone") ||
+    target.closest(".preview-card") ||
+    imageInputSection;
+
+  // File Input Drag & Drop Handlers (Works on both empty dropzone and populated preview card).
+  imageInputSection.addEventListener("dragenter", (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const dropzone = getDropzoneEl(e.target);
     if (dropzone) {
-      e.preventDefault(); // Enables dropping and drop cursor.
       dropzone.classList.add("drag-active");
     }
   });
-  imageInputSection.addEventListener("dragleave", (e) => {
-    const dropzone = e.target.closest("#dropzone");
+
+  imageInputSection.addEventListener("dragover", (e) => {
+    e.preventDefault(); // Required for drop to work.
+    e.stopPropagation();
+    const dropzone = getDropzoneEl(e.target);
     if (dropzone) {
+      dropzone.classList.add("drag-active");
+    }
+  });
+
+  imageInputSection.addEventListener("dragleave", (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const dropzone = getDropzoneEl(e.target);
+    if (dropzone && !dropzone.contains(e.relatedTarget)) {
       dropzone.classList.remove("drag-active");
     }
   });
-  imageInputSection.addEventListener("drop", (e) => {
-    const dropzone = e.target.closest("#dropzone");
-    if (dropzone) {
-      e.preventDefault(); // Prevent browser from opening file in new tab.
-      dropzone.classList.remove("drag-active");
 
-      if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-        handleFileSelected(e.dataTransfer.files[0]);
-      }
+  imageInputSection.addEventListener("drop", (e) => {
+    e.preventDefault(); // Prevent browser from opening file in new tab.
+    e.stopPropagation();
+
+    const dropzone = getDropzoneEl(e.target);
+    if (dropzone) {
+      dropzone.classList.remove("drag-active");
+    }
+
+    const droppedFiles = e.dataTransfer?.files;
+    if (droppedFiles && droppedFiles.length > 0) {
+      handleFileSelected(droppedFiles[0]);
     }
   });
 

@@ -98,6 +98,16 @@
   content: "·";
 }
 
+#dropzone.drag-active,
+.dropzone-area.drag-active,
+.preview-card.drag-active {
+  border-color: var(--color-primary, #4f46e5);
+  background-color: var(--color-primary-light, #e0e7ff);
+  outline: 2px dashed var(--color-primary, #4f46e5);
+  outline-offset: -4px;
+  transition: all 0.2s ease-in-out;
+}
+
 @media (max-width: 480px) {
   .preview-card {
     grid-template-columns: 1fr;
