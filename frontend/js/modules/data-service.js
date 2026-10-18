@@ -72,7 +72,8 @@ export const DataService = {
     let targetURL = `${API_BASE}${statusURL}`;
     if (state.job.pollingMode === "long") {
       const version = state.job.version || 0;
-      targetURL += `?after=${version}&wait=20`;
+      const waitTime = state.job.longPollWait || 20;
+      targetURL += `?after=${version}&wait=${waitTime}`;
     }
 
     // WAIT-03: Create a 30-second request timeout signal and combine it with the session cancel.

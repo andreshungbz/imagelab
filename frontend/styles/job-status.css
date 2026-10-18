@@ -8,6 +8,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: var(--space-2) var(--space-3);
   margin-bottom: var(--space-4);
 }
 
@@ -300,6 +301,14 @@
 }
 
 @media (max-width: 480px) {
+  .section-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .mode-control {
+    width: 100%;
+    justify-content: flex-start;
+  }
   .job-progress {
     grid-template-columns: 1fr;
   }

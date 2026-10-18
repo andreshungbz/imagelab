@@ -182,6 +182,23 @@ emitter.on("job:mode_change", (newMode) => {
   }
 });
 
+// job:wait_change updates the long polling wait query parameter duration.
+emitter.on("job:wait_change", (newWait) => {
+  if (state.job.longPollWait === newWait) return;
+  state.job.longPollWait = newWait;
+
+  // Restart active observation if long polling is currently active to apply the new wait threshold.
+  if (
+    state.job.pollingMode === "long" &&
+    state.job.publicID &&
+    ["pending", "queued", "processing"].includes(state.job.status)
+  ) {
+    emitter.emit("job:observe_start");
+  } else {
+    render();
+  }
+});
+
 // job:updated is triggered when the backend emits a version or progress update.
 emitter.on("job:updated", (jobData) => {
   resetNetworkState();
@@ -248,7 +265,7 @@ emitter.on("job:completed", (jobData) => {
 });
 
 // job:failed is triggered when the job reaches a terminal failed state on the server.
-emitter.on("job:failed", (errorMessage) => {
+emitter.on("job:failed", (jobData) => {
   stopPollingAndAbort();
 
   if (typeof jobData?.version === "number") {

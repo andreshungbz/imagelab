@@ -12,6 +12,7 @@ export function renderJobStatus() {
     status,
     progress,
     pollingMode,
+    longPollWait,
     version,
     simulatedProgress,
     isPolling,
@@ -41,11 +42,22 @@ export function renderJobStatus() {
   const statusLabel =
     statusClass.charAt(0).toUpperCase() + statusClass.slice(1);
 
-  // Section header with observation mode select.
+  // Section header with observation mode select and conditional wait time select.
   let content = `
     <div class="section-header">
       <h3 id="job-heading">${icon("settings")} Processing Job</h3>
       <div class="mode-control">
+        ${
+          pollingMode === "long"
+            ? `
+          <label for="wait-select" class="sr-only">Wait Duration</label>
+          <select id="wait-select" class="form-select-sm" aria-label="Select long poll wait duration">
+            <option value="20" ${longPollWait === 20 ? "selected" : ""}>Wait 20s</option>
+            <option value="10" ${longPollWait === 10 ? "selected" : ""}>Wait 10s</option>
+            <option value="1" ${longPollWait === 1 ? "selected" : ""}>Wait 1s</option>
+          </select>`
+            : ""
+        }
         <label for="poll-mode-select" class="sr-only">Observation Mode</label>
         <select id="poll-mode-select" class="form-select-sm" aria-label="Select observation mode">
           <option value="short" ${pollingMode === "short" ? "selected" : ""}>Short Polling</option>
@@ -135,8 +147,7 @@ export function renderJobStatus() {
           <span class="variant-progress-count">${completedVariantsCount} / ${targetVariantsTotal} variants (${calculatedPercentage}%)</span>
         </div>
         <div class="variant-progress-bar" role="progressbar" aria-valuenow="${calculatedPercentage}" aria-valuemin="0" aria-valuemax="100">
-          <div className="variant-progress-fill ${isActivelyProcessing ? "is-animating" : ""}"
-            class="variant-progress-fill ${isActivelyProcessing ? "is-animating" : ""}" 
+          <div class="variant-progress-fill ${isActivelyProcessing ? "is-animating" : ""}" 
             style="width: ${calculatedPercentage}%">
           </div>
         </div>

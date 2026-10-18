@@ -132,5 +132,10 @@ export function setupHandlers() {
       const selectedMode = e.target.value;
       emitter.emit("job:mode_change", selectedMode);
     }
+
+    if (e.target.id === "wait-select") {
+      const selectedWait = parseInt(e.target.value, 10);
+      emitter.emit("job:wait_change", selectedWait);
+    }
   });
 }

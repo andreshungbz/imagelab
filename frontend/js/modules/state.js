@@ -51,6 +51,7 @@ export const state = {
     // Polling
     isPolling: false,
     pollingInterval: 1000, // Short polling interval
+    longPollWait: 20,
     pollTimerID: null,
     abortController: null,
 
@@ -117,6 +118,8 @@ export function resetState() {
   state.job.error = null;
   state.job.version = 0;
   state.job.simulatedProgress = 0;
+  state.job.pollingMode = state.job.pollingMode; // Preserve user-selected polling mode
+  state.job.longPollWait = state.job.longPollWait; // Preserve user-selected long poll wait duration
   state.job.isPolling = false;
   state.job.pollTimerID = null;
   state.job.networkErrorCount = 0;
