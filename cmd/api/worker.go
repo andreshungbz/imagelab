@@ -144,14 +144,7 @@ func (app *application) processNextImageJob(ctx context.Context) error {
 	totalVariants := len(imgPayload.Variants)
 	var jobErr error
 	for i, name := range imgPayload.Variants {
-		isLastVariant := (i == totalVariants-1)
-
-		// 1. Intercept simulated worker failure on the last variant BEFORE generating or persisting
-		if isLastVariant && app.config.test_simulated_worker_failure {
-			jobErr = fmt.Errorf("simulated worker error on last variant")
-			break
-		}
-
+		// Apply artificial image process delay if configured.
 		if app.config.test_individual_image_process_delay > 0 {
 			timer := time.NewTimer(app.config.test_individual_image_process_delay)
 			select {
@@ -161,6 +154,13 @@ func (app *application) processNextImageJob(ctx context.Context) error {
 			case <-timer.C:
 				timer.Stop()
 			}
+		}
+
+		// 1. Intercept simulated worker failure on the last variant BEFORE generating or persisting
+		isLastVariant := (i == totalVariants-1)
+		if isLastVariant && app.config.test_simulated_worker_failure {
+			jobErr = fmt.Errorf("simulated worker error on last variant")
+			break
 		}
 
 		// 2. Generate individual variant
