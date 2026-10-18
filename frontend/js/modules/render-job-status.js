@@ -54,12 +54,21 @@ export function renderJobStatus() {
     status === "completed" ||
     status === "failed";
 
+  // Compute clean label for Job ID across uploading, failed, and ready states.
+  const displayJobID = publicID
+    ? escapeHTML(publicID)
+    : isUploading
+      ? "Assigning ID..."
+      : state.upload.error || status === "failed" || hasFailedStep
+        ? "Upload Failed"
+        : "—";
+
   // Check if job status structure is already rendered in the DOM.
   const existingJobMeta = container.querySelector(".job-meta-card");
   const existingSelectMode = container.querySelector("#poll-mode-select");
 
   if (existingJobMeta && existingSelectMode && hasJob) {
-    // Update controls only if mode/wait changed externally.
+    // 1. Update controls only if mode/wait changed externally.
     if (existingSelectMode.value !== pollingMode) {
       existingSelectMode.value = pollingMode;
     }
@@ -87,7 +96,13 @@ export function renderJobStatus() {
       existingWaitSelect.remove();
     }
 
-    // Update status badge.
+    // 2. Update Job ID in DOM if it changed from placeholder to active publicID.
+    const jobIdEl = container.querySelector(".job-meta-card .meta-item strong");
+    if (jobIdEl) {
+      jobIdEl.textContent = displayJobID;
+    }
+
+    // 3. Update status badge.
     const knownStatuses = [
       "pending",
       "queued",
@@ -104,13 +119,13 @@ export function renderJobStatus() {
       badgeEl.innerHTML = `${icon(statusClass === "completed" ? "check" : statusClass === "failed" ? "close" : "clock")} ${state.upload.isSubmitting ? "Uploading" : statusLabel}`;
     }
 
-    // Update Last Observed Version & Simulated Progress.
+    // 4. Update Last Observed Version & Simulated Progress.
     const versionEl = container.querySelector(".job-meta-subrow strong");
     if (versionEl) {
       versionEl.textContent = escapeHTML(String(version || 0));
     }
 
-    // Update Variant Progress Bar & Percentage.
+    // 5. Update Variant Progress Bar & Percentage.
     const countEl = container.querySelector(".variant-progress-count");
     if (countEl) {
       countEl.textContent = `${completedVariantsCount} / ${targetVariantsTotal} variants (${calculatedPercentage}%)`;
@@ -121,7 +136,7 @@ export function renderJobStatus() {
       fillEl.className = `variant-progress-fill ${isActivelyProcessing ? "is-animating" : ""}`;
     }
 
-    // Update Step Items.
+    // 6. Update Step Items.
     const steps = [
       ["uploadAccepted", "Upload Accepted"],
       ["originalStored", "Original Stored"],
@@ -158,7 +173,7 @@ export function renderJobStatus() {
       }
     });
 
-    // Update Actions / Buttons.
+    // 7. Update Actions / Buttons.
     const btnCheck = container.querySelector("#btn-check-status");
     if (btnCheck) {
       btnCheck.disabled = isButtonDisabled;
@@ -224,7 +239,7 @@ export function renderJobStatus() {
       <div class="job-meta-card">
         <div class="meta-item">
           <span>Job ID</span>
-          <strong>${publicID ? escapeHTML(publicID) : "Upload Failed"}</strong>
+          <strong>${displayJobID}</strong>
         </div>
         <span class="badge badge-${statusClass}">
           ${icon(statusClass === "completed" ? "check" : statusClass === "failed" ? "close" : "clock")}
