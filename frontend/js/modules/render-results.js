@@ -94,7 +94,7 @@ export function renderResults() {
         <article class="variant-card variant-${variantStatus}">
           <div class="variant-image-wrapper">
             ${
-              safeURL
+              !isFailed && safeURL
                 ? `<img src="${safeURL}" alt="${isReady ? safeLabel : "Source preview; variant generating..."}" class="img-variant ${!isReady ? "img-preview-faded" : ""}" />`
                 : icon("image")
             }
@@ -118,8 +118,10 @@ export function renderResults() {
                 ? `
               <a href="${safeURL}" download="${safeDownloadName}" target="_blank" rel="noopener noreferrer"
                 class="btn btn-secondary" aria-label="Download ${safeLabel}" title="Download ${safeLabel}">${icon("download")}</a>`
-                : `
+                : !isFailed
+                  ? `
               <button type="button" class="btn btn-secondary" disabled aria-label="${safeLabel} download unavailable">${icon("download")}</button>`
+                  : ""
             }
           </div>
         </article>
