@@ -75,8 +75,14 @@ export const DataService = {
       targetURL += `?after=${version}&wait=20`;
     }
 
+    // WAIT-03: Create a 30-second request timeout signal and combine it with the session cancel.
+    const timeoutSignal = AbortSignal.timeout(30000);
+    const fetchSignal = signal
+      ? AbortSignal.any([signal, timeoutSignal])
+      : timeoutSignal;
+
     try {
-      const res = await fetch(targetURL, { signal });
+      const res = await fetch(targetURL, { signal: fetchSignal });
       if (token !== state.job.observationToken) return; // UI-04
 
       // UI-03: Immediately send another long poll without parsing JSON if HTTP 204 No Content is received.
