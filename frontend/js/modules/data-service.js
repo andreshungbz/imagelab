@@ -64,46 +64,98 @@ export const DataService = {
     }
   },
 
-  // pollJobStatus periodically asks the server for job status updates via short polling.
-  async pollJobStatus(statusURL, signal) {
+  // observeJob conducts job status updates using either short polling or long polling.
+  async observeJob(statusURL, signal, token) {
+    if (token !== state.job.observationToken) return; // UI-04
+
+    // Construct the target URL according to the active observation mode.
+    let targetURL = `${API_BASE}${statusURL}`;
+    if (state.job.pollingMode === "long") {
+      const version = state.job.version || 0;
+      targetURL += `?after=${version}&wait=20`;
+    }
+
     try {
-      // Send a GET request to the particular job's status URL.
-      const res = await fetch(`${API_BASE}${statusURL}`, { signal });
+      const res = await fetch(targetURL, { signal });
+      if (token !== state.job.observationToken) return; // UI-04
+
+      // UI-03: Immediately send another long poll without parsing JSON if HTTP 204 No Content is received.
+      if (res.status === 204) {
+        if (state.job.pollingMode === "long" && state.job.isPolling) {
+          this.observeJob(statusURL, signal, token);
+        }
+        return;
+      }
+
+      // Check non-success HTTP response status (e.g., 400 Bad Request or 500 Server Error).
+      if (!res.ok) {
+        throw new Error(`Server returned status code ${res.status}`);
+      }
+
+      // Parse incoming JSON payload.
       const data = await res.json();
+      if (token !== state.job.observationToken) return; // UI-04
+
       switch (data.status) {
         case "completed":
           emitter.emit("job:completed", data);
           break;
         case "failed":
-          emitter.emit(
-            "job:failed",
-            "The server failed to process your image. Please upload another image and try again.",
-          );
+          emitter.emit("job:failed", data);
           break;
         case "queued":
         case "processing":
         default:
-          // Only emit job:updated if the backend status has actually changed.
-          if (data.status !== state.job.status) {
-            emitter.emit("job:updated", data);
+          // Emit job update event on version change, status change, or progress tick.
+          emitter.emit("job:updated", data);
+
+          // UI-03: Automatically issue the next long poll immediately upon receiving an active 200 OK.
+          if (state.job.pollingMode === "long" && state.job.isPolling) {
+            this.observeJob(statusURL, signal, token);
           }
+          break;
       }
     } catch (err) {
       // Ignore DOMException errors caused by intentional abort calls.
       if (err.name === "AbortError") return;
+      if (token !== state.job.observationToken) return; // UI-04
+
+      // UI-05: Prompt for try again, keeping the current state.
       emitter.emit(
         "job:network_error",
-        "Unable to check status. Click the 'Check Status' button to try again.",
+        "Unable to check status. Click 'Try Again' to retry.",
       );
     }
   },
 
-  // fetchVariantBlobs downloads binary image data for all variants from the server.
+  // fetchSingleVariantBlob downloads binary image data for a single newly generated variant.
+  async fetchSingleVariantBlob(variant) {
+    try {
+      const res = await fetch(`${API_BASE}${variant.url}`);
+      if (!res.ok) {
+        throw new Error(`Failed to load image variant: ${variant.name}`);
+      }
+      const blob = await res.blob();
+      const localURL = URL.createObjectURL(blob);
+
+      emitter.emit("variant:single_fetched", {
+        name: variant.name,
+        localURL,
+      });
+    } catch (err) {
+      emitter.emit("variants:error", err.message);
+    }
+  },
+
+  // fetchVariantBlobs downloads binary image data for all unhydrated variants from the server.
   async fetchVariantBlobs(variants) {
     try {
       // Concurrently fetch each variant's binary data and create local ObjectURLs.
       const variantsWithBlobs = await Promise.all(
         variants.map(async (variant) => {
+          // If blob was already fetched incrementally, preserve existing ObjectURL.
+          if (variant.localURL) return variant;
+
           const res = await fetch(`${API_BASE}${variant.url}`);
           if (!res.ok) {
             throw new Error(`Failed to load image variant: ${variant.name}`);

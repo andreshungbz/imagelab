@@ -9,7 +9,7 @@ import { setupHandlers } from "./modules/handlers.js";
 // HELPER FUNCTIONS
 // ==================================================================================== #
 
-// stopPollingAndAbort stops the polling timer and aborts pending fetch requests.
+// stopPollingAndAbort stops the observation timer and aborts pending fetch requests.
 function stopPollingAndAbort() {
   if (state.job.pollTimerID) {
     clearInterval(state.job.pollTimerID);
@@ -27,6 +27,7 @@ function resetNetworkState() {
   state.job.networkErrorCount = 0;
   state.job.isReconnecting = false;
   state.job.error = null;
+  state.results.error = null; // Ensure results error is cleared during observation retry.
 }
 
 // ==================================================================================== #
@@ -98,7 +99,7 @@ emitter.on("upload:success", (data) => {
   state.job.progress.generatingVariants.status = "active";
 
   render();
-  emitter.emit("job:poll_start");
+  emitter.emit("job:observe_start");
 });
 
 // upload:error is triggered when the initial POST request to upload the image fails.
@@ -129,47 +130,105 @@ emitter.on("upload:error", (errorPayload) => {
 });
 
 // ==================================================================================== #
-// JOB POLLING & STEP PROGRESSION EVENTS
+// JOB OBSERVATION & STEP PROGRESSION EVENTS
 // ==================================================================================== #
 
-// job:poll_start is triggered after the 202 Accepted was received for a job or manual check.
-emitter.on("job:poll_start", () => {
+// job:observe_start starts job status observation using the currently selected polling mode.
+emitter.on("job:observe_start", () => {
   stopPollingAndAbort();
   resetNetworkState();
 
-  // Create a new AbortController instance for this polling session.
+  // UI-04: Increment observation token to invalidate any previous/stale async calls.
+  state.job.observationToken += 1;
+  const token = state.job.observationToken;
+
+  // Create AbortController instance for this observation session.
   state.job.abortController = new AbortController();
   const signal = state.job.abortController.signal;
 
-  // Set polling flag.
+  // Set active observation flag.
   state.job.isPolling = true;
 
-  // Trigger immediate initial check before setting up interval.
-  DataService.pollJobStatus(state.job.statusURL, signal);
+  // Dispatch initial observation request immediately for both modes.
+  DataService.observeJob(state.job.statusURL, signal, token);
 
-  // Periodically check for job status updates on the server.
-  state.job.pollTimerID = setInterval(() => {
-    DataService.pollJobStatus(state.job.statusURL, signal);
-  }, state.job.pollingInterval);
+  // Short polling mode schedules recurring timer checks every 1000ms.
+  if (state.job.pollingMode === "short") {
+    state.job.pollTimerID = setInterval(() => {
+      DataService.observeJob(state.job.statusURL, signal, token);
+    }, state.job.pollingInterval);
+  }
 });
 
-// job:poll_stop is triggered when user manually cancels polling via the cancel link.
-emitter.on("job:poll_stop", () => {
+// job:observe_stop is triggered when user cancels status checking.
+emitter.on("job:observe_stop", () => {
   stopPollingAndAbort();
   render();
 });
 
-// job:updated is triggered when the job moves from queued to processing status.
+// job:mode_change toggles between Short Polling and Long Polling (U1-01).
+emitter.on("job:mode_change", (newMode) => {
+  if (state.job.pollingMode === newMode) return;
+  state.job.pollingMode = newMode;
+
+  // UI-04: If job observation is active, restart observation in the new mode without re-submitting an image.
+  if (
+    state.job.publicID &&
+    ["pending", "queued", "processing"].includes(state.job.status)
+  ) {
+    emitter.emit("job:observe_start");
+  } else {
+    render();
+  }
+});
+
+// job:updated is triggered when the backend emits a version or progress update.
 emitter.on("job:updated", (jobData) => {
   resetNetworkState();
+
+  // Save latest version snapshot and simulation progress step (UI-02: Saving initial snapshot).
+  if (typeof jobData.version === "number") {
+    state.job.version = jobData.version;
+  }
+  if (typeof jobData.simulated_progress === "number") {
+    state.job.simulatedProgress = jobData.simulated_progress;
+  }
+
   state.job.status = jobData.status;
+
+  // PROG-03: Process intermediate image variants incrementally.
+  const incomingVariants = jobData.result || jobData.variants;
+  if (Array.isArray(incomingVariants) && incomingVariants.length > 0) {
+    incomingVariants.forEach((incoming) => {
+      const existing = state.results.image_variants.find(
+        (v) => v.name === incoming.name,
+      );
+
+      if (!existing) {
+        // New variant completed: store entry and trigger binary blob fetch.
+        state.results.image_variants.push({ ...incoming });
+        DataService.fetchSingleVariantBlob(incoming);
+      } else if (!existing.localURL) {
+        // Existing variant missing blob: trigger binary blob fetch.
+        DataService.fetchSingleVariantBlob(incoming);
+      }
+    });
+  }
+
   render();
 });
 
-// job:completed is triggered when the job has successfully completed.
+// job:completed is triggered when the job reaches a terminal completed state.
 emitter.on("job:completed", (jobData) => {
   stopPollingAndAbort();
   resetNetworkState();
+
+  if (typeof jobData.version === "number") {
+    state.job.version = jobData.version;
+  }
+  if (typeof jobData.simulated_progress === "number") {
+    state.job.simulatedProgress = jobData.simulated_progress;
+  }
 
   // Step Progress: Generating Variants --> completed, Completed --> completed
   const now = new Date().toLocaleTimeString();
@@ -180,18 +239,29 @@ emitter.on("job:completed", (jobData) => {
   state.job.status = "completed";
 
   render();
-  if (jobData.variants && jobData.variants.length > 0) {
-    DataService.fetchVariantBlobs(jobData.variants);
+
+  // Hydrate any remaining un-fetched variant binary blobs.
+  const variants = jobData.result || jobData.variants;
+  if (Array.isArray(variants) && variants.length > 0) {
+    DataService.fetchVariantBlobs(variants);
   }
 });
 
-// job:failed is triggered when the job fails on the server.
+// job:failed is triggered when the job reaches a terminal failed state on the server.
 emitter.on("job:failed", (errorMessage) => {
   stopPollingAndAbort();
 
+  if (typeof jobData?.version === "number") {
+    state.job.version = jobData.version;
+  }
+  if (typeof jobData?.simulated_progress === "number") {
+    state.job.simulatedProgress = jobData.simulated_progress;
+  }
+
   // Populate job state with failure details.
   state.job.status = "failed";
-  state.job.error = errorMessage;
+  state.job.error =
+    "The server failed to process your image. Please upload another image and try again.";
 
   // Step Progress: Generating Variants --> failed
   state.job.progress.generatingVariants.status = "failed";
@@ -199,14 +269,21 @@ emitter.on("job:failed", (errorMessage) => {
   render();
 });
 
-// job:network_error is triggered when polling fails due to network issues.
+// job:network_error is triggered when observation encounters network or HTTP retrieval errors (UI-05).
 emitter.on("job:network_error", (errorMessage) => {
-  // Increment network error count and set reconnecting flag.
-  state.job.networkErrorCount += 1;
-  state.job.isReconnecting = true;
+  state.results.error = null; // Clear collateral variant errors.
 
-  // Halt polling and notify user only after exceeding maximum network retries.
-  if (state.job.networkErrorCount >= state.job.maxNetworkRetries) {
+  if (state.job.pollingMode === "short") {
+    // Short polling uses transient retry counter.
+    state.job.networkErrorCount += 1;
+    state.job.isReconnecting = true;
+
+    if (state.job.networkErrorCount >= state.job.maxNetworkRetries) {
+      stopPollingAndAbort();
+      state.job.error = errorMessage;
+    }
+  } else {
+    // Long polling halts immediately on network error to avoid server loops.
     stopPollingAndAbort();
     state.job.error = errorMessage;
   }
@@ -217,6 +294,15 @@ emitter.on("job:network_error", (errorMessage) => {
 // ==================================================================================== #
 // IMAGE VARIANTS RESULTS EVENTS
 // ==================================================================================== #
+
+// variant:single_fetched is triggered when an individual variant blob finishes loading.
+emitter.on("variant:single_fetched", ({ name, localURL }) => {
+  const variant = state.results.image_variants.find((v) => v.name === name);
+  if (variant) {
+    variant.localURL = localURL;
+    render();
+  }
+});
 
 // variants:fetched is triggered when binary image blobs are loaded and converted to local ObjectURLs.
 emitter.on("variants:fetched", (variantsWithBlobs) => {
@@ -235,7 +321,7 @@ emitter.on("variants:error", (errorMessage) => {
 // PAGE LIFECYCLE & APP INITIALIZATION
 // ==================================================================================== #
 
-// Abort active polling when the page unloads or navigates away.
+// Abort active observation when the page unloads or navigates away.
 window.addEventListener("beforeunload", () => {
   stopPollingAndAbort();
 });

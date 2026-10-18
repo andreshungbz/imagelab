@@ -2,7 +2,7 @@ import { state } from "./state.js";
 import { escapeHTML, getStepStatusIcon } from "./helpers.js";
 import { icon } from "./icons.js";
 
-// renderJobStatus generates the HTML for the job status section.
+// renderJobStatus generates the HTML for the job status section supporting Short/Long polling controls.
 export function renderJobStatus() {
   // Get the container element and necessary state values.
   const container = document.querySelector("#job-status");
@@ -11,6 +11,9 @@ export function renderJobStatus() {
     publicID,
     status,
     progress,
+    pollingMode,
+    version,
+    simulatedProgress,
     isPolling,
     isReconnecting,
     networkErrorCount,
@@ -38,10 +41,17 @@ export function renderJobStatus() {
   const statusLabel =
     statusClass.charAt(0).toUpperCase() + statusClass.slice(1);
 
-  // Initial section header..
+  // Section header with observation mode select.
   let content = `
     <div class="section-header">
       <h3 id="job-heading">${icon("settings")} Processing Job</h3>
+      <div class="mode-control">
+        <label for="poll-mode-select" class="sr-only">Observation Mode</label>
+        <select id="poll-mode-select" class="form-select-sm" aria-label="Select observation mode">
+          <option value="short" ${pollingMode === "short" ? "selected" : ""}>Short Polling</option>
+          <option value="long" ${pollingMode === "long" ? "selected" : ""}>Long Polling</option>
+        </select>
+      </div>
     </div>`;
 
   // If there is no active job, display an empty state message.
@@ -61,12 +71,14 @@ export function renderJobStatus() {
       ["completed", "Complete"],
     ];
 
-    // Disable the Check Status button while polling, queuing, or in terminal states.
+    // Check Status acts as "Try Again" when an error is present.
+    // Disable ONLY while actively polling without errors, queuing, or in terminal states.
     const isButtonDisabled =
-      isPolling ||
+      (isPolling && !error) ||
       status === "queued" ||
       status === "completed" ||
       status === "failed";
+
     content += `
       <div class="job-meta-card">
         <div class="meta-item">
@@ -78,6 +90,23 @@ export function renderJobStatus() {
           ${state.upload.isSubmitting ? "Uploading" : statusLabel}
         </span>
       </div>
+
+      <div class="job-meta-subrow">
+        <div class="meta-item">
+          <span>Observed Version</span>
+          <strong>${escapeHTML(String(version || 0))}</strong>
+        </div>
+        ${
+          simulatedProgress > 0 && status === "processing"
+            ? `
+          <div class="meta-item text-right">
+            <span>Simulated Progress</span>
+            <strong>${simulatedProgress}</strong>
+          </div>`
+            : ""
+        }
+      </div>
+
       <div class="job-progress">
         <ol class="job-steps-list">
           ${steps
@@ -110,19 +139,21 @@ export function renderJobStatus() {
             .join("")}
         </ol>
         ${
-          // If a publicID exists, show the "Check status" button. Otherwise, don't show it.
+          // If a publicID exists, show the "Check Status" button. Otherwise, don't show it.
           publicID
             ? `
           <div class="job-actions">
             <button type="button" id="btn-check-status" class="btn btn-secondary"
               ${isButtonDisabled ? "disabled" : ""}>
-              ${icon("refresh")} ${isPolling ? "Checking..." : "Check Status"}
+              ${icon("refresh")} ${isPolling && !error ? "Checking..." : error ? "Try Again" : "Check Status"}
             </button>
-            <p>
+            <p class="${error ? "text-danger" : ""}">
               ${
-                isPolling
-                  ? `Status updates automatically. <button type="button" id="btn-cancel-polling" class="btn-link">Cancel</button>`
-                  : "Check for the latest job status."
+                error
+                  ? escapeHTML(error)
+                  : isPolling
+                    ? `<button type="button" id="btn-cancel-polling" class="btn-link">Cancel</button>`
+                    : `Click to check status.`
               }
             </p>
           </div>`
@@ -134,11 +165,6 @@ export function renderJobStatus() {
   // Network Reconnecting Indicator
   if (isReconnecting && networkErrorCount < maxNetworkRetries) {
     content += `<div class="job-status-warning">We're having connection issues. Retrying (${networkErrorCount}/${maxNetworkRetries})...</div>`;
-  }
-
-  // Job Level Error Display
-  if (error) {
-    content += `<div class="job-status-error" role="alert"><strong>Error:</strong> ${escapeHTML(error)}</div>`;
   }
 
   // Convert the content string to DOM elements and replace the container's children.

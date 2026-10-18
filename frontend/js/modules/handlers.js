@@ -9,7 +9,7 @@ function handleFileSelected(file) {
   if (!ALLOWED_TYPES.includes(file.type.toLowerCase())) {
     emitter.emit(
       "upload:validation_error",
-      "Your image file format is not a supported. Please upload a JPEG or PNG image.",
+      "Your image file format is not supported. Please upload a JPEG or PNG image.",
     );
     return;
   }
@@ -99,7 +99,7 @@ export function setupHandlers() {
   imageInputSection.addEventListener("drop", (e) => {
     const dropzone = e.target.closest("#dropzone");
     if (dropzone) {
-      e.preventDefault(); // Prevent the browser from opening the file in a new tab.
+      e.preventDefault(); // Prevent browser from opening file in new tab.
       dropzone.classList.remove("drag-active");
 
       if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
@@ -112,14 +112,25 @@ export function setupHandlers() {
 
   // Job Status Action Buttons Handler
   jobStatusSection.addEventListener("click", (e) => {
-    // Manually Start Polling Button Handler
-    if (e.target.closest("#btn-check-status")) {
-      emitter.emit("job:poll_start");
+    // Manually Start / Retry Observation Handler
+    if (
+      e.target.closest("#btn-check-status") ||
+      e.target.closest("#btn-try-again")
+    ) {
+      emitter.emit("job:observe_start");
     }
 
-    // Cancel Polling Link Handler
+    // Cancel Observation Link Handler
     if (e.target.closest("#btn-cancel-polling")) {
-      emitter.emit("job:poll_stop");
+      emitter.emit("job:observe_stop");
+    }
+  });
+
+  // Polling Mode Change Handler (UI-01)
+  jobStatusSection.addEventListener("change", (e) => {
+    if (e.target.id === "poll-mode-select") {
+      const selectedMode = e.target.value;
+      emitter.emit("job:mode_change", selectedMode);
     }
   });
 }
