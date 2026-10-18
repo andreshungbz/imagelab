@@ -125,6 +125,26 @@ export function renderJobStatus() {
       versionEl.textContent = escapeHTML(String(version || 0));
     }
 
+    const metaItemsGroup = container.querySelector(".meta-items-group");
+    let simulatedEl = container.querySelector("[data-simulated-progress]");
+
+    if (simulatedProgress > 0) {
+      if (simulatedEl) {
+        const valEl = simulatedEl.querySelector("strong");
+        if (valEl) valEl.textContent = String(simulatedProgress);
+      } else if (metaItemsGroup) {
+        metaItemsGroup.insertAdjacentHTML(
+          "beforeend",
+          `<div class="meta-item" data-simulated-progress>
+            <span>Simulated Progress</span>
+            <strong>${simulatedProgress}</strong>
+          </div>`,
+        );
+      }
+    } else if (simulatedEl) {
+      simulatedEl.remove();
+    }
+
     // 5. Update Variant Progress Bar & Percentage based on local variants.
     const countEl = container.querySelector(".variant-progress-count");
     if (countEl) {
@@ -303,7 +323,7 @@ export function renderJobStatus() {
           ${
             simulatedProgress > 0
               ? `
-            <div class="meta-item">
+            <div class="meta-item" data-simulated-progress>
               <span>Simulated Progress</span>
               <strong>${simulatedProgress}</strong>
             </div>`
