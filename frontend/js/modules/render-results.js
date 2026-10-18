@@ -17,29 +17,32 @@ export function renderResults() {
     Boolean(state.job.publicID) &&
     ["pending", "queued", "processing"].includes(state.job.status);
 
+  // Determine if the job failed.
+  const isFailedJob = state.job.status === "failed";
+
   // Build the list of variant items to display.
   let displayedVariants = [];
 
   if (variants.length > 0) {
-    // Render existing state variants, plus placeholders for uncompleted expected variants if still processing.
+    // Render existing state variants, plus placeholders for uncompleted expected variants if still processing or failed.
     displayedVariants = [...variants];
 
-    if (isProcessing) {
+    if (isProcessing || isFailedJob) {
       EXPECTED_VARIANTS.forEach((expectedName) => {
         const exists = variants.some((v) => v.name === expectedName);
         if (!exists) {
           displayedVariants.push({
             name: expectedName,
-            status: "pending",
+            status: isFailedJob ? "failed" : "pending",
           });
         }
       });
     }
-  } else if (isProcessing) {
-    // Job is active but no intermediate variants have arrived yet; show placeholders.
+  } else if (isProcessing || isFailedJob) {
+    // Job is active/failed but no intermediate variants arrived; show placeholders.
     displayedVariants = EXPECTED_VARIANTS.map((name) => ({
       name,
-      status: "pending",
+      status: isFailedJob ? "failed" : "pending",
     }));
   }
 
@@ -72,7 +75,7 @@ export function renderResults() {
 
       // Variant Ready / Failed Status (PROG-03)
       const isReady = Boolean(variant.localURL);
-      const isFailed = variant.status === "failed";
+      const isFailed = variant.status === "failed" || (isFailedJob && !isReady);
       const variantStatus = isReady ? "ready" : isFailed ? "failed" : "pending";
       const safeURL = escapeHTML(
         isReady ? displayURL : state.upload.previewURL || "",

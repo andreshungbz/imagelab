@@ -86,7 +86,7 @@ func (app *application) processNextImageJob(ctx context.Context) error {
 				simStep++
 
 				// EXP-02: Persist simulated progress step and increment version in DB.
-				if err := app.models.Jobs.UpdateSimulatedProgress(ctx, job.ID, simStep); err != nil {
+				if err = app.models.Jobs.UpdateSimulatedProgress(ctx, job.ID, simStep); err != nil {
 					return fmt.Errorf("failed to update simulated progress: %w", err)
 				}
 
@@ -142,25 +142,35 @@ func (app *application) processNextImageJob(ctx context.Context) error {
 	// Generate image variants and update job progress after each variant is processed.
 	results := make([]variantResult, 0, len(imgPayload.Variants))
 	totalVariants := len(imgPayload.Variants)
+	var jobErr error
 	for i, name := range imgPayload.Variants {
-		// Apply artificial individual image variant process delay if configured.
-		if app.config.test_individual_image_process_delay > 0 {
-			timer := time.NewTimer(app.config.test_individual_image_process_delay)
-			defer timer.Stop()
-			select {
-			case <-ctx.Done():
-				return ctx.Err()
-			case <-timer.C:
-			}
-		}
+		isLastVariant := (i == totalVariants-1)
 
-		// Generate the individual variant.
-		v, err := app.models.ImageVariants.GenerateVariant(imgPayload.ImageID, imgPayload.SourcePath, name)
-		if err != nil {
+		// 1. Intercept simulated worker failure on the last variant BEFORE generating or persisting
+		if isLastVariant && app.config.test_simulated_worker_failure {
+			jobErr = fmt.Errorf("simulated worker error on last variant")
 			break
 		}
 
-		// Construct the variant result entry and append it to the results slice.
+		if app.config.test_individual_image_process_delay > 0 {
+			timer := time.NewTimer(app.config.test_individual_image_process_delay)
+			select {
+			case <-ctx.Done():
+				timer.Stop()
+				return ctx.Err()
+			case <-timer.C:
+				timer.Stop()
+			}
+		}
+
+		// 2. Generate individual variant
+		var v *data.ImageVariant
+		v, jobErr = app.models.ImageVariants.GenerateVariant(imgPayload.ImageID, imgPayload.SourcePath, name)
+		if jobErr != nil {
+			break
+		}
+
+		// 3. Construct result struct and append to intermediate results
 		result := variantResult{
 			Name:   v.Name,
 			Width:  v.Width,
@@ -171,21 +181,19 @@ func (app *application) processNextImageJob(ctx context.Context) error {
 
 		// Update job's result JSON field in the database.
 		stageName := fmt.Sprintf("%s_ready", name)
-		isLastVariant := (i == totalVariants-1)
-		variantJSON, marshalErr := json.Marshal(result)
-		if marshalErr != nil {
-			err = marshalErr
+		var variantJSON []byte
+		variantJSON, jobErr = json.Marshal(result)
+		if jobErr != nil {
 			break
 		}
 		if isLastVariant {
 			// Job Completion
-			// PROG-02: The last variant milestone shares one transaction with the completed status.
-			if err = app.models.Jobs.MarkCompletedWithProgress(ctx, job.ID, stageName, len(results), variantJSON); err != nil {
+			if jobErr = app.models.Jobs.MarkCompletedWithProgress(ctx, job.ID, stageName, len(results), variantJSON); jobErr != nil {
 				break
 			}
 		} else {
-			// Intermediate progress milestone update.
-			if err = app.models.Jobs.UpdateProgress(ctx, job.ID, stageName, len(results), variantJSON); err != nil {
+			// Intermediate progress milestone update
+			if jobErr = app.models.Jobs.UpdateProgress(ctx, job.ID, stageName, len(results), variantJSON); jobErr != nil {
 				break
 			}
 		}
@@ -194,26 +202,21 @@ func (app *application) processNextImageJob(ctx context.Context) error {
 		job.Version++
 		job.Stage = stageName
 		job.VariantsCompleted = len(results)
-		job.Result, err = json.Marshal(results)
-		if err != nil {
+		job.Result, jobErr = json.Marshal(results)
+		if jobErr != nil {
 			break
 		}
 	}
 
-	// Apply worker failure simulation if configured.
-	if app.config.test_simulated_worker_failure {
-		err = fmt.Errorf("simulated worker error")
-	}
-
 	// Job Failure
-	// PROG-03: Mark job failed in DB while preserving existing variants and DB progress.
-	if err != nil {
+	// PROG-03: Mark job failed in DB while keeping all previously generated variants
+	if jobErr != nil {
 		// Update in-memory struct state.
 		job.Status = "failed"
 		job.Version++
 
-		app.logger.Info("image job failed", "job_id", job.PublicID, "error", err)
-		return app.models.Jobs.MarkFailed(ctx, job.ID, err.Error())
+		app.logger.Info("image job failed", "job_id", job.PublicID, "error", jobErr)
+		return app.models.Jobs.MarkFailed(ctx, job.ID, jobErr.Error())
 	}
 
 	app.logger.Info("image job completed", "job_id", job.PublicID)

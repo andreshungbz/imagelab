@@ -284,6 +284,12 @@ emitter.on("job:failed", (jobData) => {
   state.job.progress.generatingVariants.status = "failed";
 
   render();
+
+  // Hydrate any remaining un-fetched variant binary blobs.
+  const variants = jobData.result || jobData.variants;
+  if (Array.isArray(variants) && variants.length > 0) {
+    DataService.fetchVariantBlobs(variants);
+  }
 });
 
 // job:network_error is triggered when observation encounters network or HTTP retrieval errors (UI-05).
