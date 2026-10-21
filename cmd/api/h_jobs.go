@@ -30,6 +30,7 @@ func (app *application) getImageJobHandler(w http.ResponseWriter, r *http.Reques
 		app.serverErrorResponse(w, r, err)
 		return
 	}
+	app.recordJobObservation(jobID)
 
 	// Parse and validate "after" and "wait" query parameters.
 	lpParams, err := app.readLongPollingParams(r.URL.Query())
@@ -40,24 +41,28 @@ func (app *application) getImageJobHandler(w http.ResponseWriter, r *http.Reques
 
 	// SHORT POLLING (API-01): Perform short polling when there is no "after" query parameter.
 	if !lpParams.hasAfter {
+		app.checkAndLogTerminal(job)
 		app.writeJobSnapshotResponse(w, r, job)
 		return
 	}
 
 	// LONG POLLING (API-02): If "after" exceeds current version, return a 400 Bad Request.
 	if lpParams.after > job.Version {
+		app.checkAndLogTerminal(job)
 		app.badRequestResponse(w, r, errors.New("'after' parameter exceeds current job version"))
 		return
 	}
 
 	// LONG POLLING (API-02): If the job status is terminal (completed/failed), return a 200 OK with the job snapshot.
 	if job.Terminal() {
+		app.checkAndLogTerminal(job)
 		app.writeJobSnapshotResponse(w, r, job)
 		return
 	}
 
 	// LONG POLLING (API-02): If the current job version is greater than the "after" parameter, return a 200 OK with the job snapshot.
 	if job.Version > lpParams.after {
+		app.checkAndLogTerminal(job)
 		app.writeJobSnapshotResponse(w, r, job)
 		return
 	}
@@ -94,7 +99,10 @@ func (app *application) getImageJobHandler(w http.ResponseWriter, r *http.Reques
 				return
 			}
 
+			app.recordJobObservation(jobID)
+
 			if latestJob.Terminal() || latestJob.Version > lpParams.after {
+				app.checkAndLogTerminal(latestJob)
 				app.writeJobSnapshotResponse(w, r, latestJob)
 				return
 			}
@@ -107,7 +115,11 @@ func (app *application) getImageJobHandler(w http.ResponseWriter, r *http.Reques
 				app.serverErrorResponse(w, r, err)
 				return
 			}
+
+			app.recordJobObservation(jobID)
+
 			if latestJob.Terminal() || latestJob.Version > lpParams.after {
+				app.checkAndLogTerminal(latestJob)
 				app.writeJobSnapshotResponse(w, r, latestJob)
 				return
 			}

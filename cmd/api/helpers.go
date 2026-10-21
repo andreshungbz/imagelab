@@ -12,6 +12,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/andreshungbz/imagelab/internal/data"
 	"github.com/google/uuid"
 )
 
@@ -206,4 +207,29 @@ func (app *application) readLongPollingParams(qs map[string][]string) (longPolli
 	}
 
 	return params, nil
+}
+
+// recordJobObservation increments the observation count for a job ID in memory.
+func (app *application) recordJobObservation(jobID string) {
+	app.obsMu.Lock()
+	defer app.obsMu.Unlock()
+	app.obsCounts[jobID]++
+}
+
+// checkAndLogTerminal state checks if a job is terminal.
+func (app *application) checkAndLogTerminal(job *data.Job) {
+	if !job.Terminal() {
+		return
+	}
+
+	app.obsMu.Lock()
+	count := app.obsCounts[job.PublicID]
+	delete(app.obsCounts, job.PublicID) // Clean up map to avoid memory growth.
+	app.obsMu.Unlock()
+
+	app.logger.Info("observation query count",
+		"job_id", job.PublicID,
+		"status", job.Status,
+		"observation_queries", count,
+	)
 }
