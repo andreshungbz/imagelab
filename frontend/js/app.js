@@ -11,9 +11,9 @@ import { setupHandlers } from "./modules/handlers.js";
 
 // stopPollingAndAbort stops the observation timer and aborts pending fetch requests.
 function stopPollingAndAbort() {
-  if (state.job.pollTimerID) {
-    clearInterval(state.job.pollTimerID);
-    state.job.pollTimerID = null;
+  if (state.job.shortPollTimerID) {
+    clearInterval(state.job.shortPollTimerID);
+    state.job.shortPollTimerID = null;
   }
   if (state.job.abortController) {
     state.job.abortController.abort();
@@ -27,7 +27,7 @@ function resetNetworkState() {
   state.job.networkErrorCount = 0;
   state.job.isReconnecting = false;
   state.job.error = null;
-  state.results.error = null; // Ensure results error is cleared during observation retry.
+  state.results.error = null;
 }
 
 // ==================================================================================== #
@@ -43,7 +43,7 @@ emitter.on("upload:selected", ({ file, previewURL, metadata }) => {
   state.upload.previewURL = previewURL;
   state.upload.metadata = metadata;
 
-  // Set initial status text for display
+  // Set initial status text for display.
   state.job.status = "pending";
 
   // Step Progress: Upload Accepted --> completed
@@ -153,11 +153,11 @@ emitter.on("job:observe_start", () => {
   // Dispatch initial observation request immediately for both modes.
   DataService.observeJob(state.job.statusURL, signal, token);
 
-  // Short polling mode schedules recurring timer checks every 1000ms.
+  // Short polling mode schedules recurring timer checks.
   if (state.job.pollingMode === "short") {
-    state.job.pollTimerID = setInterval(() => {
+    state.job.shortPollTimerID = setInterval(() => {
       DataService.observeJob(state.job.statusURL, signal, token);
-    }, state.job.pollingInterval);
+    }, state.job.shortPollInterval);
   }
 });
 
@@ -167,12 +167,12 @@ emitter.on("job:observe_stop", () => {
   render();
 });
 
-// job:mode_change toggles between Short Polling and Long Polling (U1-01).
+// job:mode_change toggles between short polling and long polling (U1-01).
 emitter.on("job:mode_change", (newMode) => {
   if (state.job.pollingMode === newMode) return;
   state.job.pollingMode = newMode;
 
-  // UI-04: If job observation is active, restart observation in the new mode without re-submitting an image.
+  // If job observation is active, restart observation in the new mode without re-submitting an image.
   if (
     state.job.publicID &&
     ["pending", "queued", "processing"].includes(state.job.status)

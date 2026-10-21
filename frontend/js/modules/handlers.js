@@ -133,9 +133,8 @@ export function setupHandlers() {
 
   // JOB STATUS SECTION HANDLERS
 
-  // Job Status Action Buttons Handler
+  // Manually Start / Retry Observation Handler
   jobStatusSection.addEventListener("click", (e) => {
-    // Manually Start / Retry Observation Handler
     if (
       e.target.closest("#btn-check-status") ||
       e.target.closest("#btn-try-again")

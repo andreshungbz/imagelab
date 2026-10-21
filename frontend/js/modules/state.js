@@ -23,11 +23,6 @@ export const state = {
     statusURL: "",
     error: null,
 
-    pollingMode: "short", // 'short' | 'long'
-    version: 0,
-    simulatedProgress: 0,
-    observationToken: 0,
-
     // Progress steps
     progress: {
       uploadAccepted: {
@@ -49,11 +44,15 @@ export const state = {
     },
 
     // Polling
+    pollingMode: "short", // 'short' | 'long'
     isPolling: false,
-    pollingInterval: 1000, // Short polling interval
-    longPollWait: 20,
-    pollTimerID: null,
     abortController: null,
+    version: 0,
+    simulatedProgress: 0,
+    observationToken: 0,
+    shortPollInterval: 1000,
+    shortPollTimerID: null,
+    longPollWait: 20,
 
     // Network
     networkErrorCount: 0,
@@ -86,8 +85,8 @@ export function resetState() {
   }
 
   // Stop polling and abort any pending requests.
-  if (state.job.pollTimerID) {
-    clearInterval(state.job.pollTimerID);
+  if (state.job.shortPollTimerID) {
+    clearInterval(state.job.shortPollTimerID);
   }
   if (state.job.abortController) {
     state.job.abortController.abort();
@@ -118,10 +117,10 @@ export function resetState() {
   state.job.error = null;
   state.job.version = 0;
   state.job.simulatedProgress = 0;
-  state.job.pollingMode = state.job.pollingMode; // Preserve user-selected polling mode
-  state.job.longPollWait = state.job.longPollWait; // Preserve user-selected long poll wait duration
+  state.job.pollingMode = state.job.pollingMode; // Preserve user-selected polling mode.
+  state.job.longPollWait = state.job.longPollWait; // Preserve user-selected long poll wait duration.
   state.job.isPolling = false;
-  state.job.pollTimerID = null;
+  state.job.shortPollTimerID = null;
   state.job.networkErrorCount = 0;
   state.job.isReconnecting = false;
 
