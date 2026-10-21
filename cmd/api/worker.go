@@ -215,10 +215,11 @@ func (app *application) processNextImageJob(ctx context.Context) error {
 		job.Status = "failed"
 		job.Version++
 
-		app.logger.Info("image job failed", "job_id", job.PublicID, "error", jobErr)
-		return app.models.Jobs.MarkFailed(ctx, job.ID, jobErr.Error())
+		err := app.models.Jobs.MarkFailed(ctx, job.ID, jobErr.Error())
+		app.logger.Info("terminal commit (failed)", "job_id", job.PublicID, "error", jobErr)
+		return err
 	}
 
-	app.logger.Info("image job completed", "job_id", job.PublicID)
+	app.logger.Info("terminal commit (completed)", "job_id", job.PublicID)
 	return nil
 }
