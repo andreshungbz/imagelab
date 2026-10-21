@@ -156,21 +156,21 @@ func (app *application) processNextImageJob(ctx context.Context) error {
 			}
 		}
 
-		// 1. Intercept simulated worker failure on the last variant BEFORE generating or persisting
+		// Intercept simulated worker failure on the last variant BEFORE generating or persisting.
 		isLastVariant := (i == totalVariants-1)
 		if isLastVariant && app.config.test_simulated_worker_failure {
 			jobErr = fmt.Errorf("simulated worker error on last variant")
 			break
 		}
 
-		// 2. Generate individual variant
+		// Generate individual variant.
 		var v *data.ImageVariant
 		v, jobErr = app.models.ImageVariants.GenerateVariant(imgPayload.ImageID, imgPayload.SourcePath, name)
 		if jobErr != nil {
 			break
 		}
 
-		// 3. Construct result struct and append to intermediate results
+		// Construct result struct and append to intermediate results.
 		result := variantResult{
 			Name:   v.Name,
 			Width:  v.Width,
