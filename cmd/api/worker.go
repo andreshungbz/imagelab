@@ -202,6 +202,9 @@ func (app *application) processNextImageJob(ctx context.Context) error {
 		job.Version++
 		job.Stage = stageName
 		job.VariantsCompleted = len(results)
+		if isLastVariant {
+			job.Status = "completed"
+		}
 		job.Result, jobErr = json.Marshal(results)
 		if jobErr != nil {
 			break
@@ -216,10 +219,10 @@ func (app *application) processNextImageJob(ctx context.Context) error {
 		job.Version++
 
 		err := app.models.Jobs.MarkFailed(ctx, job.ID, jobErr.Error())
-		app.logger.Info("terminal commit (failed)", "job_id", job.PublicID, "error", jobErr)
+		app.logger.Info("terminal commit", "job_id", job.PublicID, "status", job.Status, "committed version", job.Version, "error", jobErr)
 		return err
 	}
 
-	app.logger.Info("terminal commit (completed)", "job_id", job.PublicID)
+	app.logger.Info("terminal commit", "job_id", job.PublicID, "status", job.Status, "committed version", job.Version)
 	return nil
 }
