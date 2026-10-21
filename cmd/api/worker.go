@@ -128,9 +128,9 @@ func (app *application) processNextImageJob(ctx context.Context) error {
 	// EXP-03: Real Image Variant Generation
 	// ====================================================================================
 
-	// Apply artificial job start delay if configured.
-	if app.config.test_job_start_delay > 0 {
-		timer := time.NewTimer(app.config.test_job_start_delay)
+	// Apply artificial worker start delay if configured.
+	if app.config.test_worker_start_delay > 0 {
+		timer := time.NewTimer(app.config.test_worker_start_delay)
 		select {
 		case <-ctx.Done():
 			timer.Stop()

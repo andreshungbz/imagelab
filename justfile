@@ -119,7 +119,7 @@ test-delay-3s:
       -port="$PORT" \
       -cors-trusted-origins="$CORS_TRUSTED_ORIGINS" \
       -consumer-id="$CONSUMER_ID" \
-      -test-job-start-delay=3s
+      -test-worker-start-delay=3s
 
 # Run the API server with a 3s worker start delay and simulated worker failure
 test-delay-3s-simulated-worker-failure:
@@ -128,7 +128,7 @@ test-delay-3s-simulated-worker-failure:
       -port="$PORT" \
       -cors-trusted-origins="$CORS_TRUSTED_ORIGINS" \
       -consumer-id="$CONSUMER_ID" \
-      -test-job-start-delay=3s \
+      -test-worker-start-delay=3s \
       -test-simulated-worker-failure=true
 
 # Run the API server with a 3s image process delay
