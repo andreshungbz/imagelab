@@ -43,3 +43,38 @@ export function getStepStatusIcon(status) {
       return "";
   }
 }
+
+// getBelizeISOString returns the current date and time in ISO 8601 format for the America/Belize timezone.
+export function getBelizeISOString() {
+  const now = new Date();
+
+  // Extract date parts in America/Belize timezone.
+  const formatter = new Intl.DateTimeFormat("sv-SE", {
+    timeZone: "America/Belize",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: false,
+  });
+
+  const [
+    { value: year },
+    ,
+    { value: month },
+    ,
+    { value: day },
+    ,
+    { value: hour },
+    ,
+    { value: minute },
+    ,
+    { value: second },
+  ] = formatter.formatToParts(now);
+  const ms = String(now.getMilliseconds()).padStart(3, "0");
+
+  // America/Belize is strictly UTC-6 year-round.
+  return `${year}-${month}-${day}T${hour}:${minute}:${second}.${ms}-06:00`;
+}

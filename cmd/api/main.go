@@ -111,7 +111,23 @@ func main() {
 	}
 
 	// JSON logger
-	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
+	loc, err := time.LoadLocation("America/Belize")
+	if err != nil {
+		// Fallback to a fixed UTC-6 location if local tzdata is missing.
+		loc = time.FixedZone("CST", -6*60*60)
+	}
+
+	opts := &slog.HandlerOptions{
+		ReplaceAttr: func(groups []string, a slog.Attr) slog.Attr {
+			if a.Key == slog.TimeKey {
+				// Convert to Belize time and format with millisecond precision.
+				t := a.Value.Time().In(loc)
+				return slog.String(slog.TimeKey, t.Format("2006-01-02T15:04:05.000-07:00"))
+			}
+			return a
+		},
+	}
+	logger := slog.New(slog.NewJSONHandler(os.Stdout, opts))
 
 	// DATABASE
 

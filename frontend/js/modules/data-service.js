@@ -1,5 +1,6 @@
 import { emitter } from "./event-emitter.js";
 import { state } from "./state.js";
+import { getBelizeISOString } from "./helpers.js";
 
 // Dynamically resolve the API host and base URL based on the current location.
 const API_HOST = window.location.hostname;
@@ -105,9 +106,19 @@ export const DataService = {
 
       switch (data.status) {
         case "completed":
+          console.log({
+            id: data.id,
+            status: data.status,
+            browser_receipt_time: getBelizeISOString(),
+          });
           emitter.emit("job:completed", data);
           break;
         case "failed":
+          console.log({
+            id: data.id,
+            status: data.status,
+            browser_receipt_time: getBelizeISOString(),
+          });
           emitter.emit("job:failed", data);
           break;
         case "queued":
