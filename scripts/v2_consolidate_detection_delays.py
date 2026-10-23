@@ -2,26 +2,28 @@ import json
 from datetime import datetime
 from pathlib import Path
 
-# Base directory path
+# Base Directory Path
 BASE_DIR = Path("docs/v2.0.0/experiments/raw")
 
 
 def parse_iso_time(time_str: str) -> datetime:
-    """Parses ISO 8601 timestamp string into a datetime object."""
+    """parse_iso_time parses an ISO 8601 timestamp string into a datetime object."""
     return datetime.fromisoformat(time_str)
 
 
 def process_experiment_runs():
+    """process_experiment_runs aggregates and computes timing measurements across experiment condition runs."""
+
     results = []
 
-    # Iterate through condition folders (A, B, C1, C2, C3, C3-X)
+    # Iterate through condition folders (A, B, C1, C2, C3, C3-X).
     for condition_dir in sorted(BASE_DIR.iterdir()):
         if not condition_dir.is_dir():
             continue
 
         condition = condition_dir.name
 
-        # Iterate through run folders (run_id_01_sp, run_id_02_lp, etc.)
+        # Iterate through run folders (run_id_01_sp, run_id_02_lp, etc.).
         for run_dir in sorted(condition_dir.iterdir()):
             if not run_dir.is_dir():
                 continue
@@ -30,10 +32,11 @@ def process_experiment_runs():
             server_log = run_dir / "server.log"
             console_log = run_dir / "console.log"
 
+            # Ensure necessary log files exist.
             if not (server_log.exists() and console_log.exists()):
                 continue
 
-            # 1. Parse console.log for browser receipt time
+            # Parse console.log for browser receipt time.
             try:
                 with open(console_log, "r", encoding="utf-8") as f:
                     console_data = json.load(f)
@@ -43,7 +46,7 @@ def process_experiment_runs():
                 print(f"Error reading {console_log}: {e}")
                 continue
 
-            # 2. Parse server.log for terminal commit time, job_id, and observation_queries
+            # Parse server.log for terminal commit time, job_id, and observation_queries.
             job_id = "N/A"
             terminal_commit_time = None
             observation_reads = "N/A"
@@ -70,14 +73,14 @@ def process_experiment_runs():
                     except json.JSONDecodeError:
                         continue
 
-            # 3. Calculate detection delay rounded to whole milliseconds
+            # Calculate detection delay rounded to whole milliseconds.
             if terminal_commit_time and browser_receipt_time:
                 raw_delay_ms = (
                     browser_receipt_time - terminal_commit_time
                 ).total_seconds() * 1000.0
                 delay_ms = round(raw_delay_ms)
 
-                # Extract human-readable time strings (HH:MM:SS.mmm)
+                # Extract human-readable time strings (HH:MM:SS.mmm).
                 commit_str = terminal_commit_time.strftime("%H:%M:%S.%f")[:-3]
                 receipt_str = browser_receipt_time.strftime("%H:%M:%S.%f")[:-3]
 
@@ -93,13 +96,13 @@ def process_experiment_runs():
                     }
                 )
 
-    # Print Table Header
+    # Print table header.
     print(
         f"{'Condition':<10} | {'Run ID':<16} | {'Job Public ID':<36} | {'Terminal Commit':<15} | {'Browser Receipt':<15} | {'Delay (ms)':<10} | {'Obs Reads':<10}"
     )
     print("-" * 130)
 
-    # Print Table Rows
+    # Print table rows.
     for r in results:
         obs_str = str(r["observation_reads"])
         print(
@@ -107,5 +110,10 @@ def process_experiment_runs():
         )
 
 
-if __name__ == "__main__":
+def main():
+    """main is the entry point for the experiment processing tool."""
     process_experiment_runs()
+
+
+if __name__ == "__main__":
+    main()
