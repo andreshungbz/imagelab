@@ -232,3 +232,8 @@ exp/cond-c2:
 # Alias for Condition C3 (Same server config as C2; network latency is injected on client/browser)
 .PHONY: exp/cond-c3
 exp/cond-c3: exp/cond-c2
+
+# Helper to show v2 detection delay results.
+.PHONY: show-v2-detection-delays
+show-v2-detection-delays:
+		python3 scripts/v2_consolidate_detection_delays.py
