@@ -42,7 +42,7 @@ def process_experiment_runs():
                     console_data = json.load(f)
                     browser_receipt_str = console_data.get("browser_receipt_time")
                     browser_receipt_time = parse_iso_time(browser_receipt_str)
-            except Exception as e:
+            except (json.JSONDecodeError, OSError) as e:
                 print(f"Error reading {console_log}: {e}")
                 continue
 
