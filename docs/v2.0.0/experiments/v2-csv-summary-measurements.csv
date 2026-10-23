@@ -1,0 +1,37 @@
+run_id,condition,mode,repetition,job_id,image,latency_setting_ms,baseline_version,terminal_version,requests_started,initial_200,newer_200,unchanged_200,no_change_204,retrieval_errors,cancellations,distinct_new_versions_seen,processing_ms,detection_ms,observation_db_reads,notes
+1,A,short polling,1,4dff1090-6f4d-458b-9dc9-672e6f12a2e7,photo.jpg,0,1,5,32,1,2,29,0,0,0,"3 (1, 2, 5)",30604,253,32,Some distinct versions were skipped due to quick image processing.
+2,A,short polling,2,c061cd65-57cc-4a9e-9381-05f8ab1bfbc3,photo.jpg,0,1,5,32,1,2,29,0,0,0,"3 (1, 2, 5)",30573,294,32,Some distinct versions were skipped due to quick image processing.
+3,A,short polling,3,4361bc79-8d34-4f81-b8e7-400a4fc656a7,photo.jpg,0,1,5,32,1,2,29,0,0,0,"3 (1, 2, 5)",30538,405,32,Some distinct versions were skipped due to quick image processing.
+4,A,long polling,1,e0ef684f-5c18-4971-89c3-e2a4632d227a,photo.jpg,0,1,5,6,1,4,0,1,0,0,"5 (1, 2, 3, 4, 5)",30590,19,160,
+5,A,long polling,2,df690824-ea68-4d9c-b254-130860310b18,photo.jpg,0,1,5,6,1,4,0,1,0,0,"5 (1, 2, 3, 4, 5)",30585,183,160,
+6,A,long polling,3,38b347d1-0785-4c66-8077-7283c3037d80,photo.jpg,0,1,5,6,1,4,0,1,0,0,"5 (1, 2, 3, 4, 5)",30586,85,160,
+7,B,long polling,1,dd2cfd8a-5719-4d99-806d-2e8dbe93fe38,photo.jpg,0,1,5,4,1,3,0,0,0,0,"4 (1, 3, 4, 5)",563,11,7,Timing and quick image processing skipped seeing version 2.
+8,B,long polling,2,dcf15a9a-6cd7-4292-9588-26ef4f0536b3,photo.jpg,0,1,5,4,1,3,0,0,0,0,"4 (1, 3, 4, 5)",576,10,7,Timing and quick image processing skipped seeing version 2.
+9,B,long polling,3,908c3d84-bc50-4ba7-99be-eabc15be3263,photo.jpg,0,1,5,5,1,4,0,0,0,0,"5 (1, 2, 3, 4, 5)",556,175,9,
+10,B,short polling,1,8a7cde87-6931-4948-a797-75d40d4d198d,photo.jpg,0,1,5,2,1,1,0,0,0,0,"2 (1, 5)",590,202,2,There is a huge skip in versions seen due to the 1s polling rate.
+11,B,short polling,2,db8a8a4a-83a7-4201-bcbe-f2ed95b0eeb2,photo.jpg,0,1,5,2,1,1,0,0,0,0,"2 (1, 5)",566,348,2,There is a huge skip in versions seen due to the 1s polling rate.
+12,B,short polling,3,9f063e09-8dfe-4a7c-97dd-2ae09e35c8a6,photo.jpg,0,1,5,2,1,1,0,0,0,0,"2 (1, 5)",584,335,2,There is a huge skip in versions seen due to the 1s polling rate.
+13,C1,short polling,1,e6139e7f-d605-4fa2-b1dc-e59c0041b768,photo.jpg,0,2,10,12,1,5,6,0,0,0,"6 (2, 3, 4, 5. 6. 10)",10587,414,12,Timing caused the baseline version seen to be 2 instead of 1.
+14,C1,short polling,2,322dcb1f-f850-4c61-bdd7-335f75ebebf8,photo.jpg,0,1,10,12,1,6,5,0,0,0,"7 (1, 2, 3, 4, 5, 6, 10)",10594,202,12,
+15,C1,short polling,3,a6c9c739-ba57-4add-9e0f-3f9d91b73ec0,photo.jpg,0,1,10,12,1,6,5,0,0,0,"7 (1, 2, 3, 4, 5, 6, 10)",10575,369,12,
+16,C1,long polling,1,7960bf2c-add2-4721-a7d0-43befd792aad,photo.jpg,0,1,10,10,1,9,0,0,0,0,10 (1 - 10),10569,96,64,
+17,C1,long polling,2,b7efaac6-146d-45b2-b14f-6028ffb2ada1,photo.jpg,0,1,10,10,1,9,0,0,0,0,10 (1 - 10),10579,156,64,
+18,C1,long polling,3,48a532cc-4757-444e-9f5f-225d7e84be6f,photo.jpg,0,1,10,9,1,8,0,0,0,0,"10 (1 - 10, expect 7)",10595,26,62,Timing caused version 7 to not be seen.
+19,C2,long polling,1,b044453f-3208-4fb3-a803-a51c6eb8812a,photo.jpg,0,1,55,54,1,53,0,0,0,0,55 (1 - 55),10601,29,107,
+20,C2,long polling,2,3b255ade-dfda-4c84-80e7-6a09d1dd7b3e,photo.jpg,0,1,55,54,1,53,0,0,0,0,55 (1 - 55),10577,109,107,
+21,C2,long polling,3,173336aa-0fc8-449d-a43a-dc3a196bffcc,photo.jpg,0,1,55,53,1,52,0,0,0,0,"55 (1 - 55, except 52)",10579,188,106,Timing caused version 52 to not be seen.
+22,C2,short polling,1,1a3c19d7-8151-4f73-a607-b5c59f4f8829,photo.jpg,0,1,55,12,1,11,0,0,0,0,"12 (1, 6, 11, 16, 21, 25, 31, 36, 41, 46, 51, 55)",10586,401,12,Versions are seen in steps and timing caused version 25 to be seen.
+23,C2,short polling,2,3ec07cca-4baf-49ae-847b-bd2f1050930f,photo.jpg,0,1,55,12,1,11,0,0,0,0,"12 (1, 6, 11, 16, 21, 26, 31, 36, 41, 46, 51, 55)",10594,324,12,
+24,C2,short polling,3,fa1ce07a-14e5-4791-9c3a-ffa1f8d9cccd,photo.jpg,0,1,55,12,1,11,0,0,0,0,"12 (1, 6, 11, 16, 21, 26, 31, 36, 41, 46, 51, 55)",10586,283,12,
+25,C3,short polling,1,cccafde4-76fc-4641-bdcb-542ca56e121b,photo.jpg,200,2,55,12,1,11,0,0,0,0,"12 (2, 7, 12, 17, 22, 27, 32, 37, 42, 47, 53, 55)",10598,799,12,
+26,C3,short polling,2,3e8f6c62-7b6a-474f-9fb6-34d5fb0f88a3,photo.jpg,200,2,55,12,1,11,0,0,0,0,"12 (2, 7, 12, 17, 22. 27, 32, 37, 42, 47, 53, 55)",10592,788,12,
+27,C3,short polling,3,859984c0-a3a2-4120-8323-7b788c4fb353,photo.jpg,200,2,55,12,1,11,0,0,0,0,"12 (2, 6, 11, 16, 21, 26, 31, 36, 41, 46, 51, 55)",10615,602,12,Timing caused a step to 6.
+28,C3,long polling,1,06315b19-2fff-4e5c-a332-b6f376da78f7,photo.jpg,200,2,55,54,1,53,0,0,0,0,54 (2 - 55),10583,377,53,The latency timing caused the baseline version to be 2.
+29,C3,long polling,2,0912b889-054b-40e8-87e9-827cd9cd30ad,photo.jpg,200,1,55,54,1,53,0,0,0,0,55 (1 - 55),10588,335,56,
+30,C3,long polling,3,e4309619-a7ad-40d4-921c-e19d73b81cc9,photo.jpg,200,1,55,53,1,52,0,0,0,0,"53 (1 - 55, except 13, 52)",10561,200,54,The latency timing caused versions 13 and 52 to not be seen.
+31,C3-X,long polling,1,57551550-1df8-4aca-b406-e31b433eb3a2,photo.jpg,400,3,55,27,1,26,0,0,0,0,"27 (3 - 55, step 2)",10596,522,27,The latency timing caused the baseline verison to be 3.
+32,C3-X,long polling,2,5fc7c998-9697-4bf9-bcaa-1de38823d86d,photo.jpg,400,3,55,27,1,26,0,0,0,0,"27 (3 - 55, step 2, 3 for 18, 1 for 54)",10599,679,27,The latency timing causes a varying step.
+33,C3-X,long polling,3,5a47eb1c-4b35-4738-b7db-25fa7e09c44c,photo.jpg,400,2,55,27,1,26,0,0,0,0,"27 (2 - 55, step 2, 3 for 13)",10604,488,27,The latency timing causes a varying step.
+34,C3-X,short polling,1,193d6063-f356-42c4-a1dd-afc3ecd50585,photo.jpg,400,3,55,12,1,11,0,0,0,0,"12 (3 - 55, step 5, 2 for 55)",10549,1112,12,
+35,C3-X,short polling,2,a20dddb1-d92e-4c34-af27-64958ea20aae,photo.jpg,400,3,55,12,1,11,0,0,0,0,"12 (3 - 55, step 5, 2 for 55)",10572,1094,12,
+36,C3-X,short polling,3,a7167108-e36c-4d04-bdaf-3248fea331e3,photo.jpg,400,3,55,12,1,11,0,0,0,0,"12 (3 - 55, step 5, 2 for 55)",10595,1156,12,
