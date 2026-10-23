@@ -1,13 +1,13 @@
-Condition,Mode,Average Requests,Average Completion-Detection Delay
-A,Short Polling,32.0,317.3
-A,Long Polling,6.0,95.7
-B,Short Polling,2.0,295.0
-B,Long Polling,4.3,65.3
-C1,Short Polling,12.0,328.3
-C1,Long Polling,9.7,92.7
-C2,Short Polling,12.0,336.0
-C2,Long Polling,53.7,108.7
-C3,Short Polling,12.0,729.7
-C3,Long Polling,53.7,304.0
-C3-X,Short Polling,12.0,1120.7
-C3-X,Long Polling,27.0,563.0
+Condition,Mode,Minimum Requests,Maximum Requests,Average Requests,Average Completion-Detection Delay
+A,Short Polling,32.0,32.0,32.0,317.3
+A,Long Polling,6.0,6.0,6.0,95.7
+B,Short Polling,2.0,2.0,2.0,295.0
+B,Long Polling,4.0,5.0,4.3,65.3
+C1,Short Polling,12.0,12.0,12.0,328.3
+C1,Long Polling,9.0,10.0,9.7,92.7
+C2,Short Polling,12.0,12.0,12.0,336.0
+C2,Long Polling,53.0,54.0,53.7,108.7
+C3,Short Polling,12.0,12.0,12.0,729.7
+C3,Long Polling,53.0,54.0,53.7,304.0
+C3-X,Short Polling,12.0,12.0,12.0,1120.7
+C3-X,Long Polling,27.0,27.0,27.0,563.0
