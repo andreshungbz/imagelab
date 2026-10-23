@@ -1,0 +1,28 @@
+go run ./cmd/api -db-dsn="$IMAGELAB_DB_DSN" -port="$PORT" -cors-trusted-origins="$CORS_TRUSTED_ORIGINS" -consumer-id="$CONSUMER_ID" -exp-simulation-phase-enabled=true -exp-simulation-interval=2s -exp-simulation-total-duration=10s
+{"time":"2026-10-23T09:41:46.305-06:00","level":"INFO","msg":"database connection pool established"}
+{"time":"2026-10-23T09:41:46.305-06:00","level":"INFO","msg":"starting server","addr":":4000","env":"development"}
+{"time":"2026-10-23T09:41:54.627-06:00","level":"INFO","msg":"client request","method":"POST","path":"/v1/images"}
+{"time":"2026-10-23T09:41:54.635-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/jobs/7960bf2c-add2-4721-a7d0-43befd792aad"}
+{"time":"2026-10-23T09:41:54.637-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/jobs/7960bf2c-add2-4721-a7d0-43befd792aad"}
+{"time":"2026-10-23T09:41:54.817-06:00","level":"INFO","msg":"image job started","job_id":"7960bf2c-add2-4721-a7d0-43befd792aad","exp_quiet_delay":false,"exp_simulation_phase":true}
+{"time":"2026-10-23T09:41:54.817-06:00","level":"INFO","msg":"starting experimental simulation phase","job_id":"7960bf2c-add2-4721-a7d0-43befd792aad","interval":2000000000,"duration":10000000000}
+{"time":"2026-10-23T09:41:54.841-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/jobs/7960bf2c-add2-4721-a7d0-43befd792aad"}
+{"time":"2026-10-23T09:41:56.828-06:00","level":"INFO","msg":"simulated progress commit","job_id":"7960bf2c-add2-4721-a7d0-43befd792aad","version":3,"simulated_progress":1,"commit_time_ms":1792770116828}
+{"time":"2026-10-23T09:41:56.845-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/jobs/7960bf2c-add2-4721-a7d0-43befd792aad"}
+{"time":"2026-10-23T09:41:58.828-06:00","level":"INFO","msg":"simulated progress commit","job_id":"7960bf2c-add2-4721-a7d0-43befd792aad","version":4,"simulated_progress":2,"commit_time_ms":1792770118828}
+{"time":"2026-10-23T09:41:58.850-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/jobs/7960bf2c-add2-4721-a7d0-43befd792aad"}
+{"time":"2026-10-23T09:42:00.824-06:00","level":"INFO","msg":"simulated progress commit","job_id":"7960bf2c-add2-4721-a7d0-43befd792aad","version":5,"simulated_progress":3,"commit_time_ms":1792770120824}
+{"time":"2026-10-23T09:42:00.854-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/jobs/7960bf2c-add2-4721-a7d0-43befd792aad"}
+{"time":"2026-10-23T09:42:02.829-06:00","level":"INFO","msg":"simulated progress commit","job_id":"7960bf2c-add2-4721-a7d0-43befd792aad","version":6,"simulated_progress":4,"commit_time_ms":1792770122829}
+{"time":"2026-10-23T09:42:02.858-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/jobs/7960bf2c-add2-4721-a7d0-43befd792aad"}
+{"time":"2026-10-23T09:42:04.819-06:00","level":"INFO","msg":"simulated progress commit","job_id":"7960bf2c-add2-4721-a7d0-43befd792aad","version":7,"simulated_progress":5,"commit_time_ms":1792770124819}
+{"time":"2026-10-23T09:42:04.861-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/jobs/7960bf2c-add2-4721-a7d0-43befd792aad"}
+{"time":"2026-10-23T09:42:05.065-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/images/16/variants/thumbnail"}
+{"time":"2026-10-23T09:42:05.066-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/jobs/7960bf2c-add2-4721-a7d0-43befd792aad"}
+{"time":"2026-10-23T09:42:05.269-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/images/16/variants/preview"}
+{"time":"2026-10-23T09:42:05.270-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/jobs/7960bf2c-add2-4721-a7d0-43befd792aad"}
+{"time":"2026-10-23T09:42:05.376-06:00","level":"INFO","msg":"terminal commit","job_id":"7960bf2c-add2-4721-a7d0-43befd792aad","status":"completed","committed version":10}
+{"time":"2026-10-23T09:42:05.471-06:00","level":"INFO","msg":"observation query count","job_id":"7960bf2c-add2-4721-a7d0-43befd792aad","status":"completed","observation_queries":64}
+{"time":"2026-10-23T09:42:05.475-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/images/16/variants/thumbnail"}
+{"time":"2026-10-23T09:42:05.475-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/images/16/variants/preview"}
+{"time":"2026-10-23T09:42:05.475-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/images/16/variants/display"}

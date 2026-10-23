@@ -1,0 +1,12 @@
+go run ./cmd/api -db-dsn="$IMAGELAB_DB_DSN" -port="$PORT" -cors-trusted-origins="$CORS_TRUSTED_ORIGINS" -consumer-id="$CONSUMER_ID" 
+{"time":"2026-10-23T09:24:58.883-06:00","level":"INFO","msg":"database connection pool established"}
+{"time":"2026-10-23T09:24:58.883-06:00","level":"INFO","msg":"starting server","addr":":4000","env":"development"}
+{"time":"2026-10-23T09:25:05.032-06:00","level":"INFO","msg":"client request","method":"POST","path":"/v1/images"}
+{"time":"2026-10-23T09:25:05.051-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/jobs/9f063e09-8dfe-4a7c-97dd-2ae09e35c8a6"}
+{"time":"2026-10-23T09:25:05.135-06:00","level":"INFO","msg":"image job started","job_id":"9f063e09-8dfe-4a7c-97dd-2ae09e35c8a6","exp_quiet_delay":false,"exp_simulation_phase":false}
+{"time":"2026-10-23T09:25:05.718-06:00","level":"INFO","msg":"terminal commit","job_id":"9f063e09-8dfe-4a7c-97dd-2ae09e35c8a6","status":"completed","committed version":5}
+{"time":"2026-10-23T09:25:06.052-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/jobs/9f063e09-8dfe-4a7c-97dd-2ae09e35c8a6"}
+{"time":"2026-10-23T09:25:06.052-06:00","level":"INFO","msg":"observation query count","job_id":"9f063e09-8dfe-4a7c-97dd-2ae09e35c8a6","status":"completed","observation_queries":2}
+{"time":"2026-10-23T09:25:06.054-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/images/12/variants/thumbnail"}
+{"time":"2026-10-23T09:25:06.055-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/images/12/variants/preview"}
+{"time":"2026-10-23T09:25:06.065-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/images/12/variants/display"}

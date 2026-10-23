@@ -1,0 +1,18 @@
+go run ./cmd/api -db-dsn="$IMAGELAB_DB_DSN" -port="$PORT" -cors-trusted-origins="$CORS_TRUSTED_ORIGINS" -consumer-id="$CONSUMER_ID" 
+{"time":"2026-10-23T09:18:58.636-06:00","level":"INFO","msg":"database connection pool established"}
+{"time":"2026-10-23T09:18:58.636-06:00","level":"INFO","msg":"starting server","addr":":4000","env":"development"}
+{"time":"2026-10-23T09:19:02.555-06:00","level":"INFO","msg":"client request","method":"OPTIONS","path":"/v1/images"}
+{"time":"2026-10-23T09:19:02.555-06:00","level":"INFO","msg":"client request","method":"OPTIONS","path":"/v1/images"}
+{"time":"2026-10-23T09:20:14.087-06:00","level":"INFO","msg":"client request","method":"POST","path":"/v1/images"}
+{"time":"2026-10-23T09:20:14.098-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/jobs/dd2cfd8a-5719-4d99-806d-2e8dbe93fe38"}
+{"time":"2026-10-23T09:20:14.100-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/jobs/dd2cfd8a-5719-4d99-806d-2e8dbe93fe38"}
+{"time":"2026-10-23T09:20:14.138-06:00","level":"INFO","msg":"image job started","job_id":"dd2cfd8a-5719-4d99-806d-2e8dbe93fe38","exp_quiet_delay":false,"exp_simulation_phase":false}
+{"time":"2026-10-23T09:20:14.304-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/images/7/variants/thumbnail"}
+{"time":"2026-10-23T09:20:14.305-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/jobs/dd2cfd8a-5719-4d99-806d-2e8dbe93fe38"}
+{"time":"2026-10-23T09:20:14.509-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/images/7/variants/preview"}
+{"time":"2026-10-23T09:20:14.509-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/jobs/dd2cfd8a-5719-4d99-806d-2e8dbe93fe38"}
+{"time":"2026-10-23T09:20:14.700-06:00","level":"INFO","msg":"terminal commit","job_id":"dd2cfd8a-5719-4d99-806d-2e8dbe93fe38","status":"completed","committed version":5}
+{"time":"2026-10-23T09:20:14.710-06:00","level":"INFO","msg":"observation query count","job_id":"dd2cfd8a-5719-4d99-806d-2e8dbe93fe38","status":"completed","observation_queries":7}
+{"time":"2026-10-23T09:20:14.713-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/images/7/variants/thumbnail"}
+{"time":"2026-10-23T09:20:14.714-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/images/7/variants/display"}
+{"time":"2026-10-23T09:20:14.714-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/images/7/variants/preview"}

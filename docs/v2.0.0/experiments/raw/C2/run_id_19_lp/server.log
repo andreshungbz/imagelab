@@ -1,0 +1,119 @@
+go run ./cmd/api -db-dsn="$IMAGELAB_DB_DSN" -port="$PORT" -cors-trusted-origins="$CORS_TRUSTED_ORIGINS" -consumer-id="$CONSUMER_ID" -exp-simulation-phase-enabled=true -exp-simulation-interval=200ms -exp-simulation-total-duration=10s
+{"time":"2026-10-23T09:44:36.136-06:00","level":"INFO","msg":"database connection pool established"}
+{"time":"2026-10-23T09:44:36.136-06:00","level":"INFO","msg":"starting server","addr":":4000","env":"development"}
+{"time":"2026-10-23T09:44:53.028-06:00","level":"INFO","msg":"client request","method":"OPTIONS","path":"/v1/images"}
+{"time":"2026-10-23T09:44:53.029-06:00","level":"INFO","msg":"client request","method":"OPTIONS","path":"/v1/images"}
+{"time":"2026-10-23T09:45:59.666-06:00","level":"INFO","msg":"client request","method":"POST","path":"/v1/images"}
+{"time":"2026-10-23T09:45:59.696-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/jobs/b044453f-3208-4fb3-a803-a51c6eb8812a"}
+{"time":"2026-10-23T09:45:59.700-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/jobs/b044453f-3208-4fb3-a803-a51c6eb8812a"}
+{"time":"2026-10-23T09:45:59.897-06:00","level":"INFO","msg":"image job started","job_id":"b044453f-3208-4fb3-a803-a51c6eb8812a","exp_quiet_delay":false,"exp_simulation_phase":true}
+{"time":"2026-10-23T09:45:59.897-06:00","level":"INFO","msg":"starting experimental simulation phase","job_id":"b044453f-3208-4fb3-a803-a51c6eb8812a","interval":200000000,"duration":10000000000}
+{"time":"2026-10-23T09:45:59.904-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/jobs/b044453f-3208-4fb3-a803-a51c6eb8812a"}
+{"time":"2026-10-23T09:46:00.099-06:00","level":"INFO","msg":"simulated progress commit","job_id":"b044453f-3208-4fb3-a803-a51c6eb8812a","version":3,"simulated_progress":1,"commit_time_ms":1792770360099}
+{"time":"2026-10-23T09:46:00.109-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/jobs/b044453f-3208-4fb3-a803-a51c6eb8812a"}
+{"time":"2026-10-23T09:46:00.309-06:00","level":"INFO","msg":"simulated progress commit","job_id":"b044453f-3208-4fb3-a803-a51c6eb8812a","version":4,"simulated_progress":2,"commit_time_ms":1792770360309}
+{"time":"2026-10-23T09:46:00.313-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/jobs/b044453f-3208-4fb3-a803-a51c6eb8812a"}
+{"time":"2026-10-23T09:46:00.508-06:00","level":"INFO","msg":"simulated progress commit","job_id":"b044453f-3208-4fb3-a803-a51c6eb8812a","version":5,"simulated_progress":3,"commit_time_ms":1792770360508}
+{"time":"2026-10-23T09:46:00.517-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/jobs/b044453f-3208-4fb3-a803-a51c6eb8812a"}
+{"time":"2026-10-23T09:46:00.699-06:00","level":"INFO","msg":"simulated progress commit","job_id":"b044453f-3208-4fb3-a803-a51c6eb8812a","version":6,"simulated_progress":4,"commit_time_ms":1792770360699}
+{"time":"2026-10-23T09:46:00.721-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/jobs/b044453f-3208-4fb3-a803-a51c6eb8812a"}
+{"time":"2026-10-23T09:46:00.908-06:00","level":"INFO","msg":"simulated progress commit","job_id":"b044453f-3208-4fb3-a803-a51c6eb8812a","version":7,"simulated_progress":5,"commit_time_ms":1792770360908}
+{"time":"2026-10-23T09:46:00.925-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/jobs/b044453f-3208-4fb3-a803-a51c6eb8812a"}
+{"time":"2026-10-23T09:46:01.108-06:00","level":"INFO","msg":"simulated progress commit","job_id":"b044453f-3208-4fb3-a803-a51c6eb8812a","version":8,"simulated_progress":6,"commit_time_ms":1792770361108}
+{"time":"2026-10-23T09:46:01.128-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/jobs/b044453f-3208-4fb3-a803-a51c6eb8812a"}
+{"time":"2026-10-23T09:46:01.308-06:00","level":"INFO","msg":"simulated progress commit","job_id":"b044453f-3208-4fb3-a803-a51c6eb8812a","version":9,"simulated_progress":7,"commit_time_ms":1792770361308}
+{"time":"2026-10-23T09:46:01.333-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/jobs/b044453f-3208-4fb3-a803-a51c6eb8812a"}
+{"time":"2026-10-23T09:46:01.508-06:00","level":"INFO","msg":"simulated progress commit","job_id":"b044453f-3208-4fb3-a803-a51c6eb8812a","version":10,"simulated_progress":8,"commit_time_ms":1792770361508}
+{"time":"2026-10-23T09:46:01.537-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/jobs/b044453f-3208-4fb3-a803-a51c6eb8812a"}
+{"time":"2026-10-23T09:46:01.708-06:00","level":"INFO","msg":"simulated progress commit","job_id":"b044453f-3208-4fb3-a803-a51c6eb8812a","version":11,"simulated_progress":9,"commit_time_ms":1792770361708}
+{"time":"2026-10-23T09:46:01.741-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/jobs/b044453f-3208-4fb3-a803-a51c6eb8812a"}
+{"time":"2026-10-23T09:46:01.908-06:00","level":"INFO","msg":"simulated progress commit","job_id":"b044453f-3208-4fb3-a803-a51c6eb8812a","version":12,"simulated_progress":10,"commit_time_ms":1792770361908}
+{"time":"2026-10-23T09:46:01.945-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/jobs/b044453f-3208-4fb3-a803-a51c6eb8812a"}
+{"time":"2026-10-23T09:46:02.109-06:00","level":"INFO","msg":"simulated progress commit","job_id":"b044453f-3208-4fb3-a803-a51c6eb8812a","version":13,"simulated_progress":11,"commit_time_ms":1792770362109}
+{"time":"2026-10-23T09:46:02.149-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/jobs/b044453f-3208-4fb3-a803-a51c6eb8812a"}
+{"time":"2026-10-23T09:46:02.309-06:00","level":"INFO","msg":"simulated progress commit","job_id":"b044453f-3208-4fb3-a803-a51c6eb8812a","version":14,"simulated_progress":12,"commit_time_ms":1792770362309}
+{"time":"2026-10-23T09:46:02.352-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/jobs/b044453f-3208-4fb3-a803-a51c6eb8812a"}
+{"time":"2026-10-23T09:46:02.509-06:00","level":"INFO","msg":"simulated progress commit","job_id":"b044453f-3208-4fb3-a803-a51c6eb8812a","version":15,"simulated_progress":13,"commit_time_ms":1792770362509}
+{"time":"2026-10-23T09:46:02.557-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/jobs/b044453f-3208-4fb3-a803-a51c6eb8812a"}
+{"time":"2026-10-23T09:46:02.698-06:00","level":"INFO","msg":"simulated progress commit","job_id":"b044453f-3208-4fb3-a803-a51c6eb8812a","version":16,"simulated_progress":14,"commit_time_ms":1792770362698}
+{"time":"2026-10-23T09:46:02.761-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/jobs/b044453f-3208-4fb3-a803-a51c6eb8812a"}
+{"time":"2026-10-23T09:46:02.908-06:00","level":"INFO","msg":"simulated progress commit","job_id":"b044453f-3208-4fb3-a803-a51c6eb8812a","version":17,"simulated_progress":15,"commit_time_ms":1792770362908}
+{"time":"2026-10-23T09:46:02.964-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/jobs/b044453f-3208-4fb3-a803-a51c6eb8812a"}
+{"time":"2026-10-23T09:46:03.108-06:00","level":"INFO","msg":"simulated progress commit","job_id":"b044453f-3208-4fb3-a803-a51c6eb8812a","version":18,"simulated_progress":16,"commit_time_ms":1792770363108}
+{"time":"2026-10-23T09:46:03.169-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/jobs/b044453f-3208-4fb3-a803-a51c6eb8812a"}
+{"time":"2026-10-23T09:46:03.308-06:00","level":"INFO","msg":"simulated progress commit","job_id":"b044453f-3208-4fb3-a803-a51c6eb8812a","version":19,"simulated_progress":17,"commit_time_ms":1792770363308}
+{"time":"2026-10-23T09:46:03.372-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/jobs/b044453f-3208-4fb3-a803-a51c6eb8812a"}
+{"time":"2026-10-23T09:46:03.508-06:00","level":"INFO","msg":"simulated progress commit","job_id":"b044453f-3208-4fb3-a803-a51c6eb8812a","version":20,"simulated_progress":18,"commit_time_ms":1792770363508}
+{"time":"2026-10-23T09:46:03.575-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/jobs/b044453f-3208-4fb3-a803-a51c6eb8812a"}
+{"time":"2026-10-23T09:46:03.708-06:00","level":"INFO","msg":"simulated progress commit","job_id":"b044453f-3208-4fb3-a803-a51c6eb8812a","version":21,"simulated_progress":19,"commit_time_ms":1792770363708}
+{"time":"2026-10-23T09:46:03.780-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/jobs/b044453f-3208-4fb3-a803-a51c6eb8812a"}
+{"time":"2026-10-23T09:46:03.909-06:00","level":"INFO","msg":"simulated progress commit","job_id":"b044453f-3208-4fb3-a803-a51c6eb8812a","version":22,"simulated_progress":20,"commit_time_ms":1792770363909}
+{"time":"2026-10-23T09:46:03.984-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/jobs/b044453f-3208-4fb3-a803-a51c6eb8812a"}
+{"time":"2026-10-23T09:46:04.108-06:00","level":"INFO","msg":"simulated progress commit","job_id":"b044453f-3208-4fb3-a803-a51c6eb8812a","version":23,"simulated_progress":21,"commit_time_ms":1792770364108}
+{"time":"2026-10-23T09:46:04.189-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/jobs/b044453f-3208-4fb3-a803-a51c6eb8812a"}
+{"time":"2026-10-23T09:46:04.309-06:00","level":"INFO","msg":"simulated progress commit","job_id":"b044453f-3208-4fb3-a803-a51c6eb8812a","version":24,"simulated_progress":22,"commit_time_ms":1792770364309}
+{"time":"2026-10-23T09:46:04.393-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/jobs/b044453f-3208-4fb3-a803-a51c6eb8812a"}
+{"time":"2026-10-23T09:46:04.508-06:00","level":"INFO","msg":"simulated progress commit","job_id":"b044453f-3208-4fb3-a803-a51c6eb8812a","version":25,"simulated_progress":23,"commit_time_ms":1792770364508}
+{"time":"2026-10-23T09:46:04.598-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/jobs/b044453f-3208-4fb3-a803-a51c6eb8812a"}
+{"time":"2026-10-23T09:46:04.699-06:00","level":"INFO","msg":"simulated progress commit","job_id":"b044453f-3208-4fb3-a803-a51c6eb8812a","version":26,"simulated_progress":24,"commit_time_ms":1792770364699}
+{"time":"2026-10-23T09:46:04.801-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/jobs/b044453f-3208-4fb3-a803-a51c6eb8812a"}
+{"time":"2026-10-23T09:46:04.908-06:00","level":"INFO","msg":"simulated progress commit","job_id":"b044453f-3208-4fb3-a803-a51c6eb8812a","version":27,"simulated_progress":25,"commit_time_ms":1792770364908}
+{"time":"2026-10-23T09:46:05.006-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/jobs/b044453f-3208-4fb3-a803-a51c6eb8812a"}
+{"time":"2026-10-23T09:46:05.109-06:00","level":"INFO","msg":"simulated progress commit","job_id":"b044453f-3208-4fb3-a803-a51c6eb8812a","version":28,"simulated_progress":26,"commit_time_ms":1792770365109}
+{"time":"2026-10-23T09:46:05.210-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/jobs/b044453f-3208-4fb3-a803-a51c6eb8812a"}
+{"time":"2026-10-23T09:46:05.308-06:00","level":"INFO","msg":"simulated progress commit","job_id":"b044453f-3208-4fb3-a803-a51c6eb8812a","version":29,"simulated_progress":27,"commit_time_ms":1792770365308}
+{"time":"2026-10-23T09:46:05.414-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/jobs/b044453f-3208-4fb3-a803-a51c6eb8812a"}
+{"time":"2026-10-23T09:46:05.508-06:00","level":"INFO","msg":"simulated progress commit","job_id":"b044453f-3208-4fb3-a803-a51c6eb8812a","version":30,"simulated_progress":28,"commit_time_ms":1792770365508}
+{"time":"2026-10-23T09:46:05.619-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/jobs/b044453f-3208-4fb3-a803-a51c6eb8812a"}
+{"time":"2026-10-23T09:46:05.708-06:00","level":"INFO","msg":"simulated progress commit","job_id":"b044453f-3208-4fb3-a803-a51c6eb8812a","version":31,"simulated_progress":29,"commit_time_ms":1792770365708}
+{"time":"2026-10-23T09:46:05.823-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/jobs/b044453f-3208-4fb3-a803-a51c6eb8812a"}
+{"time":"2026-10-23T09:46:05.909-06:00","level":"INFO","msg":"simulated progress commit","job_id":"b044453f-3208-4fb3-a803-a51c6eb8812a","version":32,"simulated_progress":30,"commit_time_ms":1792770365909}
+{"time":"2026-10-23T09:46:06.027-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/jobs/b044453f-3208-4fb3-a803-a51c6eb8812a"}
+{"time":"2026-10-23T09:46:06.108-06:00","level":"INFO","msg":"simulated progress commit","job_id":"b044453f-3208-4fb3-a803-a51c6eb8812a","version":33,"simulated_progress":31,"commit_time_ms":1792770366108}
+{"time":"2026-10-23T09:46:06.232-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/jobs/b044453f-3208-4fb3-a803-a51c6eb8812a"}
+{"time":"2026-10-23T09:46:06.308-06:00","level":"INFO","msg":"simulated progress commit","job_id":"b044453f-3208-4fb3-a803-a51c6eb8812a","version":34,"simulated_progress":32,"commit_time_ms":1792770366308}
+{"time":"2026-10-23T09:46:06.437-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/jobs/b044453f-3208-4fb3-a803-a51c6eb8812a"}
+{"time":"2026-10-23T09:46:06.509-06:00","level":"INFO","msg":"simulated progress commit","job_id":"b044453f-3208-4fb3-a803-a51c6eb8812a","version":35,"simulated_progress":33,"commit_time_ms":1792770366509}
+{"time":"2026-10-23T09:46:06.640-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/jobs/b044453f-3208-4fb3-a803-a51c6eb8812a"}
+{"time":"2026-10-23T09:46:06.708-06:00","level":"INFO","msg":"simulated progress commit","job_id":"b044453f-3208-4fb3-a803-a51c6eb8812a","version":36,"simulated_progress":34,"commit_time_ms":1792770366708}
+{"time":"2026-10-23T09:46:06.845-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/jobs/b044453f-3208-4fb3-a803-a51c6eb8812a"}
+{"time":"2026-10-23T09:46:06.909-06:00","level":"INFO","msg":"simulated progress commit","job_id":"b044453f-3208-4fb3-a803-a51c6eb8812a","version":37,"simulated_progress":35,"commit_time_ms":1792770366909}
+{"time":"2026-10-23T09:46:07.049-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/jobs/b044453f-3208-4fb3-a803-a51c6eb8812a"}
+{"time":"2026-10-23T09:46:07.103-06:00","level":"INFO","msg":"simulated progress commit","job_id":"b044453f-3208-4fb3-a803-a51c6eb8812a","version":38,"simulated_progress":36,"commit_time_ms":1792770367103}
+{"time":"2026-10-23T09:46:07.253-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/jobs/b044453f-3208-4fb3-a803-a51c6eb8812a"}
+{"time":"2026-10-23T09:46:07.309-06:00","level":"INFO","msg":"simulated progress commit","job_id":"b044453f-3208-4fb3-a803-a51c6eb8812a","version":39,"simulated_progress":37,"commit_time_ms":1792770367309}
+{"time":"2026-10-23T09:46:07.457-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/jobs/b044453f-3208-4fb3-a803-a51c6eb8812a"}
+{"time":"2026-10-23T09:46:07.508-06:00","level":"INFO","msg":"simulated progress commit","job_id":"b044453f-3208-4fb3-a803-a51c6eb8812a","version":40,"simulated_progress":38,"commit_time_ms":1792770367508}
+{"time":"2026-10-23T09:46:07.662-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/jobs/b044453f-3208-4fb3-a803-a51c6eb8812a"}
+{"time":"2026-10-23T09:46:07.708-06:00","level":"INFO","msg":"simulated progress commit","job_id":"b044453f-3208-4fb3-a803-a51c6eb8812a","version":41,"simulated_progress":39,"commit_time_ms":1792770367708}
+{"time":"2026-10-23T09:46:07.865-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/jobs/b044453f-3208-4fb3-a803-a51c6eb8812a"}
+{"time":"2026-10-23T09:46:07.908-06:00","level":"INFO","msg":"simulated progress commit","job_id":"b044453f-3208-4fb3-a803-a51c6eb8812a","version":42,"simulated_progress":40,"commit_time_ms":1792770367908}
+{"time":"2026-10-23T09:46:08.070-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/jobs/b044453f-3208-4fb3-a803-a51c6eb8812a"}
+{"time":"2026-10-23T09:46:08.109-06:00","level":"INFO","msg":"simulated progress commit","job_id":"b044453f-3208-4fb3-a803-a51c6eb8812a","version":43,"simulated_progress":41,"commit_time_ms":1792770368109}
+{"time":"2026-10-23T09:46:08.273-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/jobs/b044453f-3208-4fb3-a803-a51c6eb8812a"}
+{"time":"2026-10-23T09:46:08.308-06:00","level":"INFO","msg":"simulated progress commit","job_id":"b044453f-3208-4fb3-a803-a51c6eb8812a","version":44,"simulated_progress":42,"commit_time_ms":1792770368308}
+{"time":"2026-10-23T09:46:08.478-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/jobs/b044453f-3208-4fb3-a803-a51c6eb8812a"}
+{"time":"2026-10-23T09:46:08.509-06:00","level":"INFO","msg":"simulated progress commit","job_id":"b044453f-3208-4fb3-a803-a51c6eb8812a","version":45,"simulated_progress":43,"commit_time_ms":1792770368509}
+{"time":"2026-10-23T09:46:08.681-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/jobs/b044453f-3208-4fb3-a803-a51c6eb8812a"}
+{"time":"2026-10-23T09:46:08.708-06:00","level":"INFO","msg":"simulated progress commit","job_id":"b044453f-3208-4fb3-a803-a51c6eb8812a","version":46,"simulated_progress":44,"commit_time_ms":1792770368708}
+{"time":"2026-10-23T09:46:08.885-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/jobs/b044453f-3208-4fb3-a803-a51c6eb8812a"}
+{"time":"2026-10-23T09:46:08.909-06:00","level":"INFO","msg":"simulated progress commit","job_id":"b044453f-3208-4fb3-a803-a51c6eb8812a","version":47,"simulated_progress":45,"commit_time_ms":1792770368909}
+{"time":"2026-10-23T09:46:09.089-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/jobs/b044453f-3208-4fb3-a803-a51c6eb8812a"}
+{"time":"2026-10-23T09:46:09.108-06:00","level":"INFO","msg":"simulated progress commit","job_id":"b044453f-3208-4fb3-a803-a51c6eb8812a","version":48,"simulated_progress":46,"commit_time_ms":1792770369108}
+{"time":"2026-10-23T09:46:09.294-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/jobs/b044453f-3208-4fb3-a803-a51c6eb8812a"}
+{"time":"2026-10-23T09:46:09.308-06:00","level":"INFO","msg":"simulated progress commit","job_id":"b044453f-3208-4fb3-a803-a51c6eb8812a","version":49,"simulated_progress":47,"commit_time_ms":1792770369308}
+{"time":"2026-10-23T09:46:09.498-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/jobs/b044453f-3208-4fb3-a803-a51c6eb8812a"}
+{"time":"2026-10-23T09:46:09.512-06:00","level":"INFO","msg":"simulated progress commit","job_id":"b044453f-3208-4fb3-a803-a51c6eb8812a","version":50,"simulated_progress":48,"commit_time_ms":1792770369512}
+{"time":"2026-10-23T09:46:09.702-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/jobs/b044453f-3208-4fb3-a803-a51c6eb8812a"}
+{"time":"2026-10-23T09:46:09.708-06:00","level":"INFO","msg":"simulated progress commit","job_id":"b044453f-3208-4fb3-a803-a51c6eb8812a","version":51,"simulated_progress":49,"commit_time_ms":1792770369708}
+{"time":"2026-10-23T09:46:09.906-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/jobs/b044453f-3208-4fb3-a803-a51c6eb8812a"}
+{"time":"2026-10-23T09:46:09.908-06:00","level":"INFO","msg":"simulated progress commit","job_id":"b044453f-3208-4fb3-a803-a51c6eb8812a","version":52,"simulated_progress":50,"commit_time_ms":1792770369908}
+{"time":"2026-10-23T09:46:10.110-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/images/19/variants/thumbnail"}
+{"time":"2026-10-23T09:46:10.111-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/jobs/b044453f-3208-4fb3-a803-a51c6eb8812a"}
+{"time":"2026-10-23T09:46:10.314-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/images/19/variants/preview"}
+{"time":"2026-10-23T09:46:10.315-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/jobs/b044453f-3208-4fb3-a803-a51c6eb8812a"}
+{"time":"2026-10-23T09:46:10.488-06:00","level":"INFO","msg":"terminal commit","job_id":"b044453f-3208-4fb3-a803-a51c6eb8812a","status":"completed","committed version":55}
+{"time":"2026-10-23T09:46:10.516-06:00","level":"INFO","msg":"observation query count","job_id":"b044453f-3208-4fb3-a803-a51c6eb8812a","status":"completed","observation_queries":107}
+{"time":"2026-10-23T09:46:10.520-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/images/19/variants/thumbnail"}
+{"time":"2026-10-23T09:46:10.520-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/images/19/variants/display"}
+{"time":"2026-10-23T09:46:10.521-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/images/19/variants/preview"}

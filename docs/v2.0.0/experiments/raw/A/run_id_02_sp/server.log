@@ -1,0 +1,43 @@
+go run ./cmd/api -db-dsn="$IMAGELAB_DB_DSN" -port="$PORT" -cors-trusted-origins="$CORS_TRUSTED_ORIGINS" -consumer-id="$CONSUMER_ID" -exp-quiet-delay-enabled=true -exp-quiet-delay-duration=30s
+{"time":"2026-10-23T09:06:23.535-06:00","level":"INFO","msg":"database connection pool established"}
+{"time":"2026-10-23T09:06:23.535-06:00","level":"INFO","msg":"starting server","addr":":4000","env":"development"}
+{"time":"2026-10-23T09:06:34.892-06:00","level":"INFO","msg":"client request","method":"POST","path":"/v1/images"}
+{"time":"2026-10-23T09:06:34.901-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/jobs/c061cd65-57cc-4a9e-9381-05f8ab1bfbc3"}
+{"time":"2026-10-23T09:06:35.047-06:00","level":"INFO","msg":"image job started","job_id":"c061cd65-57cc-4a9e-9381-05f8ab1bfbc3","exp_quiet_delay":true,"exp_simulation_phase":false}
+{"time":"2026-10-23T09:06:35.047-06:00","level":"INFO","msg":"starting quiet delay phase","job_id":"c061cd65-57cc-4a9e-9381-05f8ab1bfbc3","duration":30000000000}
+{"time":"2026-10-23T09:06:35.901-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/jobs/c061cd65-57cc-4a9e-9381-05f8ab1bfbc3"}
+{"time":"2026-10-23T09:06:36.901-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/jobs/c061cd65-57cc-4a9e-9381-05f8ab1bfbc3"}
+{"time":"2026-10-23T09:06:37.901-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/jobs/c061cd65-57cc-4a9e-9381-05f8ab1bfbc3"}
+{"time":"2026-10-23T09:06:38.901-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/jobs/c061cd65-57cc-4a9e-9381-05f8ab1bfbc3"}
+{"time":"2026-10-23T09:06:39.902-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/jobs/c061cd65-57cc-4a9e-9381-05f8ab1bfbc3"}
+{"time":"2026-10-23T09:06:40.902-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/jobs/c061cd65-57cc-4a9e-9381-05f8ab1bfbc3"}
+{"time":"2026-10-23T09:06:41.901-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/jobs/c061cd65-57cc-4a9e-9381-05f8ab1bfbc3"}
+{"time":"2026-10-23T09:06:42.901-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/jobs/c061cd65-57cc-4a9e-9381-05f8ab1bfbc3"}
+{"time":"2026-10-23T09:06:43.902-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/jobs/c061cd65-57cc-4a9e-9381-05f8ab1bfbc3"}
+{"time":"2026-10-23T09:06:44.901-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/jobs/c061cd65-57cc-4a9e-9381-05f8ab1bfbc3"}
+{"time":"2026-10-23T09:06:45.901-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/jobs/c061cd65-57cc-4a9e-9381-05f8ab1bfbc3"}
+{"time":"2026-10-23T09:06:46.902-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/jobs/c061cd65-57cc-4a9e-9381-05f8ab1bfbc3"}
+{"time":"2026-10-23T09:06:47.901-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/jobs/c061cd65-57cc-4a9e-9381-05f8ab1bfbc3"}
+{"time":"2026-10-23T09:06:48.901-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/jobs/c061cd65-57cc-4a9e-9381-05f8ab1bfbc3"}
+{"time":"2026-10-23T09:06:49.901-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/jobs/c061cd65-57cc-4a9e-9381-05f8ab1bfbc3"}
+{"time":"2026-10-23T09:06:50.901-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/jobs/c061cd65-57cc-4a9e-9381-05f8ab1bfbc3"}
+{"time":"2026-10-23T09:06:51.901-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/jobs/c061cd65-57cc-4a9e-9381-05f8ab1bfbc3"}
+{"time":"2026-10-23T09:06:52.902-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/jobs/c061cd65-57cc-4a9e-9381-05f8ab1bfbc3"}
+{"time":"2026-10-23T09:06:53.901-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/jobs/c061cd65-57cc-4a9e-9381-05f8ab1bfbc3"}
+{"time":"2026-10-23T09:06:54.901-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/jobs/c061cd65-57cc-4a9e-9381-05f8ab1bfbc3"}
+{"time":"2026-10-23T09:06:55.902-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/jobs/c061cd65-57cc-4a9e-9381-05f8ab1bfbc3"}
+{"time":"2026-10-23T09:06:56.901-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/jobs/c061cd65-57cc-4a9e-9381-05f8ab1bfbc3"}
+{"time":"2026-10-23T09:06:57.901-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/jobs/c061cd65-57cc-4a9e-9381-05f8ab1bfbc3"}
+{"time":"2026-10-23T09:06:58.902-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/jobs/c061cd65-57cc-4a9e-9381-05f8ab1bfbc3"}
+{"time":"2026-10-23T09:06:59.901-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/jobs/c061cd65-57cc-4a9e-9381-05f8ab1bfbc3"}
+{"time":"2026-10-23T09:07:00.902-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/jobs/c061cd65-57cc-4a9e-9381-05f8ab1bfbc3"}
+{"time":"2026-10-23T09:07:01.901-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/jobs/c061cd65-57cc-4a9e-9381-05f8ab1bfbc3"}
+{"time":"2026-10-23T09:07:02.901-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/jobs/c061cd65-57cc-4a9e-9381-05f8ab1bfbc3"}
+{"time":"2026-10-23T09:07:03.901-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/jobs/c061cd65-57cc-4a9e-9381-05f8ab1bfbc3"}
+{"time":"2026-10-23T09:07:04.901-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/jobs/c061cd65-57cc-4a9e-9381-05f8ab1bfbc3"}
+{"time":"2026-10-23T09:07:05.609-06:00","level":"INFO","msg":"terminal commit","job_id":"c061cd65-57cc-4a9e-9381-05f8ab1bfbc3","status":"completed","committed version":5}
+{"time":"2026-10-23T09:07:05.901-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/jobs/c061cd65-57cc-4a9e-9381-05f8ab1bfbc3"}
+{"time":"2026-10-23T09:07:05.902-06:00","level":"INFO","msg":"observation query count","job_id":"c061cd65-57cc-4a9e-9381-05f8ab1bfbc3","status":"completed","observation_queries":32}
+{"time":"2026-10-23T09:07:05.905-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/images/2/variants/preview"}
+{"time":"2026-10-23T09:07:05.915-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/images/2/variants/display"}
+{"time":"2026-10-23T09:07:05.916-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/images/2/variants/thumbnail"}

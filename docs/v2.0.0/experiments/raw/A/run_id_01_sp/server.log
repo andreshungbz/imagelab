@@ -1,0 +1,47 @@
+go run ./cmd/api -db-dsn="$IMAGELAB_DB_DSN" -port="$PORT" -cors-trusted-origins="$CORS_TRUSTED_ORIGINS" -consumer-id="$CONSUMER_ID" -exp-quiet-delay-enabled=true -exp-quiet-delay-duration=30s
+{"time":"2026-10-23T08:59:32.757-06:00","level":"INFO","msg":"database connection pool established"}
+{"time":"2026-10-23T08:59:32.757-06:00","level":"INFO","msg":"starting server","addr":":4000","env":"development"}
+{"time":"2026-10-23T08:59:39.347-06:00","level":"INFO","msg":"client request","method":"OPTIONS","path":"/v1/images"}
+{"time":"2026-10-23T08:59:39.348-06:00","level":"INFO","msg":"client request","method":"OPTIONS","path":"/v1/images"}
+{"time":"2026-10-23T08:59:54.484-06:00","level":"INFO","msg":"client request","method":"OPTIONS","path":"/v1/images"}
+{"time":"2026-10-23T08:59:54.485-06:00","level":"INFO","msg":"client request","method":"OPTIONS","path":"/v1/images"}
+{"time":"2026-10-23T09:01:53.844-06:00","level":"INFO","msg":"client request","method":"POST","path":"/v1/images"}
+{"time":"2026-10-23T09:01:53.864-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/jobs/4dff1090-6f4d-458b-9dc9-672e6f12a2e7"}
+{"time":"2026-10-23T09:01:54.009-06:00","level":"INFO","msg":"image job started","job_id":"4dff1090-6f4d-458b-9dc9-672e6f12a2e7","exp_quiet_delay":true,"exp_simulation_phase":false}
+{"time":"2026-10-23T09:01:54.009-06:00","level":"INFO","msg":"starting quiet delay phase","job_id":"4dff1090-6f4d-458b-9dc9-672e6f12a2e7","duration":30000000000}
+{"time":"2026-10-23T09:01:54.865-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/jobs/4dff1090-6f4d-458b-9dc9-672e6f12a2e7"}
+{"time":"2026-10-23T09:01:55.864-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/jobs/4dff1090-6f4d-458b-9dc9-672e6f12a2e7"}
+{"time":"2026-10-23T09:01:56.864-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/jobs/4dff1090-6f4d-458b-9dc9-672e6f12a2e7"}
+{"time":"2026-10-23T09:01:57.864-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/jobs/4dff1090-6f4d-458b-9dc9-672e6f12a2e7"}
+{"time":"2026-10-23T09:01:58.864-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/jobs/4dff1090-6f4d-458b-9dc9-672e6f12a2e7"}
+{"time":"2026-10-23T09:01:59.865-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/jobs/4dff1090-6f4d-458b-9dc9-672e6f12a2e7"}
+{"time":"2026-10-23T09:02:00.865-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/jobs/4dff1090-6f4d-458b-9dc9-672e6f12a2e7"}
+{"time":"2026-10-23T09:02:01.865-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/jobs/4dff1090-6f4d-458b-9dc9-672e6f12a2e7"}
+{"time":"2026-10-23T09:02:02.865-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/jobs/4dff1090-6f4d-458b-9dc9-672e6f12a2e7"}
+{"time":"2026-10-23T09:02:03.865-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/jobs/4dff1090-6f4d-458b-9dc9-672e6f12a2e7"}
+{"time":"2026-10-23T09:02:04.865-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/jobs/4dff1090-6f4d-458b-9dc9-672e6f12a2e7"}
+{"time":"2026-10-23T09:02:05.864-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/jobs/4dff1090-6f4d-458b-9dc9-672e6f12a2e7"}
+{"time":"2026-10-23T09:02:06.864-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/jobs/4dff1090-6f4d-458b-9dc9-672e6f12a2e7"}
+{"time":"2026-10-23T09:02:07.865-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/jobs/4dff1090-6f4d-458b-9dc9-672e6f12a2e7"}
+{"time":"2026-10-23T09:02:08.865-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/jobs/4dff1090-6f4d-458b-9dc9-672e6f12a2e7"}
+{"time":"2026-10-23T09:02:09.865-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/jobs/4dff1090-6f4d-458b-9dc9-672e6f12a2e7"}
+{"time":"2026-10-23T09:02:10.864-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/jobs/4dff1090-6f4d-458b-9dc9-672e6f12a2e7"}
+{"time":"2026-10-23T09:02:11.864-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/jobs/4dff1090-6f4d-458b-9dc9-672e6f12a2e7"}
+{"time":"2026-10-23T09:02:12.864-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/jobs/4dff1090-6f4d-458b-9dc9-672e6f12a2e7"}
+{"time":"2026-10-23T09:02:13.864-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/jobs/4dff1090-6f4d-458b-9dc9-672e6f12a2e7"}
+{"time":"2026-10-23T09:02:14.865-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/jobs/4dff1090-6f4d-458b-9dc9-672e6f12a2e7"}
+{"time":"2026-10-23T09:02:15.864-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/jobs/4dff1090-6f4d-458b-9dc9-672e6f12a2e7"}
+{"time":"2026-10-23T09:02:16.864-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/jobs/4dff1090-6f4d-458b-9dc9-672e6f12a2e7"}
+{"time":"2026-10-23T09:02:17.864-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/jobs/4dff1090-6f4d-458b-9dc9-672e6f12a2e7"}
+{"time":"2026-10-23T09:02:18.865-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/jobs/4dff1090-6f4d-458b-9dc9-672e6f12a2e7"}
+{"time":"2026-10-23T09:02:19.864-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/jobs/4dff1090-6f4d-458b-9dc9-672e6f12a2e7"}
+{"time":"2026-10-23T09:02:20.864-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/jobs/4dff1090-6f4d-458b-9dc9-672e6f12a2e7"}
+{"time":"2026-10-23T09:02:21.864-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/jobs/4dff1090-6f4d-458b-9dc9-672e6f12a2e7"}
+{"time":"2026-10-23T09:02:22.864-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/jobs/4dff1090-6f4d-458b-9dc9-672e6f12a2e7"}
+{"time":"2026-10-23T09:02:23.864-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/jobs/4dff1090-6f4d-458b-9dc9-672e6f12a2e7"}
+{"time":"2026-10-23T09:02:24.613-06:00","level":"INFO","msg":"terminal commit","job_id":"4dff1090-6f4d-458b-9dc9-672e6f12a2e7","status":"completed","committed version":5}
+{"time":"2026-10-23T09:02:24.864-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/jobs/4dff1090-6f4d-458b-9dc9-672e6f12a2e7"}
+{"time":"2026-10-23T09:02:24.865-06:00","level":"INFO","msg":"observation query count","job_id":"4dff1090-6f4d-458b-9dc9-672e6f12a2e7","status":"completed","observation_queries":32}
+{"time":"2026-10-23T09:02:24.868-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/images/1/variants/thumbnail"}
+{"time":"2026-10-23T09:02:24.869-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/images/1/variants/preview"}
+{"time":"2026-10-23T09:02:24.879-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/images/1/variants/display"}
