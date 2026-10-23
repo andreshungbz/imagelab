@@ -13,6 +13,7 @@ dependencies = [
 
 [project.scripts]
 measurement = "measurement.main:main"
+show-v2-detection-delays = "measurement.v2_detection_delays:main"
 
 [build-system]
 requires = ["uv_build>=0.12.11,<0.13.0"]

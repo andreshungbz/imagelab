@@ -3,7 +3,7 @@ from datetime import datetime
 from pathlib import Path
 
 # Base Directory Path
-BASE_DIR = Path("docs/v2.0.0/experiments/raw")
+BASE_DIR = Path("../docs/v2.0.0/experiments/raw")
 
 
 def parse_iso_time(time_str: str) -> datetime:

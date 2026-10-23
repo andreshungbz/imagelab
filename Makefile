@@ -236,4 +236,4 @@ exp/cond-c3: exp/cond-c2
 # Helper to show v2 detection delay results.
 .PHONY: show-v2-detection-delays
 show-v2-detection-delays:
-		python3 scripts/v2_consolidate_detection_delays.py
+		uv run --directory ./python show-v2-detection-delays
