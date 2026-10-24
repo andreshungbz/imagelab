@@ -51,7 +51,7 @@ docker compose down
 
 #### Database Setup
 
-Logging into your own PostgreSQL database instance as a user with sufficient permissions, run the following commands to create the necessary database and user.
+Log in to your own PostgreSQL database instance as a user with sufficient permissions, and run the following commands to create the necessary database and user.
 
 ```
 CREATE ROLE imagelab WITH LOGIN PASSWORD 'password';
@@ -72,7 +72,7 @@ make run
 #### Web Application Setup
 
 > [!NOTE]
-> Using another host other than `localhost` or a different port other than `5500` requires appropriately setting the `CORS_TRUSTED_ORIGINS` environment variable so that the API server does not block requests from the web application.
+> Using a host other than `localhost` or a different port other than `5500` requires appropriately setting the `CORS_TRUSTED_ORIGINS` environment variable so that the API server does not block requests from the web application.
 
 Use any HTTP server application such as [nginx](https://nginx.org/en/), [Apache](https://httpd.apache.org/), or [Caddy](https://caddyserver.com/) to serve the static web application files in the `/frontend` directory. The [Live Server](https://marketplace.visualstudio.com/items?itemName=ritwickdey.LiveServer) extension for VS Code can also be used, but ensure the workspace is the `/frontend` directory and not the repository root. Then, the web application will be available at http://localhost:5500.
 
@@ -91,7 +91,7 @@ docker compose run --rm measure
 - Python 3.14
 - uv
 
-With the API server running, run the `measure/baseline` and `measure/concurrent` Makefile rules to run the 1-count and 5-count measurements, respectively. For clearer delineations, run the API server with the 3-second image processing delay. The results will be printed to the terminal. To manually provide a count, run the `uv` command manually from the project root.
+With the API server running, run the `measure/baseline` and `measure/concurrent` Makefile rules to run the 1-count and 5-count measurements, respectively. For clearer delineation, run the API server with a 3-second image processing delay. The results will be printed to the terminal. To manually provide a count, run the `uv` command from the project root.
 
 ```
 make test/delay-3s
@@ -115,7 +115,7 @@ source .envrc && uv run --directory ./python measurement \
 
 ### v2.0.0 Experimental Condition Tests
 
-Run the server configured for each experimental condition using the defined rules in `Makefile` or the defined recipes in `justfile`. The table below lists each condition and the correspoding recipe using `just`. For Condition C3 and C3-X (uses the same command as C3), configure the appropriate latency in a custom profile in the browser developer tools network tab. C3 uses 200ms latency and C3-X uses 400ms latency. Conditions C1, C2, C3, and C3-X show Simulated Progress in the UI.
+Run the server configured for each experimental condition using the defined rules in `Makefile` or the defined recipes in `justfile`. The table below lists each condition and the corresponding recipe using `just`. For Condition C3 and C3-X (which use the same command as C3), configure the appropriate latency in a custom profile in the browser developer tools' network tab. C3 uses 200ms latency, and C3-X uses 400ms latency. Conditions C1, C2, C3, and C3-X show Simulated Progress in the UI.
 
 | Condition | Just Recipe        |
 | --------- | ------------------ |
@@ -125,7 +125,7 @@ Run the server configured for each experimental condition using the defined rule
 | C2        | `just exp-cond-c2` |
 | C3        | `just exp-cond-c3` |
 
-Submit an image to ImageLab with the browser develop tools open to view the resulting network requests. Timestamps will be seen in the browser console as well as the server logs.The following command shows the consolidated detection delays for each run using a Python script.
+Submit an image to ImageLab with the browser developer tools open to view the resulting network requests. Timestamps will appear in the browser console as well as in the server logs. The following command uses a Python script to show the consolidated detection delays for each run.
 
 ```
 just show-v2-detection-delays
@@ -136,4 +136,4 @@ The `v_job_metrics` view in the database can be queried for the processing durat
 ## Attributions
 
 - Favicon framed picture icon is copyright 2020 Twitter, Inc., and other contributors. The graphics are licensed under [CC-BY 4.0](https://creativecommons.org/licenses/by/4.0/). No modifications were made to the original image.
-- The `/python/src/measurement/pittsburgh.jpg` test image used for measurements tests is copyright 2024 Andres Hung and is licensed under [CC-BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/).
+- The `/python/src/measurement/pittsburgh.jpg` test image used for measurement tests is copyright 2024 Andres Hung and is licensed under [CC-BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/).
