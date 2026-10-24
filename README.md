@@ -2,9 +2,11 @@
 
 ImageLab is a single-page application for generating image variants. It is a demonstration of Asynchronous APIs and the Event-Emitter pattern. The application consists of three main parts: an API server written in Go (`/cmd/api`), a web application using HTML, CSS, and JavaScript (`/frontend`), and a PostgreSQL database (`/migrations`).
 
-## CMPS4191 Test 1
+ImageLab demonstrates the asynchronous APIs of short polling and long polling. Use the dropdown in the UI to change the mode. Wait time can be additionally configured for long polling.
 
-Check-in documentation can be found in the `/docs` directory.
+## CMPS4191 Test 1, 2, 3 (Final Project)
+
+Reports, presentations, and raw files can be found in the `/docs` directory, organized by major versions.
 
 | Key                | Value                                                                                              |
 | ------------------ | -------------------------------------------------------------------------------------------------- |
@@ -12,9 +14,7 @@ Check-in documentation can be found in the `/docs` directory.
 | **Student Emails** | 2018118240@ub.edu.bz & 2021153908@ub.edu.bz                                                        |
 | **Course**         | CMPS4191 - Advanced Web Technologies                                                               |
 | **School**         | University of Belize                                                                               |
-| **Due Date**       | September 30, 2026                                                                                 |
-
-Final Presentation can be found as a PowerPoint file in the `/docs` directory or as a Google Slides presentation [here](https://docs.google.com/presentation/d/1sG8_3x4rZIWZ4SkDSI0SGAGYmicCrL6UGiMXfcc2ikc/edit?usp=sharing).
+| **Due Date**       | November 18, 2026                                                                                  |
 
 ## Running the Project
 
@@ -40,14 +40,6 @@ Close down the services with the following command.
 docker compose down
 ```
 
-#### Measurement Tests
-
-The `measure` service in the `compose.yaml` file runs the 5-count measurements for the Docker Compose setup. The count can be edited in the `compose.yaml` file. The following command runs the measurement tests.
-
-```
-docker compose run --rm measure
-```
-
 ### Manual Setup Procedure
 
 #### Prerequisites
@@ -56,11 +48,6 @@ docker compose run --rm measure
 - golang-migrate
 - make/just
 - PostgreSQL
-
-#### Measurement Tests Prerequisites
-
-- Python 3.14
-- uv
 
 #### Database Setup
 
@@ -89,7 +76,20 @@ make run
 
 Use any HTTP server application such as [nginx](https://nginx.org/en/), [Apache](https://httpd.apache.org/), or [Caddy](https://caddyserver.com/) to serve the static web application files in the `/frontend` directory. The [Live Server](https://marketplace.visualstudio.com/items?itemName=ritwickdey.LiveServer) extension for VS Code can also be used, but ensure the workspace is the `/frontend` directory and not the repository root. Then, the web application will be available at http://localhost:5500.
 
-#### Measurement Tests
+## Testing
+
+### v1.0.0 Short Polling Measurement Tests
+
+The `measure` service in the `compose.yaml` file runs the 5-count measurements for the Docker Compose setup. The count can be edited in the `compose.yaml` file. The following command runs the measurement tests.
+
+```
+docker compose run --rm measure
+```
+
+#### Manual Tests Prerequisites
+
+- Python 3.14
+- uv
 
 With the API server running, run the `measure/baseline` and `measure/concurrent` Makefile rules to run the 1-count and 5-count measurements, respectively. For clearer delineations, run the API server with the 3-second image processing delay. The results will be printed to the terminal. To manually provide a count, run the `uv` command manually from the project root.
 
@@ -112,6 +112,26 @@ source .envrc && uv run --directory ./python measurement \
 	--db-dsn="$IMAGELAB_DB_DSN" \
 	--image-path="src/measurement/pittsburgh.jpg"
 ```
+
+### v2.0.0 Experimental Condition Tests
+
+Run the server configured for each experimental condition using the defined rules in `Makefile` or the defined recipes in `justfile`. The table below lists each condition and the correspoding recipe using `just`. For Condition C3 and C3-X (uses the same command as C3), configure the appropriate latency in a custom profile in the browser developer tools network tab. C3 uses 200ms latency and C3-X uses 400ms latency. Conditions C1, C2, C3, and C3-X show Simulated Progress in the UI.
+
+| Condition | Just Recipe        |
+| --------- | ------------------ |
+| A         | `just exp-cond-a`  |
+| B         | `just exp-cond-b`  |
+| C1        | `just exp-cond-c1` |
+| C2        | `just exp-cond-c2` |
+| C3        | `just exp-cond-c3` |
+
+Submit an image to ImageLab with the browser develop tools open to view the resulting network requests. Timestamps will be seen in the browser console as well as the server logs.The following command shows the consolidated detection delays for each run using a Python script.
+
+```
+just show-v2-detection-delays
+```
+
+The `v_job_metrics` view in the database can be queried for the processing durations.
 
 ## Attributions
 
