@@ -21,21 +21,21 @@ type envelope map[string]any
 
 // writeJSON encodes data into a JSON response, applies HTTP headers, and writes the HTTP status code.
 func (app *application) writeJSON(w http.ResponseWriter, status int, data envelope, headers http.Header) error {
-	// Encode the data into JSON
+	// Encode the data into JSON.
 	js, err := json.MarshalIndent(data, "", "\t")
 	if err != nil {
 		return err
 	}
 	js = append(js, '\n')
 
-	// Apply HTTP headers
+	// Apply HTTP headers.
 	for key, values := range headers {
 		for _, value := range values {
 			w.Header().Add(key, value)
 		}
 	}
 
-	// Set Content-Type and write to HTTP response
+	// Set Content-Type and write to HTTP response.
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(status)
 	w.Write(js)
@@ -45,10 +45,10 @@ func (app *application) writeJSON(w http.ResponseWriter, status int, data envelo
 
 // readJSON decodes JSON input, writing it to a destination object.
 func (app *application) readJSON(w http.ResponseWriter, r *http.Request, dst any) error {
-	// Set a reasonable 1MB limit for HTTP request body
+	// Set a reasonable 1MB limit for HTTP request body.
 	r.Body = http.MaxBytesReader(w, r.Body, 1_048_576)
 
-	// Decode JSON and check for errors
+	// Decode JSON and check for errors.
 	dec := json.NewDecoder(r.Body)
 	dec.DisallowUnknownFields()
 	err := dec.Decode(dst)
@@ -94,7 +94,7 @@ func (app *application) readJSON(w http.ResponseWriter, r *http.Request, dst any
 		}
 	}
 
-	// Check for extraneous input
+	// Check for extraneous input.
 	err = dec.Decode(&struct{}{})
 	if !errors.Is(err, io.EOF) {
 		return errors.New("Body must only contain a single JSON value")
