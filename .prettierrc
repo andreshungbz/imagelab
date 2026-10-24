@@ -21,6 +21,5 @@
   "vueIndentScriptAndStyle": false,
   "experimentalTernaries": false,
   "objectWrap": "preserve",
-  "experimentalOperatorPosition": "end",
-  "parser": "babel"
+  "experimentalOperatorPosition": "end"
 }
