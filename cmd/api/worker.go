@@ -50,6 +50,8 @@ func (app *application) processNextImageJob(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
+	// SYNC-01: Notification for queued to processing.
+	app.jobObservers.notify(job.PublicID)
 
 	// Assert that the payload is an ImagePayload.
 	imgPayload, ok := job.Payload.(data.ImagePayload)
@@ -89,9 +91,8 @@ func (app *application) processNextImageJob(ctx context.Context) error {
 				if err = app.models.Jobs.UpdateSimulatedProgress(ctx, job.ID, simStep); err != nil {
 					return fmt.Errorf("failed to update simulated progress: %w", err)
 				}
-
-				// EXP-02: Log actual commit time (milliseconds) rather than assuming ideal timer intervals.
-				commitTime := time.Now().UnixMilli()
+				// SYNC-01: Notification for simulated progress update.
+				app.jobObservers.notify(job.PublicID)
 
 				// Update in-memory struct state.
 				job.Version++
@@ -101,7 +102,6 @@ func (app *application) processNextImageJob(ctx context.Context) error {
 					"job_id", job.PublicID,
 					"version", job.Version,
 					"simulated_progress", simStep,
-					"commit_time_ms", commitTime,
 				)
 			}
 		}
@@ -197,6 +197,8 @@ func (app *application) processNextImageJob(ctx context.Context) error {
 				break
 			}
 		}
+		// SYNC-01: Notification for progress update and job completion.
+		app.jobObservers.notify(job.PublicID)
 
 		// Update in-memory job struct.
 		job.Version++
@@ -209,6 +211,7 @@ func (app *application) processNextImageJob(ctx context.Context) error {
 		if jobErr != nil {
 			break
 		}
+
 	}
 
 	// Job Failure
@@ -219,7 +222,12 @@ func (app *application) processNextImageJob(ctx context.Context) error {
 		job.Version++
 
 		err := app.models.Jobs.MarkFailed(ctx, job.ID, jobErr.Error())
-		app.logger.Info("terminal commit", "job_id", job.PublicID, "status", job.Status, "committed version", job.Version, "error", jobErr)
+		if err == nil {
+			app.logger.Info("terminal commit", "job_id", job.PublicID, "status", job.Status, "committed version", job.Version, "error", jobErr)
+			// SYNC-01: Notification for job failure.
+			app.jobObservers.notify(job.PublicID)
+		}
+
 		return err
 	}
 

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"net/http"
@@ -30,7 +31,7 @@ func (app *application) getImageJobHandler(w http.ResponseWriter, r *http.Reques
 		app.serverErrorResponse(w, r, err)
 		return
 	}
-	app.recordJobObservation(jobID)
+	app.recordJobObservation(jobID) // MEAS-05: Observation Database Read.
 
 	// Parse and validate "after" and "wait" query parameters.
 	lpParams, err := app.readLongPollingParams(r.URL.Query())
@@ -42,7 +43,7 @@ func (app *application) getImageJobHandler(w http.ResponseWriter, r *http.Reques
 	// SHORT POLLING (API-01): Perform short polling when there is no "after" query parameter.
 	if !lpParams.hasAfter {
 		app.checkAndLogTerminal(job)
-		app.writeJobSnapshotResponse(w, r, job)
+		app.writePollingJobSnapshotResponse(w, r, job)
 		return
 	}
 
@@ -56,14 +57,14 @@ func (app *application) getImageJobHandler(w http.ResponseWriter, r *http.Reques
 	// LONG POLLING (API-02): If the job status is terminal (completed/failed), return a 200 OK with the job snapshot.
 	if job.Terminal() {
 		app.checkAndLogTerminal(job)
-		app.writeJobSnapshotResponse(w, r, job)
+		app.writePollingJobSnapshotResponse(w, r, job)
 		return
 	}
 
 	// LONG POLLING (API-02): If the current job version is greater than the "after" parameter, return a 200 OK with the job snapshot.
 	if job.Version > lpParams.after {
 		app.checkAndLogTerminal(job)
-		app.writeJobSnapshotResponse(w, r, job)
+		app.writePollingJobSnapshotResponse(w, r, job)
 		return
 	}
 
@@ -98,12 +99,11 @@ func (app *application) getImageJobHandler(w http.ResponseWriter, r *http.Reques
 				app.serverErrorResponse(w, r, err)
 				return
 			}
-
-			app.recordJobObservation(jobID)
+			app.recordJobObservation(jobID) // MEAS-05: Observation Database Read.
 
 			if latestJob.Terminal() || latestJob.Version > lpParams.after {
 				app.checkAndLogTerminal(latestJob)
-				app.writeJobSnapshotResponse(w, r, latestJob)
+				app.writePollingJobSnapshotResponse(w, r, latestJob)
 				return
 			}
 
@@ -115,12 +115,11 @@ func (app *application) getImageJobHandler(w http.ResponseWriter, r *http.Reques
 				app.serverErrorResponse(w, r, err)
 				return
 			}
-
-			app.recordJobObservation(jobID)
+			app.recordJobObservation(jobID) // MEAS-05: Observation Database Read.
 
 			if latestJob.Terminal() || latestJob.Version > lpParams.after {
 				app.checkAndLogTerminal(latestJob)
-				app.writeJobSnapshotResponse(w, r, latestJob)
+				app.writePollingJobSnapshotResponse(w, r, latestJob)
 				return
 			}
 
@@ -136,17 +135,137 @@ func (app *application) getImageJobHandler(w http.ResponseWriter, r *http.Reques
 	}
 }
 
-// writeJobSnapshotResponse formats and writes the uniform observation JSON payload.
-func (app *application) writeJobSnapshotResponse(w http.ResponseWriter, r *http.Request, job *data.Job) {
-	// Safely assert that the payload is an ImagePayload.
-	imgPayload, ok := job.Payload.(data.ImagePayload)
-	if !ok {
-		app.serverErrorResponse(w, r, fmt.Errorf("unexpected payload structure for job type %q", job.JobType))
+// getImageJobEventsHandler streams versioned job snapshots to an EventSource client.
+func (app *application) getImageJobEventsHandler(w http.ResponseWriter, r *http.Request) {
+	// Extract the job public ID from the URL parameters.
+	params := httprouter.ParamsFromContext(r.Context())
+	jobID := params.ByName("id")
+
+	// SYNC-03: 1. Subscribe.
+	updates, unsubscribe := app.jobObservers.subscribe(jobID)
+	defer unsubscribe() // SYNC-06: Release subscriber registrations when the handler exits.
+
+	// SSE-02/SYNC-03: Read once after subscribing so unknown jobs return 404 without opening a stream.
+	job, err := app.models.Jobs.GetByPublicID(jobID)
+	if err != nil {
+		if errors.Is(err, data.ErrRecordNotFound) {
+			app.notFoundResponse(w, r)
+			return
+		}
+		app.serverErrorResponse(w, r, err)
+		return
+	}
+	app.recordJobObservation(jobID) // MEAS-05: Observation Database Read.
+
+	// SSE-03: Identify the response as an unbuffered event stream.
+	w.Header().Set("Content-Type", "text/event-stream; charset=utf-8")
+	w.Header().Set("Cache-Control", "no-cache")
+	w.Header().Set("X-Accel-Buffering", "no")
+
+	// SSE-04: Send the complete current snapshot immediately on connection (job-update event).
+	if err := writeSSEJobSnapshot(w, job); err != nil {
 		return
 	}
 
-	// Send a JSON response of the retrieved job, handling any errors.
-	response := envelope{
+	// SSE-07: A terminal snapshot ends the server stream.
+	if job.Terminal() {
+		app.checkAndLogTerminal(job)
+		return
+	}
+
+	// SYNC-03: 3. Wait.
+	heartbeat := time.NewTicker(20 * time.Second)
+	defer heartbeat.Stop()
+	lastVersion := job.Version
+	for {
+		select {
+		// SYNC-04: Notification prompts a database reread. The signal itself doesn't contruct the SSE payload.
+		case <-updates:
+			// Read job snapshot from the database.
+			job, err = app.models.Jobs.GetByPublicID(jobID)
+			if err != nil {
+				app.serverErrorResponse(w, r, err)
+				return
+			}
+			app.recordJobObservation(jobID) // MEAS-05: Observation Database Read.
+
+			// SYNC-05: Skip older or same versions. Notifications may be coalesced.
+			if job.Version <= lastVersion {
+				continue
+			}
+
+			// SSE-05: A newly observed committed version sends the current snapshot to the client (job-update event).
+			if err := writeSSEJobSnapshot(w, job); err != nil {
+				return
+			}
+
+			// Update the last observed version to the current one.
+			lastVersion = job.Version
+
+			// SSE-07: A terminal snapshot ends the server stream.
+			if job.Terminal() {
+				app.checkAndLogTerminal(job)
+				return
+			}
+
+		// SSE-08: Heartbeats keep idle streams active without changing job state or version.
+		case <-heartbeat.C:
+			if _, err := fmt.Fprint(w, ": keep-alive\n\n"); err != nil {
+				return
+			}
+			if err := http.NewResponseController(w).Flush(); err != nil {
+				return
+			}
+
+		// SYNC-07: Client cancellation stops observation only. The worker remains independent.
+		case <-r.Context().Done():
+			return
+		}
+	}
+}
+
+// writePollingJobSnapshotResponse formats and writes the polling JSON payload.
+func (app *application) writePollingJobSnapshotResponse(w http.ResponseWriter, r *http.Request, job *data.Job) {
+	response, err := buildJobSnapshot(job)
+	if err != nil {
+		app.serverErrorResponse(w, r, err)
+		return
+	}
+
+	if err := app.writeJSON(w, http.StatusOK, response, nil); err != nil {
+		app.serverErrorResponse(w, r, err)
+	}
+}
+
+// writeSSEJobSnapshot writes one complete named SSE event and flushes it without closing the stream.
+func writeSSEJobSnapshot(w http.ResponseWriter, job *data.Job) error {
+	snapshot, err := buildJobSnapshot(job)
+	if err != nil {
+		return err
+	}
+
+	payload, err := json.Marshal(snapshot)
+	if err != nil {
+		return err
+	}
+
+	// SSE-06: The event frame ends with a blank line, and Flush makes it available immediately.
+	if _, err := fmt.Fprintf(w, "event: job-update\ndata: %s\n\n", payload); err != nil { // Blank line ending.
+		return err
+	}
+	return http.NewResponseController(w).Flush() // Flush call.
+}
+
+// buildJobSnapshot constructs the complete client-visible representation of a job.
+func buildJobSnapshot(job *data.Job) (envelope, error) {
+	// Safely assert that the payload is an ImagePayload.// Construct snapshot.
+	imgPayload, ok := job.Payload.(data.ImagePayload)
+	if !ok {
+		return nil, fmt.Errorf("unexpected payload structure for job type %q", job.JobType)
+	}
+
+	// SSE-09: Construct snapshot without (internal) ID fields or claims to Last-Evend-ID replays.
+	snapshot := envelope{
 		"id":                 job.PublicID,
 		"image_id":           imgPayload.ImageID,
 		"status":             job.Status,
@@ -158,18 +277,18 @@ func (app *application) writeJobSnapshotResponse(w http.ResponseWriter, r *http.
 		"started_at":         job.StartedAt,
 		"completed_at":       job.CompletedAt,
 	}
-
 	// Conditionally add failed_at field if it is not nil.
 	if job.FailedAt != nil {
-		response["failed_at"] = job.FailedAt
+		snapshot["failed_at"] = job.FailedAt
 	}
-
+	// Conditionally add error field if it is not nil.
+	if job.ErrorMessage != nil {
+		snapshot["error"] = *job.ErrorMessage
+	}
 	// Conditionally add variants field if the result is not empty.
 	if len(job.Result) > 0 && string(job.Result) != "null" {
-		response["variants"] = job.Result
+		snapshot["variants"] = job.Result
 	}
 
-	if err := app.writeJSON(w, http.StatusOK, response, nil); err != nil {
-		app.serverErrorResponse(w, r, err)
-	}
+	return snapshot, nil
 }

@@ -20,9 +20,8 @@ func (app *application) serve() error {
 		Handler:     app.routes(),
 		IdleTimeout: time.Minute,
 		ReadTimeout: 5 * time.Second,
-		// WAIT-03: A WriteTimeout of 35 should account for server handler hold time, browser timeout, and network latency.
-		// Server Handler Max Wait (20s) < Browser Timeout (30s) < Server Write Timeout (35s)
-		WriteTimeout: 35 * time.Second,
+		// SSE-07: A finite server WriteTimeout would terminate an active stream, so handlers manage their own lifetimes.
+		WriteTimeout: 0,
 		ErrorLog:     slog.NewLogLogger(app.logger.Handler(), slog.LevelError),
 	}
 

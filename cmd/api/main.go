@@ -54,9 +54,10 @@ type config struct {
 type application struct {
 	config            config
 	logger            *slog.Logger
-	models            data.Models        // Data models for the application
-	wg                sync.WaitGroup     // Synchronization primitive to manage goroutines
-	imageWorkerCancel context.CancelFunc // Worker cancellation function to stop the image worker gracefully
+	models            data.Models          // Data models for the application
+	wg                sync.WaitGroup       // Synchronization primitive to manage goroutines
+	imageWorkerCancel context.CancelFunc   // Worker cancellation function to stop the image worker gracefully
+	jobObservers      *jobObserverRegistry // Registry for managing job observers and notifications
 
 	// Observation query tracking
 	obsMu     sync.Mutex
@@ -146,10 +147,11 @@ func main() {
 	// APPLICATION
 
 	app := &application{
-		config:    cfg,
-		logger:    logger,
-		models:    data.NewModels(db),
-		obsCounts: make(map[string]int),
+		config:       cfg,
+		logger:       logger,
+		models:       data.NewModels(db),
+		obsCounts:    make(map[string]int),
+		jobObservers: newJobObserverRegistry(),
 	}
 
 	// Start the image worker (in a separate goroutine) with a cancellable context.

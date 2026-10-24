@@ -24,6 +24,7 @@ func (app *application) routes() http.Handler {
 
 	// Job routes
 	router.HandlerFunc(http.MethodGet, "/v1/jobs/:id", app.getImageJobHandler)
+	router.HandlerFunc(http.MethodGet, "/v1/jobs/:id/events", app.getImageJobEventsHandler) // SSE-01: Endpoint for browser EventSource API.
 
 	// Image routes
 	router.HandlerFunc(http.MethodPost, "/v1/images", app.processImageHandler)
