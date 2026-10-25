@@ -146,6 +146,55 @@ export const DataService = {
     }
   },
 
+  // observeJobSSE opens one EventSource for a job and keeps it available for browser reconnection.
+  observeJobSSE(statusURL, token) {
+    if (token !== state.job.observationToken) return null;
+
+    // UI-01: Open the event stream for the accepted job without submitting another image.
+    const events = new EventSource(`${API_BASE}${statusURL}/events`);
+
+    // UI-04: A successful browser reconnect clears the transient connection message.
+    events.onopen = () => {
+      if (token !== state.job.observationToken) return;
+      emitter.emit("job:sse_open");
+    };
+
+    // UI-02: Parse each named snapshot and pass it to the existing job render events.
+    events.addEventListener("job-update", (event) => {
+      if (token !== state.job.observationToken) return;
+
+      let data;
+      try {
+        data = JSON.parse(event.data);
+      } catch {
+        emitter.emit("job:sse_error", "Received an invalid job update.");
+        return;
+      }
+
+      switch (data.status) {
+        case "completed":
+          emitter.emit("job:completed", data);
+          break;
+        case "failed":
+          emitter.emit("job:failed", data);
+          break;
+        case "queued":
+        case "processing":
+        default:
+          emitter.emit("job:updated", data);
+          break;
+      }
+    });
+
+    // UI-04/UI-05: Keep the same EventSource so the browser can reconnect without creating a job or upload.
+    events.onerror = () => {
+      if (token !== state.job.observationToken) return;
+      emitter.emit("job:sse_error", "Connection interrupted; reconnecting...");
+    };
+
+    return events;
+  },
+
   // fetchSingleVariantBlob downloads binary image data for a single newly generated variant.
   async fetchSingleVariantBlob(variant) {
     try {

@@ -2,7 +2,7 @@ import { state } from "./state.js";
 import { escapeHTML, getStepStatusIcon } from "./helpers.js";
 import { icon } from "./icons.js";
 
-// renderJobStatus generates the HTML for the job status section supporting Short/Long polling controls.
+// renderJobStatus generates the HTML for the job status section and observation mode controls.
 export function renderJobStatus() {
   // Get the container element and necessary state values.
   const container = document.querySelector("#job-status");
@@ -13,6 +13,8 @@ export function renderJobStatus() {
     status,
     progress,
     pollingMode,
+    stage,
+    variantsCompleted,
     longPollWait,
     version,
     simulatedProgress,
@@ -20,6 +22,7 @@ export function renderJobStatus() {
     isReconnecting,
     networkErrorCount,
     maxNetworkRetries,
+    sseError,
     error,
   } = state.job;
 
@@ -32,9 +35,11 @@ export function renderJobStatus() {
     Boolean(publicID) || isUploading || status === "failed" || hasFailedStep;
 
   // Calculate variant progress based strictly on completed local variant blobs.
-  const completedVariantsCount = state.results.image_variants
+  const localVariantsCount = state.results.image_variants
     ? state.results.image_variants.filter((v) => Boolean(v.localURL)).length
     : 0;
+  const completedVariantsCount =
+    pollingMode === "sse" ? variantsCompleted : localVariantsCount;
   const targetVariantsTotal =
     state.results.targetTotal || Math.max(completedVariantsCount, 3);
   const calculatedPercentage =
@@ -126,6 +131,11 @@ export function renderJobStatus() {
     }
 
     const metaItemsGroup = container.querySelector(".meta-items-group");
+    const stageEl = container.querySelector("[data-stage]");
+    if (stageEl) {
+      const valueEl = stageEl.querySelector("strong");
+      if (valueEl) valueEl.textContent = stage;
+    }
     let simulatedEl = container.querySelector("[data-simulated-progress]");
 
     if (simulatedProgress > 0) {
@@ -234,14 +244,17 @@ export function renderJobStatus() {
 
     // 8. Network Reconnecting Indicator
     let warningEl = container.querySelector(".job-status-warning");
-    if (isReconnecting && networkErrorCount < maxNetworkRetries) {
+    if (sseError || (isReconnecting && networkErrorCount < maxNetworkRetries)) {
+      const warningMessage =
+        sseError ||
+        `We're having connection issues. Retrying (${networkErrorCount}/${maxNetworkRetries})...`;
       if (!warningEl) {
         container.insertAdjacentHTML(
           "beforeend",
-          `<div class="job-status-warning">We're having connection issues. Retrying (${networkErrorCount}/${maxNetworkRetries})...</div>`,
+          `<div class="job-status-warning">${escapeHTML(warningMessage)}</div>`,
         );
       } else {
-        warningEl.textContent = `We're having connection issues. Retrying (${networkErrorCount}/${maxNetworkRetries})...`;
+        warningEl.textContent = warningMessage;
       }
     } else if (warningEl) {
       warningEl.remove();
@@ -281,6 +294,7 @@ export function renderJobStatus() {
         <select id="poll-mode-select" class="form-select-sm" aria-label="Select observation mode">
           <option value="short" ${pollingMode === "short" ? "selected" : ""}>Short Polling</option>
           <option value="long" ${pollingMode === "long" ? "selected" : ""}>Long Polling</option>
+          <option value="sse" ${pollingMode === "sse" ? "selected" : ""}>SSE</option>
         </select>
       </div>
     </div>`;
@@ -319,6 +333,10 @@ export function renderJobStatus() {
           <div class="meta-item">
             <span>Last Observed Version</span>
             <strong>${escapeHTML(String(version || 0))}</strong>
+          </div>
+          <div class="meta-item" data-stage>
+            <span>Stage</span>
+            <strong>${escapeHTML(stage)}</strong>
           </div>
           ${
             simulatedProgress > 0
@@ -399,8 +417,11 @@ export function renderJobStatus() {
   }
 
   // Network Reconnecting Indicator
-  if (isReconnecting && networkErrorCount < maxNetworkRetries) {
-    content += `<div class="job-status-warning">We're having connection issues. Retrying (${networkErrorCount}/${maxNetworkRetries})...</div>`;
+  if (sseError || (isReconnecting && networkErrorCount < maxNetworkRetries)) {
+    const warningMessage =
+      sseError ||
+      `We're having connection issues. Retrying (${networkErrorCount}/${maxNetworkRetries})...`;
+    content += `<div class="job-status-warning">${escapeHTML(warningMessage)}</div>`;
   }
 
   // Convert the content string to DOM elements and replace the container's children.

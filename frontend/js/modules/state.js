@@ -20,6 +20,8 @@ export const state = {
     publicID: "",
     imageID: 0,
     status: "", // 'pending' | 'queued' | 'processing' | 'completed' | 'failed'
+    stage: "starting",
+    variantsCompleted: 0,
     statusURL: "",
     error: null,
 
@@ -44,9 +46,10 @@ export const state = {
     },
 
     // Polling
-    pollingMode: "short", // 'short' | 'long'
+    pollingMode: "short", // 'short' | 'long' | 'sse'
     isPolling: false,
     abortController: null,
+    eventSource: null,
     version: 0,
     simulatedProgress: 0,
     observationToken: 0,
@@ -58,6 +61,7 @@ export const state = {
     networkErrorCount: 0,
     maxNetworkRetries: 3,
     isReconnecting: false,
+    sseError: null,
   },
 
   // Results Section
@@ -92,6 +96,10 @@ export function resetState() {
     state.job.abortController.abort();
     state.job.abortController = null;
   }
+  if (state.job.eventSource) {
+    state.job.eventSource.close();
+    state.job.eventSource = null;
+  }
 
   // Invalidate any in-flight observation loops.
   state.job.observationToken += 1;
@@ -113,6 +121,8 @@ export function resetState() {
   state.job.publicID = "";
   state.job.imageID = 0;
   state.job.status = "";
+  state.job.stage = "starting";
+  state.job.variantsCompleted = 0;
   state.job.statusURL = "";
   state.job.error = null;
   state.job.version = 0;
@@ -121,8 +131,10 @@ export function resetState() {
   state.job.longPollWait = state.job.longPollWait; // Preserve user-selected long poll wait duration.
   state.job.isPolling = false;
   state.job.shortPollTimerID = null;
+  state.job.eventSource = null;
   state.job.networkErrorCount = 0;
   state.job.isReconnecting = false;
+  state.job.sseError = null;
 
   // Reset Job Progress Steps.
   Object.keys(state.job.progress).forEach((step) => {

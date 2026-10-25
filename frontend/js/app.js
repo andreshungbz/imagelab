@@ -19,6 +19,13 @@ function stopPollingAndAbort() {
     state.job.abortController.abort();
     state.job.abortController = null;
   }
+  // UI-06: Invalidate callbacks from an observation stream after it is closed.
+  if (state.job.eventSource) {
+    state.job.eventSource.close();
+    state.job.eventSource = null;
+  }
+
+  state.job.observationToken += 1;
   state.job.isPolling = false;
 }
 
@@ -26,6 +33,7 @@ function stopPollingAndAbort() {
 function resetNetworkState() {
   state.job.networkErrorCount = 0;
   state.job.isReconnecting = false;
+  state.job.sseError = null;
   state.job.error = null;
   state.results.error = null;
 }
@@ -134,7 +142,7 @@ emitter.on("upload:error", (errorPayload) => {
 // JOB OBSERVATION & STEP PROGRESSION EVENTS
 // ==================================================================================== #
 
-// job:observe_start starts job status observation using the currently selected polling mode.
+// job:observe_start starts job status observation using the currently selected observation mode.
 emitter.on("job:observe_start", () => {
   stopPollingAndAbort();
   resetNetworkState();
@@ -150,7 +158,16 @@ emitter.on("job:observe_start", () => {
   // Set active observation flag.
   state.job.isPolling = true;
 
-  // Dispatch initial observation request immediately for both modes.
+  // UI-01: Dispatch observation for the accepted job without creating another upload.
+  if (state.job.pollingMode === "sse") {
+    state.job.eventSource = DataService.observeJobSSE(
+      state.job.statusURL,
+      token,
+    );
+    return;
+  }
+
+  // Dispatch initial polling request immediately.
   DataService.observeJob(state.job.statusURL, signal, token);
 
   // Short polling mode schedules recurring timer checks.
@@ -200,6 +217,22 @@ emitter.on("job:wait_change", (newWait) => {
   }
 });
 
+// job:sse_open clears a temporary SSE reconnecting message after the stream opens or reconnects.
+emitter.on("job:sse_open", () => {
+  state.job.sseError = null;
+  state.job.isReconnecting = false;
+  state.job.error = null;
+  render();
+});
+
+// job:sse_error reports a connection issue without changing the server job status.
+emitter.on("job:sse_error", (errorMessage) => {
+  state.job.sseError = errorMessage;
+  state.job.isReconnecting = true;
+  state.job.error = errorMessage;
+  render();
+});
+
 // job:updated is triggered when the backend emits a version or progress update.
 emitter.on("job:updated", (jobData) => {
   resetNetworkState();
@@ -211,10 +244,16 @@ emitter.on("job:updated", (jobData) => {
   if (typeof jobData.simulated_progress === "number") {
     state.job.simulatedProgress = jobData.simulated_progress;
   }
+  if (typeof jobData.stage === "string") {
+    state.job.stage = jobData.stage;
+  }
+  if (typeof jobData.variants_completed === "number") {
+    state.job.variantsCompleted = jobData.variants_completed;
+  }
 
   state.job.status = jobData.status;
 
-  // PROG-03: Process intermediate image variants incrementally.
+  // UI-03: Process variant progress from every observation mode as snapshots arrive.
   const incomingVariants = jobData.result || jobData.variants;
   if (Array.isArray(incomingVariants) && incomingVariants.length > 0) {
     incomingVariants.forEach((incoming) => {
@@ -247,6 +286,12 @@ emitter.on("job:completed", (jobData) => {
   if (typeof jobData.simulated_progress === "number") {
     state.job.simulatedProgress = jobData.simulated_progress;
   }
+  if (typeof jobData.stage === "string") {
+    state.job.stage = jobData.stage;
+  }
+  if (typeof jobData.variants_completed === "number") {
+    state.job.variantsCompleted = jobData.variants_completed;
+  }
 
   // Step Progress: Generating Variants --> completed, Completed --> completed
   const now = new Date().toLocaleTimeString();
@@ -274,6 +319,12 @@ emitter.on("job:failed", (jobData) => {
   }
   if (typeof jobData?.simulated_progress === "number") {
     state.job.simulatedProgress = jobData.simulated_progress;
+  }
+  if (typeof jobData.stage === "string") {
+    state.job.stage = jobData.stage;
+  }
+  if (typeof jobData.variants_completed === "number") {
+    state.job.variantsCompleted = jobData.variants_completed;
   }
 
   // Populate job state with failure details.
