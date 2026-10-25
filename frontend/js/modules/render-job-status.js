@@ -143,13 +143,16 @@ export function renderJobStatus() {
         const valEl = simulatedEl.querySelector("strong");
         if (valEl) valEl.textContent = String(simulatedProgress);
       } else if (metaItemsGroup) {
-        metaItemsGroup.insertAdjacentHTML(
-          "beforeend",
-          `<div class="meta-item" data-simulated-progress>
+        const simulatedProgressHTML = `
+          <div class="meta-item" data-simulated-progress>
             <span>Simulated Progress</span>
             <strong>${simulatedProgress}</strong>
-          </div>`,
-        );
+          </div>`;
+        if (stageEl) {
+          stageEl.insertAdjacentHTML("beforebegin", simulatedProgressHTML);
+        } else {
+          metaItemsGroup.insertAdjacentHTML("beforeend", simulatedProgressHTML);
+        }
       }
     } else if (simulatedEl) {
       simulatedEl.remove();
@@ -331,12 +334,8 @@ export function renderJobStatus() {
       <div class="job-meta-subrow">
         <div class="meta-items-group">
           <div class="meta-item">
-            <span>Last Observed Version</span>
+            <span>Job Version</span>
             <strong>${escapeHTML(String(version || 0))}</strong>
-          </div>
-          <div class="meta-item" data-stage>
-            <span>Stage</span>
-            <strong>${escapeHTML(stage)}</strong>
           </div>
           ${
             simulatedProgress > 0
@@ -347,6 +346,10 @@ export function renderJobStatus() {
             </div>`
               : ""
           }
+          <div class="meta-item" data-stage>
+            <span>Stage</span>
+            <strong>${escapeHTML(stage)}</strong>
+          </div>
         </div>
       </div>
 
