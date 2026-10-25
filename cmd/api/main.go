@@ -40,6 +40,7 @@ type config struct {
 	test_worker_start_delay             time.Duration // Artificial delay before a worker starts processing a job
 	test_individual_image_process_delay time.Duration // Artificial delay for processing each image variant
 	test_lp_db_observation_interval     time.Duration // DB recheck frequency during long-poll holding (ticker)
+	test_sse_disconnect_after_stage     string        // Simulate one SSE disconnect after the configured stage snapshot
 
 	// EXP-01: Experimental controls
 	exp_quiet_delay_enabled       bool          // Condition A quiet 30s delay
@@ -62,6 +63,10 @@ type application struct {
 	// Observation query tracking
 	obsMu     sync.Mutex
 	obsCounts map[string]int
+
+	// SSE test disconnect tracking
+	sseTestMu           sync.Mutex
+	sseTestDisconnected map[string]struct{}
 }
 
 func main() {
@@ -99,6 +104,7 @@ func main() {
 	flag.DurationVar(&cfg.test_worker_start_delay, "test-worker-start-delay", 0, "Artificial delay before a worker starts processing a job")
 	flag.DurationVar(&cfg.test_individual_image_process_delay, "test-individual-image-process-delay", 0, "Artificial delay for processing each image variant")
 	flag.DurationVar(&cfg.test_lp_db_observation_interval, "test-lp-db-observation-interval", 200*time.Millisecond, "Internal DB recheck interval during long polling")
+	flag.StringVar(&cfg.test_sse_disconnect_after_stage, "test-sse-disconnect-after-stage", "", "Test SSE disconnect after the configured stage snapshot, e.g. thumbnail_ready")
 
 	// EXP-01: Experimental control flags (disabled by default)
 	flag.BoolVar(&cfg.exp_quiet_delay_enabled, "exp-quiet-delay-enabled", false, "EXP-01: Enable quiet delay phase (Condition A)")
@@ -147,11 +153,12 @@ func main() {
 	// APPLICATION
 
 	app := &application{
-		config:       cfg,
-		logger:       logger,
-		models:       data.NewModels(db),
-		obsCounts:    make(map[string]int),
-		jobObservers: newJobObserverRegistry(),
+		config:              cfg,
+		logger:              logger,
+		models:              data.NewModels(db),
+		obsCounts:           make(map[string]int),
+		jobObservers:        newJobObserverRegistry(),
+		sseTestDisconnected: make(map[string]struct{}),
 	}
 
 	// Start the image worker (in a separate goroutine) with a cancellable context.

@@ -161,6 +161,16 @@ test/image-process-delay-3s-simulated-worker-failure:
 		-test-individual-image-process-delay=3s \
 		-test-simulated-worker-failure=true
 
+.PHONY: test/image-process-delay-3s-sse-disconnect-thumbnail
+test/image-process-delay-3s-sse-disconnect-thumbnail:
+	go run ./cmd/api \
+		-db-dsn=${IMAGELAB_DB_DSN} \
+		-port=${PORT} \
+		-cors-trusted-origins=${CORS_TRUSTED_ORIGINS} \
+		-consumer-id=${CONSUMER_ID} \
+		-test-individual-image-process-delay=3s \
+		-test-sse-disconnect-after-stage=thumbnail_ready
+
 # ==================================================================================== #
 # MEASUREMENTS
 # ==================================================================================== #

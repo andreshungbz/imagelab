@@ -166,6 +166,9 @@ func (app *application) getImageJobEventsHandler(w http.ResponseWriter, r *http.
 	if err := writeSSEJobSnapshot(w, job); err != nil {
 		return
 	}
+	if app.shouldTestSSEDisconnectAfterStage(job) {
+		return
+	}
 
 	// SSE-07: A terminal snapshot ends the server stream.
 	if job.Terminal() {
@@ -201,6 +204,9 @@ func (app *application) getImageJobEventsHandler(w http.ResponseWriter, r *http.
 
 			// Update the last observed version to the current one.
 			lastVersion = job.Version
+			if app.shouldTestSSEDisconnectAfterStage(job) {
+				return
+			}
 
 			// SSE-07: A terminal snapshot ends the server stream.
 			if job.Terminal() {
@@ -291,4 +297,23 @@ func buildJobSnapshot(job *data.Job) (envelope, error) {
 	}
 
 	return snapshot, nil
+}
+
+// shouldTestSSEDisconnectAfterStage returns true once after the configured stage snapshot is written.
+func (app *application) shouldTestSSEDisconnectAfterStage(job *data.Job) bool {
+	stage := app.config.test_sse_disconnect_after_stage
+	if stage == "" || job.Stage != stage {
+		return false
+	}
+
+	app.sseTestMu.Lock()
+	defer app.sseTestMu.Unlock()
+	if app.sseTestDisconnected == nil {
+		app.sseTestDisconnected = make(map[string]struct{})
+	}
+	if _, disconnected := app.sseTestDisconnected[job.PublicID]; disconnected {
+		return false
+	}
+	app.sseTestDisconnected[job.PublicID] = struct{}{}
+	return true
 }
