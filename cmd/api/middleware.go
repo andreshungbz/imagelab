@@ -82,6 +82,14 @@ func (gzw gzipResponseWriter) Write(b []byte) (int, error) {
 	return gzw.writer.Write(b)
 }
 
+// FlushError flushes compressed response data and then flushes the underlying HTTP response.
+func (gzw gzipResponseWriter) FlushError() error {
+	if err := gzw.writer.Flush(); err != nil {
+		return err
+	}
+	return http.NewResponseController(gzw.ResponseWriter).Flush()
+}
+
 // gzip compress responses if the client accepts the gzip encoding in its HTTP request.
 func (app *application) gzip(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
