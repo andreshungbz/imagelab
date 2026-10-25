@@ -227,6 +227,7 @@ func (app *application) checkAndLogTerminal(job *data.Job) {
 	delete(app.obsCounts, job.PublicID) // Clean up map to avoid memory growth.
 	app.obsMu.Unlock()
 
+	// MEAS-05: Observation GET logs.
 	app.logger.Info("observation query count",
 		"job_id", job.PublicID,
 		"status", job.Status,

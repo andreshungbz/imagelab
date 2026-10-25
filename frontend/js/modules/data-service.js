@@ -106,6 +106,7 @@ export const DataService = {
 
       switch (data.status) {
         case "completed":
+          // MEAS-04: Browser receipt log.
           console.log({
             id: data.id,
             status: data.status,
@@ -114,6 +115,7 @@ export const DataService = {
           emitter.emit("job:completed", data);
           break;
         case "failed":
+          // MEAS-04: Browser receipt log.
           console.log({
             id: data.id,
             status: data.status,

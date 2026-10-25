@@ -66,7 +66,7 @@ func (app *application) processNextImageJob(ctx context.Context) error {
 	)
 
 	// ====================================================================================
-	// Simulated Update Phase (Conditions C1, C2, C3)
+	// Simulated Update Phase (v2 Conditions C1, C2, C3) (v3 MEAS-03)
 	// ====================================================================================
 
 	if app.config.exp_simulation_phase_enabled {
@@ -109,7 +109,7 @@ func (app *application) processNextImageJob(ctx context.Context) error {
 	}
 
 	// ====================================================================================
-	// Quiet Delay Phase (Condition A)
+	// Quiet Delay Phase (v2 Condition A) (v3 MEAS-01)
 	// ====================================================================================
 
 	if app.config.exp_quiet_delay_enabled {
@@ -223,6 +223,7 @@ func (app *application) processNextImageJob(ctx context.Context) error {
 
 		err := app.models.Jobs.MarkFailed(ctx, job.ID, jobErr.Error())
 		if err == nil {
+			// MEAS-04: Terminal commit log.
 			app.logger.Info("terminal commit", "job_id", job.PublicID, "status", job.Status, "committed version", job.Version, "error", jobErr)
 			// SYNC-01: Notification for job failure.
 			app.jobObservers.notify(job.PublicID)
@@ -231,6 +232,7 @@ func (app *application) processNextImageJob(ctx context.Context) error {
 		return err
 	}
 
+	// MEAS-04: Terminal commit log.
 	app.logger.Info("terminal commit", "job_id", job.PublicID, "status", job.Status, "committed version", job.Version)
 	return nil
 }

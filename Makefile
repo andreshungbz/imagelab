@@ -195,7 +195,7 @@ measure/sp/five:
 # EXPERIMENTAL CONTROLS (EXP-01 – EXP-03)
 # ==================================================================================== #
 
-# Run Condition A: Quiet job with 30s delay and 0 updates
+# MEAS-01 / Condition A: Quiet active interval for 30s with no client-visible progress.
 .PHONY: exp/cond-a
 exp/cond-a:
 	go run ./cmd/api \
@@ -206,7 +206,7 @@ exp/cond-a:
 		-exp-quiet-delay-enabled=true \
 		-exp-quiet-delay-duration=30s
 
-# Run Condition B: Standard variant processing
+# MEAS-02 / Condition B: Ordinary processing with real progress after each stored variant.
 .PHONY: exp/cond-b
 exp/cond-b:
 	go run ./cmd/api \
@@ -227,7 +227,7 @@ exp/cond-c1:
 		-exp-simulation-interval=2s \
 		-exp-simulation-total-duration=10s
 
-# Run Condition C2 / C3: Fast simulated updates (Updates every 200ms for 10s)
+# MEAS-03 / Condition C2: Labelled simulated progress every 200ms for 10s.
 .PHONY: exp/cond-c2
 exp/cond-c2:
 	go run ./cmd/api \
@@ -242,6 +242,22 @@ exp/cond-c2:
 # Alias for Condition C3 (Same server config as C2; network latency is injected on client/browser)
 .PHONY: exp/cond-c3
 exp/cond-c3: exp/cond-c2
+
+# ==================================================================================== #
+# V3 MEASUREMENT CONDITION ALIASES (MEAS-01 – MEAS-03)
+# ==================================================================================== #
+
+# MEAS-01: V3 alias for the existing quiet Condition A server configuration.
+.PHONY: v3/meas-01
+v3/meas-01: exp/cond-a
+
+# MEAS-02: V3 alias for the existing ordinary Condition B server configuration.
+.PHONY: v3/meas-02
+v3/meas-02: exp/cond-b
+
+# MEAS-03: V3 alias for the existing fast simulated Condition C2 server configuration.
+.PHONY: v3/meas-03
+v3/meas-03: exp/cond-c2
 
 # Helper to show v2 detection delay results.
 .PHONY: show-v2-detection-delays

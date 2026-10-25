@@ -161,6 +161,10 @@ func (app *application) getImageJobEventsHandler(w http.ResponseWriter, r *http.
 	w.Header().Set("Content-Type", "text/event-stream; charset=utf-8")
 	w.Header().Set("Cache-Control", "no-cache")
 	w.Header().Set("X-Accel-Buffering", "no")
+	
+	// MEAS-05: Record the start of one SSE stream GET and track active/peak handler counts.
+	endSSEStream := app.beginSSEStream(jobID)
+	defer endSSEStream()
 
 	// SSE-04: Send the complete current snapshot immediately on connection (job-update event).
 	if err := writeSSEJobSnapshot(w, job); err != nil {
@@ -316,4 +320,41 @@ func (app *application) shouldTestSSEDisconnectAfterStage(job *data.Job) bool {
 	}
 	app.sseTestDisconnected[job.PublicID] = struct{}{}
 	return true
+}
+
+// beginSSEStream records one SSE stream GET and returns its lifecycle cleanup function.
+func (app *application) beginSSEStream(jobID string) func() {
+	startedAt := time.Now()
+
+	app.sseMetricsMu.Lock()
+	app.sseActiveStreams++
+	if app.sseActiveStreams > app.ssePeakActiveStreams {
+		app.ssePeakActiveStreams = app.sseActiveStreams
+	}
+	activeStreams := app.sseActiveStreams
+	peakActiveStreams := app.ssePeakActiveStreams
+	app.sseMetricsMu.Unlock()
+
+	// MEAS-05: One start log represents one SSE stream GET and records active/peak handler counts.
+	app.logger.Info("sse stream started",
+		"job_id", jobID,
+		"active_sse_streams", activeStreams,
+		"peak_active_sse_streams", peakActiveStreams,
+	)
+
+	return func() {
+		app.sseMetricsMu.Lock()
+		app.sseActiveStreams--
+		activeStreams := app.sseActiveStreams
+		peakActiveStreams := app.ssePeakActiveStreams
+		app.sseMetricsMu.Unlock()
+
+		// MEAS-05: The end log records this stream's duration and peak active handlers.
+		app.logger.Info("sse stream ended",
+			"job_id", jobID,
+			"stream_duration_ms", time.Since(startedAt).Milliseconds(),
+			"active_sse_streams", activeStreams,
+			"peak_active_sse_streams", peakActiveStreams,
+		)
+	}
 }

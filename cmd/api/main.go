@@ -67,6 +67,11 @@ type application struct {
 	// SSE test disconnect tracking
 	sseTestMu           sync.Mutex
 	sseTestDisconnected map[string]struct{}
+
+	// SSE stream measurement tracking
+	sseMetricsMu         sync.Mutex
+	sseActiveStreams     int
+	ssePeakActiveStreams int
 }
 
 func main() {
