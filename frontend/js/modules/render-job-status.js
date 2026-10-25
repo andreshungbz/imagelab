@@ -124,12 +124,12 @@ export function renderJobStatus() {
       jobIdEl.textContent = displayJobID;
     }
 
-    const jobIdValueContainer = container.querySelector(".job-id-value");
+    const jobIdLabel = container.querySelector(".job-id-label");
     let copyJobIDButton = container.querySelector("#btn-copy-job-id");
 
     if (publicID) {
-      if (!copyJobIDButton && jobIdValueContainer) {
-        jobIdValueContainer.insertAdjacentHTML(
+      if (!copyJobIDButton && jobIdLabel) {
+        jobIdLabel.insertAdjacentHTML(
           "beforeend",
           `<button type="button" id="btn-copy-job-id" class="btn btn-secondary btn-icon" aria-label="Copy job ID" title="Copy job ID">
             ${icon("copy")}
@@ -371,9 +371,8 @@ export function renderJobStatus() {
     content += `
       <div class="job-meta-card">
         <div class="meta-item">
-          <span>Job ID</span>
-          <div class="job-id-value">
-            <strong>${displayJobID}</strong>
+          <div class="job-id-label">
+            <span>Job ID</span>
             ${
               publicID
                 ? `<button type="button" id="btn-copy-job-id" class="btn btn-secondary btn-icon" aria-label="Copy job ID" title="Copy job ID">
@@ -381,6 +380,9 @@ export function renderJobStatus() {
                   </button>`
                 : ""
             }
+          </div>
+          <div class="job-id-value">
+            <strong>${displayJobID}</strong>
           </div>
         </div>
         <span class="badge badge-${statusClass}">
