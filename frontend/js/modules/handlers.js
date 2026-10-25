@@ -1,4 +1,5 @@
 import { emitter } from "./event-emitter.js";
+import { state } from "./state.js";
 
 // handleFileSelected validates the selected file and creates an object URL for preview.
 function handleFileSelected(file) {
@@ -133,8 +134,58 @@ export function setupHandlers() {
 
   // JOB STATUS SECTION HANDLERS
 
-  // Manually Start / Retry Observation Handler
+  // Manually Start / Retry Observation Handler & Action Delegation
   jobStatusSection.addEventListener("click", (e) => {
+    const copyBtn = e.target.closest("#btn-copy-job-id");
+    if (copyBtn) {
+      const publicID = state.job.publicID;
+      if (!publicID) return;
+
+      const triggerSuccessFeedback = () => {
+        copyBtn.title = "Copied!";
+        copyBtn.classList.add("copied");
+        setTimeout(() => {
+          copyBtn.title = "Copy job ID";
+          copyBtn.classList.remove("copied");
+        }, 1200);
+      };
+
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard
+          .writeText(publicID)
+          .then(triggerSuccessFeedback)
+          .catch(() => {
+            // Fallback if clipboard permission fails.
+            const textarea = document.createElement("textarea");
+            textarea.value = publicID;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand("copy");
+            document.body.removeChild(textarea);
+            triggerSuccessFeedback();
+          });
+      } else {
+        // Direct execCommand fallback for non-HTTPS / restricted contexts.
+        const textarea = document.createElement("textarea");
+        textarea.value = publicID;
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand("copy");
+        document.body.removeChild(textarea);
+        triggerSuccessFeedback();
+      }
+      return;
+    }
+
+    if (e.target.closest("#btn-observe-job-id")) {
+      const input = jobStatusSection.querySelector("#observe-job-id");
+      const publicID = input?.value.trim();
+      if (publicID) {
+        emitter.emit("job:observe_existing", publicID);
+      }
+      return;
+    }
+
     if (
       e.target.closest("#btn-check-status") ||
       e.target.closest("#btn-try-again")
@@ -145,6 +196,15 @@ export function setupHandlers() {
     // Cancel Observation Link Handler
     if (e.target.closest("#btn-cancel-polling")) {
       emitter.emit("job:observe_stop");
+    }
+  });
+
+  jobStatusSection.addEventListener("keydown", (e) => {
+    if (e.key !== "Enter" || e.target.id !== "observe-job-id") return;
+    e.preventDefault();
+    const publicID = e.target.value.trim();
+    if (publicID) {
+      emitter.emit("job:observe_existing", publicID);
     }
   });
 

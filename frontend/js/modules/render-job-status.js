@@ -71,6 +71,23 @@ export function renderJobStatus() {
   // Check if job status structure is already rendered in the DOM.
   const existingJobMeta = container.querySelector(".job-meta-card");
   const existingSelectMode = container.querySelector("#poll-mode-select");
+  const existingObserverInput = container.querySelector("#observe-job-id");
+
+  const observerInputState = existingObserverInput
+    ? {
+        value: existingObserverInput.value,
+        focused: document.activeElement === existingObserverInput,
+        selectionStart: existingObserverInput.selectionStart,
+        selectionEnd: existingObserverInput.selectionEnd,
+      }
+    : null;
+
+  const activeSelectId =
+    document.activeElement &&
+    (document.activeElement.id === "poll-mode-select" ||
+      document.activeElement.id === "wait-select")
+      ? document.activeElement.id
+      : null;
 
   if (existingJobMeta && existingSelectMode && hasJob) {
     // 1. Update controls only if mode/wait changed externally.
@@ -79,10 +96,10 @@ export function renderJobStatus() {
     }
 
     const modeControlGroup = container.querySelector(".mode-control");
-    let existingWaitSelect = container.querySelector("#wait-select");
+    let currentWaitSelect = container.querySelector("#wait-select");
 
     if (pollingMode === "long") {
-      if (!existingWaitSelect) {
+      if (!currentWaitSelect) {
         const waitSelectHTML = `
           <label for="wait-select" class="sr-only">Wait Duration</label>
           <select id="wait-select" class="form-select-sm" aria-label="Select long poll wait duration">
@@ -91,20 +108,36 @@ export function renderJobStatus() {
             <option value="1" ${longPollWait === 1 ? "selected" : ""}>Wait 1s</option>
           </select>`;
         modeControlGroup.insertAdjacentHTML("afterbegin", waitSelectHTML);
-      } else if (parseInt(existingWaitSelect.value, 10) !== longPollWait) {
-        existingWaitSelect.value = String(longPollWait);
+      } else if (parseInt(currentWaitSelect.value, 10) !== longPollWait) {
+        currentWaitSelect.value = String(longPollWait);
       }
-    } else if (existingWaitSelect) {
-      // Remove wait-select when switching back to short polling.
+    } else if (currentWaitSelect) {
+      // Remove wait-select when switching back to short polling or SSE.
       const waitLabel = container.querySelector("label[for='wait-select']");
       if (waitLabel) waitLabel.remove();
-      existingWaitSelect.remove();
+      currentWaitSelect.remove();
     }
 
-    // 2. Update Job ID in DOM if it changed from placeholder to active publicID.
+    // 2. Update Job ID and Copy Button in DOM dynamically.
     const jobIdEl = container.querySelector(".job-meta-card .meta-item strong");
     if (jobIdEl) {
       jobIdEl.textContent = displayJobID;
+    }
+
+    const jobIdValueContainer = container.querySelector(".job-id-value");
+    let copyJobIDButton = container.querySelector("#btn-copy-job-id");
+
+    if (publicID) {
+      if (!copyJobIDButton && jobIdValueContainer) {
+        jobIdValueContainer.insertAdjacentHTML(
+          "beforeend",
+          `<button type="button" id="btn-copy-job-id" class="btn btn-secondary btn-icon" aria-label="Copy job ID" title="Copy job ID">
+            ${icon("copy")}
+          </button>`,
+        );
+      }
+    } else if (copyJobIDButton) {
+      copyJobIDButton.remove();
     }
 
     // 3. Update status badge.
@@ -263,6 +296,12 @@ export function renderJobStatus() {
       warningEl.remove();
     }
 
+    // Preserve active select focus if dropdown was active
+    if (activeSelectId) {
+      const activeEl = container.querySelector(`#${activeSelectId}`);
+      if (activeEl) activeEl.focus({ preventScroll: true });
+    }
+
     return;
   }
 
@@ -302,6 +341,16 @@ export function renderJobStatus() {
       </div>
     </div>`;
 
+  // Existing-job observation control supports opening the same job in another tab.
+  content += `
+    <div class="job-observer-control">
+      <label for="observe-job-id">Observe Existing Job</label>
+      <div class="job-observer-input-group">
+        <input id="observe-job-id" type="text" value="${escapeHTML(publicID)}" placeholder="Paste job ID" autocomplete="off" />
+        <button type="button" id="btn-observe-job-id" class="btn btn-secondary">Observe</button>
+      </div>
+    </div>`;
+
   // If there is no active job, display an empty state message.
   if (!hasJob) {
     content += `
@@ -323,7 +372,16 @@ export function renderJobStatus() {
       <div class="job-meta-card">
         <div class="meta-item">
           <span>Job ID</span>
-          <strong>${displayJobID}</strong>
+          <div class="job-id-value">
+            <strong>${displayJobID}</strong>
+            ${
+              publicID
+                ? `<button type="button" id="btn-copy-job-id" class="btn btn-secondary btn-icon" aria-label="Copy job ID" title="Copy job ID">
+                    ${icon("copy")}
+                  </button>`
+                : ""
+            }
+          </div>
         </div>
         <span class="badge badge-${statusClass}">
           ${icon(statusClass === "completed" ? "check" : statusClass === "failed" ? "close" : "clock")}
@@ -431,4 +489,23 @@ export function renderJobStatus() {
   const tpl = document.createElement("template");
   tpl.innerHTML = content.trim();
   container.replaceChildren(tpl.content);
+
+  if (observerInputState) {
+    const observerInput = container.querySelector("#observe-job-id");
+    if (observerInput) {
+      observerInput.value = observerInputState.value;
+      if (observerInputState.focused) {
+        observerInput.focus({ preventScroll: true });
+        observerInput.setSelectionRange(
+          observerInputState.selectionStart,
+          observerInputState.selectionEnd,
+        );
+      }
+    }
+  }
+
+  if (activeSelectId) {
+    const activeEl = container.querySelector(`#${activeSelectId}`);
+    if (activeEl) activeEl.focus({ preventScroll: true });
+  }
 }

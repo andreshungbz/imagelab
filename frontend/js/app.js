@@ -178,6 +178,40 @@ emitter.on("job:observe_start", () => {
   }
 });
 
+// job:observe_existing starts observation for an already-created job without uploading a new image.
+emitter.on("job:observe_existing", (publicID) => {
+  stopPollingAndAbort();
+
+  // Clear only observation and result state; preserve any unrelated upload selection.
+  state.job.publicID = publicID;
+  state.job.imageID = 0;
+  state.job.status = "queued";
+  state.job.stage = "starting";
+  state.job.variantsCompleted = 0;
+  state.job.statusURL = `/v1/jobs/${encodeURIComponent(publicID)}`;
+  state.job.version = 0;
+  state.job.simulatedProgress = 0;
+  state.job.error = null;
+  state.job.sseError = null;
+  Object.values(state.job.progress).forEach((step) => {
+    step.status = "pending";
+    step.timestamp = null;
+  });
+  state.job.progress.uploadAccepted.status = "completed";
+  state.job.progress.originalStored.status = "completed";
+  state.job.progress.generatingVariants.status = "active";
+  state.job.progress.completed.status = "pending";
+
+  state.results.image_variants.forEach((variant) => {
+    if (variant.localURL) URL.revokeObjectURL(variant.localURL);
+  });
+  state.results.image_variants = [];
+  state.results.error = null;
+
+  render();
+  emitter.emit("job:observe_start");
+});
+
 // job:observe_stop is triggered when user cancels status checking.
 emitter.on("job:observe_stop", () => {
   stopPollingAndAbort();

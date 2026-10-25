@@ -9,6 +9,7 @@ const paths = {
     '<path d="m10 3-.5 2-2 .9-1.9-.6-2 3.4L5 10v3l-1.4 1.3 2 3.4 1.9-.6 2 .9.5 2h4l.5-2 2-.9 1.9.6 2-3.4L19 13v-3l1.4-1.3-2-3.4-1.9.6-2-.9-.5-2z"/><circle cx="12" cy="11.5" r="3"/>',
   refresh:
     '<path d="M20 7v5h-5M4 17v-5h5"/><path d="M6 7a7 7 0 0 1 11.5-1L20 9M4 15l2.5 3A7 7 0 0 0 18 17"/>',
+  copy: '<rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>',
   download: '<path d="M12 3v12m-4-4 4 4 4-4M4 16v5h16v-5"/>',
   check: '<path d="m5 12 4 4L19 6"/>',
   clock: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
