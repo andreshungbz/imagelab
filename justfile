@@ -157,6 +157,11 @@ test-img-proc-del-3s-sse-disc:
 # MEASUREMENTS
 # ==================================================================================== #
 
+# Show consolidated measurements for a supplied experiment directory.
+show-consolidated-measurements base_dir:
+    uv run --directory ./python consolidated-measurements "{{ base_dir }}" \
+        --db-dsn="$IMAGELAB_DB_DSN"
+
 # v1 Measurements
 # ==================================================================================== #
 
@@ -222,9 +227,9 @@ meas-v2-exp-cond-c2:
 # Alias for Condition C3 (Network latency is set be the client/browser).
 meas-v2-exp-cond-c3: meas-v2-exp-cond-c2
 
-# Helper to show v2 detection delay results.
-show-v2-detect-del:
-    uv run --directory ./python show-v2-detection-delays
+# Show v2 processing duration,detection delay and observation reads.
+show-v2-meas:
+    just show-consolidated-measurements docs/v2.0.0/experiments/raw
 
 # v3 Measurements
 # ==================================================================================== #
@@ -238,6 +243,6 @@ meas-v3-cond-b: meas-v2-exp-cond-b
 # MEAS-03: v2 Condition C2 configuration.
 meas-v3-cond-c: meas-v2-exp-cond-c2
 
-# Helper to show v3 SSE versus long-polling detection delay results.
-show-v3-detect-del:
-    uv run --directory ./python show-v3-detection-delays
+# Show v3 processing duration, detection delay, observation reads, and SSE measurements.
+show-v3-meas:
+    just show-consolidated-measurements docs/v3.0.0/experiments/raw
