@@ -202,7 +202,7 @@ exp-cond-b:
       -cors-trusted-origins="$CORS_TRUSTED_ORIGINS" \
       -consumer-id="$CONSUMER_ID" \
 
-# Run Condition C1: Slow simulated updates (Updates every 2s for 10s)
+# Run Condition C1: Slow simulated updates (Updates every 2s for 10s).
 exp-cond-c1:
     go run ./cmd/api \
       -db-dsn="$IMAGELAB_DB_DSN" \
@@ -224,21 +224,25 @@ exp-cond-c2:
       -exp-simulation-interval=200ms \
       -exp-simulation-total-duration=10s
 
-# Alias for Condition C3 (Same server config as C2; network latency is injected on client/browser)
+# Alias for Condition C3 (Same server config as C2; network latency is injected on client/browser).
 exp-cond-c3: exp-cond-c2
 
 # ==================================================================================== #
 # V3 MEASUREMENT CONDITION ALIASES (MEAS-01 – MEAS-03)
 # ==================================================================================== #
 
-# MEAS-01: V3 alias for the existing quiet Condition A server configuration.
+# MEAS-01: v3 alias for the existing quiet Condition A server configuration.
 v3-meas-01: exp-cond-a
 
-# MEAS-02: V3 alias for the existing ordinary Condition B server configuration.
+# MEAS-02: v3 alias for the existing ordinary Condition B server configuration.
 v3-meas-02: exp-cond-b
 
-# MEAS-03: V3 alias for the existing fast simulated Condition C2 server configuration.
+# MEAS-03: v3 alias for the existing fast simulated Condition C2 server configuration.
 v3-meas-03: exp-cond-c2
+
+# ==================================================================================== #
+# HELPERS
+# ==================================================================================== #
 
 # Helper to show v2 detection delay results.
 show-v2-detection-delays:
