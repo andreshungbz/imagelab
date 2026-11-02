@@ -1,5 +1,6 @@
-# Justfile
-# Structure adapted from https://lets-go-further.alexedwards.net/ (2025)
+# ==================================================================================== #
+# SETUP & VARIABLES
+# ==================================================================================== #
 
 set dotenv-load
 set dotenv-filename := ".envrc"
@@ -12,10 +13,10 @@ export CONSUMER_ID := env("CONSUMER_ID", "")
 ECHO_PREFIX := "[just]"
 
 # ==================================================================================== #
-# HELPERS
+# GENERAL
 # ==================================================================================== #
 
-# Print recipe list
+# Print recipe list.
 default:
     @just --list --unsorted
 
@@ -23,7 +24,7 @@ default:
 # DEVELOPMENT
 # ==================================================================================== #
 
-# Run the cmd/api application
+# Run the API server.
 run:
     go run ./cmd/api \
       -db-dsn="$IMAGELAB_DB_DSN" \
@@ -31,7 +32,7 @@ run:
       -cors-trusted-origins="$CORS_TRUSTED_ORIGINS" \
       -consumer-id="$CONSUMER_ID"
 
-# Remove the ./bin and ./storage directories and reset the database
+# Remove the ./bin and ./storage directories and reset the database.
 cleanup:
     @echo "{{ ECHO_PREFIX }} Resetting database..."
     migrate -path ./migrations -database "$IMAGELAB_DB_DSN" down
@@ -44,31 +45,31 @@ cleanup:
 # DATABASE MIGRATIONS
 # ==================================================================================== #
 
-# Connect to the database using psql
+# Connect to the database using psql.
 db-psql:
     psql "$IMAGELAB_DB_DSN"
 
-# Create a new database migration
+# Create a new database migration.
 db-migrations-new name:
     @echo "Creating migration files for {{ name }}..."
     migrate create -seq -ext=.sql -dir=./migrations {{ name }}
 
-# Apply all up database migrations
+# Apply all up database migrations.
 db-migrations-up:
     @echo "Running up migrations..."
     migrate -path ./migrations -database "$IMAGELAB_DB_DSN" up
 
-# Apply all down database migrations
+# Apply all down database migrations.
 db-migrations-down:
     @echo "Reverting all migrations..."
     migrate -path ./migrations -database "$IMAGELAB_DB_DSN" down
 
-# Go to the specified migration version
+# Go to the specified migration version.
 db-migrations-goto version:
     @echo "Going to schema migration version {{ version }}..."
     migrate -path ./migrations -database "$IMAGELAB_DB_DSN" goto {{ version }}
 
-# Force the schema_migrations table version
+# Force the schema_migrations table version.
 db-migrations-fix version:
     @echo "Forcing schema migrations version to {{ version }}..."
     migrate -path ./migrations -database "$IMAGELAB_DB_DSN" force {{ version }}
@@ -77,7 +78,7 @@ db-migrations-fix version:
 # QUALITY CONTROL
 # ==================================================================================== #
 
-# Tidy module dependencies and format all .go files
+# Tidy module dependencies and format all .go files.
 tidy:
     @echo "{{ ECHO_PREFIX }} Tidying module dependencies..."
     go mod tidy
@@ -87,7 +88,7 @@ tidy:
     @echo "{{ ECHO_PREFIX }} Formatting .go files..."
     go fmt ./...
 
-# Run quality control checks and tests
+# Run quality control checks and tests.
 audit:
     @echo "{{ ECHO_PREFIX }} Checking module dependencies..."
     go mod tidy -diff
@@ -102,7 +103,7 @@ audit:
 # BUILD
 # ==================================================================================== #
 
-# Build the cmd/api application
+# Build the API server.
 build-api:
     @echo "{{ ECHO_PREFIX }} Building cmd/api..."
     go build -ldflags='-s' -o=./bin/api ./cmd/api
@@ -112,7 +113,7 @@ build-api:
 # TESTS
 # ==================================================================================== #
 
-# Run the API server with a 3s worker start delay
+# Test the API server with a 3s worker start delay.
 test-delay-3s:
     go run ./cmd/api \
       -db-dsn="$IMAGELAB_DB_DSN" \
@@ -121,7 +122,7 @@ test-delay-3s:
       -consumer-id="$CONSUMER_ID" \
       -test-worker-start-delay=3s
 
-# Run the API server with a 3s worker start delay and simulated worker failure
+# Test the API server with a 3s worker start delay and simulated worker failure.
 test-delay-3s-simulated-worker-failure:
     go run ./cmd/api \
       -db-dsn="$IMAGELAB_DB_DSN" \
@@ -131,7 +132,7 @@ test-delay-3s-simulated-worker-failure:
       -test-worker-start-delay=3s \
       -test-simulated-worker-failure=true
 
-# Run the API server with a 3s image process delay
+# Test the API server with a 3s image process delay.
 test-image-process-delay-3s:
     go run ./cmd/api \
       -db-dsn="$IMAGELAB_DB_DSN" \
@@ -140,7 +141,7 @@ test-image-process-delay-3s:
       -consumer-id="$CONSUMER_ID" \
       -test-individual-image-process-delay=3s
 
-# Run the API server with a 3s image process delay and simulated worker failure
+# Test the API server with a 3s image process delay and simulated worker failure.
 test-image-process-delay-3s-simulated-worker-failure:
     go run ./cmd/api \
       -db-dsn="$IMAGELAB_DB_DSN" \
@@ -150,7 +151,7 @@ test-image-process-delay-3s-simulated-worker-failure:
       -test-simulated-worker-failure=true \
       -test-individual-image-process-delay=3s
 
-# Run the API server with a 3s image process delay and close the SSE stream once after the thumbnail variant update
+# Test the API server with a 3s image process delay and close the SSE stream once after the thumbnail variant update.
 test-image-process-delay-3s-sse-disconnect-thumbnail:
     go run ./cmd/api \
       -db-dsn="$IMAGELAB_DB_DSN" \
@@ -164,28 +165,30 @@ test-image-process-delay-3s-sse-disconnect-thumbnail:
 # MEASUREMENTS
 # ==================================================================================== #
 
-# Take measurements of a single image processing job
-measure-sp-one:
+# v1 Measurements
+# ==================================================================================== #
+
+# Take measurements of a single image processing job.
+v1-measure-sp-one:
     uv run --directory ./python measurement \
       --count 1 \
       --api-url="http://localhost:$PORT" \
       --db-dsn="$IMAGELAB_DB_DSN" \
       --image-path="src/measurement/pittsburgh.jpg"
 
-# Take measurements of 5 concurrent image processing jobs
-measure-sp-five:
+# Take measurements of 5 concurrent image processing jobs.
+v1-measure-sp-five:
     uv run --directory ./python measurement \
       --count 5 \
       --api-url="http://localhost:$PORT" \
       --db-dsn="$IMAGELAB_DB_DSN" \
       --image-path="src/measurement/pittsburgh.jpg"
 
-# ==================================================================================== #
-# EXPERIMENTAL CONTROLS (EXP-01 – EXP-03)
+# v2 Measurements
 # ==================================================================================== #
 
-# MEAS-01 / Condition A: Quiet active interval for 30s with no client-visible progress.
-exp-cond-a:
+# Condition A: Quiet active interval for 30s with no client-visible progress.
+v2-exp-cond-a:
     go run ./cmd/api \
       -db-dsn="$IMAGELAB_DB_DSN" \
       -port="$PORT" \
@@ -194,16 +197,16 @@ exp-cond-a:
       -exp-quiet-delay-enabled=true \
       -exp-quiet-delay-duration=30s
 
-# MEAS-02 / Condition B: Ordinary processing with real progress after each stored variant.
-exp-cond-b:
+# Condition B: Ordinary processing with real progress after each stored variant.
+v2-exp-cond-b:
     go run ./cmd/api \
       -db-dsn="$IMAGELAB_DB_DSN" \
       -port="$PORT" \
       -cors-trusted-origins="$CORS_TRUSTED_ORIGINS" \
       -consumer-id="$CONSUMER_ID" \
 
-# Run Condition C1: Slow simulated updates (Updates every 2s for 10s).
-exp-cond-c1:
+# Condition C1: Slow simulated updates (Updates every 2s for 10s).
+v2-exp-cond-c1:
     go run ./cmd/api \
       -db-dsn="$IMAGELAB_DB_DSN" \
       -port="$PORT" \
@@ -213,8 +216,8 @@ exp-cond-c1:
       -exp-simulation-interval=2s \
       -exp-simulation-total-duration=10s
 
-# MEAS-03 / Condition C2: Labelled simulated progress every 200ms for 10s.
-exp-cond-c2:
+# Condition C2: Fast simulated updates (Updates every 200ms for 10s).
+v2-exp-cond-c2:
     go run ./cmd/api \
       -db-dsn="$IMAGELAB_DB_DSN" \
       -port="$PORT" \
@@ -224,21 +227,20 @@ exp-cond-c2:
       -exp-simulation-interval=200ms \
       -exp-simulation-total-duration=10s
 
-# Alias for Condition C3 (Same server config as C2; network latency is injected on client/browser).
-exp-cond-c3: exp-cond-c2
+# Alias for Condition C3 (Network latency is set be the client/browser).
+v2-exp-cond-c3: v2-exp-cond-c2
 
+# v3 Measurements
 # ==================================================================================== #
-# V3 MEASUREMENT CONDITION ALIASES (MEAS-01 – MEAS-03)
-# ==================================================================================== #
 
-# MEAS-01: v3 alias for the existing quiet Condition A server configuration.
-v3-cond-a: exp-cond-a
+# MEAS-01: v2 Condition A configuration.
+v3-cond-a: v2-exp-cond-a
 
-# MEAS-02: v3 alias for the existing ordinary Condition B server configuration.
-v3-cond-b: exp-cond-b
+# MEAS-02: v2 Condition B configuration.
+v3-cond-b: v2-exp-cond-b
 
-# MEAS-03: v3 alias for the existing fast simulated Condition C2 server configuration.
-v3-cond-c: exp-cond-c2
+# MEAS-03: v2 Condition C2 configuration.
+v3-cond-c: v2-exp-cond-c2
 
 # ==================================================================================== #
 # HELPERS
