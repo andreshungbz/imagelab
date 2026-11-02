@@ -32,6 +32,33 @@ run:
       -cors-trusted-origins="$CORS_TRUSTED_ORIGINS" \
       -consumer-id="$CONSUMER_ID"
 
+# Build the API server.
+build:
+    @echo "{{ ECHO_PREFIX }} Building cmd/api..."
+    go build -ldflags='-s' -o=./bin/api ./cmd/api
+    GOOS=linux GOARCH=amd64 go build -ldflags='-s' -o=./bin/linux_amd64/api ./cmd/api
+
+# Tidy module dependencies and format all .go files.
+tidy:
+    @echo "{{ ECHO_PREFIX }} Tidying module dependencies..."
+    go mod tidy
+    @echo "{{ ECHO_PREFIX }} Verifying and vendoring module dependencies..."
+    go mod verify
+    # go mod vendor
+    @echo "{{ ECHO_PREFIX }} Formatting .go files..."
+    go fmt ./...
+
+# Run quality control checks and tests.
+audit:
+    @echo "{{ ECHO_PREFIX }} Checking module dependencies..."
+    go mod tidy -diff
+    go mod verify
+    @echo "{{ ECHO_PREFIX }} Vetting code..."
+    go vet ./...
+    # go tool staticcheck ./...
+    @echo "{{ ECHO_PREFIX }} Running tests..."
+    go test -race -vet=off ./...
+
 # Remove the ./bin and ./storage directories and reset the database.
 cleanup:
     @echo "{{ ECHO_PREFIX }} Resetting database..."
@@ -75,46 +102,11 @@ db-migrations-fix version:
     migrate -path ./migrations -database "$IMAGELAB_DB_DSN" force {{ version }}
 
 # ==================================================================================== #
-# QUALITY CONTROL
-# ==================================================================================== #
-
-# Tidy module dependencies and format all .go files.
-tidy:
-    @echo "{{ ECHO_PREFIX }} Tidying module dependencies..."
-    go mod tidy
-    @echo "{{ ECHO_PREFIX }} Verifying and vendoring module dependencies..."
-    go mod verify
-    # go mod vendor
-    @echo "{{ ECHO_PREFIX }} Formatting .go files..."
-    go fmt ./...
-
-# Run quality control checks and tests.
-audit:
-    @echo "{{ ECHO_PREFIX }} Checking module dependencies..."
-    go mod tidy -diff
-    go mod verify
-    @echo "{{ ECHO_PREFIX }} Vetting code..."
-    go vet ./...
-    # go tool staticcheck ./...
-    @echo "{{ ECHO_PREFIX }} Running tests..."
-    go test -race -vet=off ./...
-
-# ==================================================================================== #
-# BUILD
-# ==================================================================================== #
-
-# Build the API server.
-build-api:
-    @echo "{{ ECHO_PREFIX }} Building cmd/api..."
-    go build -ldflags='-s' -o=./bin/api ./cmd/api
-    GOOS=linux GOARCH=amd64 go build -ldflags='-s' -o=./bin/linux_amd64/api ./cmd/api
-
-# ==================================================================================== #
 # TESTS
 # ==================================================================================== #
 
 # Test the API server with a 3s worker start delay.
-test-delay-3s:
+test-wrk-del-3s:
     go run ./cmd/api \
       -db-dsn="$IMAGELAB_DB_DSN" \
       -port="$PORT" \
@@ -123,7 +115,7 @@ test-delay-3s:
       -test-worker-start-delay=3s
 
 # Test the API server with a 3s worker start delay and simulated worker failure.
-test-delay-3s-simulated-worker-failure:
+test-wrk-del-3s-fail:
     go run ./cmd/api \
       -db-dsn="$IMAGELAB_DB_DSN" \
       -port="$PORT" \
@@ -133,7 +125,7 @@ test-delay-3s-simulated-worker-failure:
       -test-simulated-worker-failure=true
 
 # Test the API server with a 3s image process delay.
-test-image-process-delay-3s:
+test-img-proc-del-3s:
     go run ./cmd/api \
       -db-dsn="$IMAGELAB_DB_DSN" \
       -port="$PORT" \
@@ -142,7 +134,7 @@ test-image-process-delay-3s:
       -test-individual-image-process-delay=3s
 
 # Test the API server with a 3s image process delay and simulated worker failure.
-test-image-process-delay-3s-simulated-worker-failure:
+test-img-proc-del-3s-fail:
     go run ./cmd/api \
       -db-dsn="$IMAGELAB_DB_DSN" \
       -port="$PORT" \
@@ -152,7 +144,7 @@ test-image-process-delay-3s-simulated-worker-failure:
       -test-individual-image-process-delay=3s
 
 # Test the API server with a 3s image process delay and close the SSE stream once after the thumbnail variant update.
-test-image-process-delay-3s-sse-disconnect-thumbnail:
+test-img-proc-del-3s-sse-disc:
     go run ./cmd/api \
       -db-dsn="$IMAGELAB_DB_DSN" \
       -port="$PORT" \
@@ -169,7 +161,7 @@ test-image-process-delay-3s-sse-disconnect-thumbnail:
 # ==================================================================================== #
 
 # Take measurements of a single image processing job.
-v1-measure-sp-one:
+meas-v1-single:
     uv run --directory ./python measurement \
       --count 1 \
       --api-url="http://localhost:$PORT" \
@@ -177,7 +169,7 @@ v1-measure-sp-one:
       --image-path="src/measurement/pittsburgh.jpg"
 
 # Take measurements of 5 concurrent image processing jobs.
-v1-measure-sp-five:
+meas-v1-five:
     uv run --directory ./python measurement \
       --count 5 \
       --api-url="http://localhost:$PORT" \
@@ -188,7 +180,7 @@ v1-measure-sp-five:
 # ==================================================================================== #
 
 # Condition A: Quiet active interval for 30s with no client-visible progress.
-v2-exp-cond-a:
+meas-v2-exp-cond-a:
     go run ./cmd/api \
       -db-dsn="$IMAGELAB_DB_DSN" \
       -port="$PORT" \
@@ -198,7 +190,7 @@ v2-exp-cond-a:
       -exp-quiet-delay-duration=30s
 
 # Condition B: Ordinary processing with real progress after each stored variant.
-v2-exp-cond-b:
+meas-v2-exp-cond-b:
     go run ./cmd/api \
       -db-dsn="$IMAGELAB_DB_DSN" \
       -port="$PORT" \
@@ -206,7 +198,7 @@ v2-exp-cond-b:
       -consumer-id="$CONSUMER_ID" \
 
 # Condition C1: Slow simulated updates (Updates every 2s for 10s).
-v2-exp-cond-c1:
+meas-v2-exp-cond-c1:
     go run ./cmd/api \
       -db-dsn="$IMAGELAB_DB_DSN" \
       -port="$PORT" \
@@ -217,7 +209,7 @@ v2-exp-cond-c1:
       -exp-simulation-total-duration=10s
 
 # Condition C2: Fast simulated updates (Updates every 200ms for 10s).
-v2-exp-cond-c2:
+meas-v2-exp-cond-c2:
     go run ./cmd/api \
       -db-dsn="$IMAGELAB_DB_DSN" \
       -port="$PORT" \
@@ -228,24 +220,20 @@ v2-exp-cond-c2:
       -exp-simulation-total-duration=10s
 
 # Alias for Condition C3 (Network latency is set be the client/browser).
-v2-exp-cond-c3: v2-exp-cond-c2
+meas-v2-exp-cond-c3: meas-v2-exp-cond-c2
+
+# Helper to show v2 detection delay results.
+show-v2-detect-del:
+    uv run --directory ./python show-v2-detection-delays
 
 # v3 Measurements
 # ==================================================================================== #
 
 # MEAS-01: v2 Condition A configuration.
-v3-cond-a: v2-exp-cond-a
+meas-v3-cond-a: meas-v2-exp-cond-a
 
 # MEAS-02: v2 Condition B configuration.
-v3-cond-b: v2-exp-cond-b
+meas-v3-cond-b: meas-v2-exp-cond-b
 
 # MEAS-03: v2 Condition C2 configuration.
-v3-cond-c: v2-exp-cond-c2
-
-# ==================================================================================== #
-# HELPERS
-# ==================================================================================== #
-
-# Helper to show v2 detection delay results.
-show-v2-detection-delays:
-    uv run --directory ./python show-v2-detection-delays
+meas-v3-cond-c: meas-v2-exp-cond-c2
