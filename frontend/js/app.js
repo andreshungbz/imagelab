@@ -5,11 +5,12 @@ import { state, resetState } from "./modules/state.js";
 import { render } from "./modules/render.js";
 import { setupHandlers } from "./modules/handlers.js";
 
-// ==================================================================================== #
-// HELPER FUNCTIONS
-// ==================================================================================== #
+// ==================================================================================== //
+// OBSERVATION LIFECYCLE HELPERS
+// ==================================================================================== //
 
-// stopPollingAndAbort stops the observation timer and aborts pending fetch requests.
+// stopPollingAndAbort closes every active observation mechanism. It is shared by
+// explicit cancellation, mode changes, terminal states, and page teardown.
 function stopPollingAndAbort() {
   if (state.job.shortPollTimerID) {
     clearInterval(state.job.shortPollTimerID);
@@ -29,7 +30,7 @@ function stopPollingAndAbort() {
   state.job.isPolling = false;
 }
 
-// resetNetworkState resets the job network tracking flags and errors.
+// resetNetworkState clears transient transport errors without changing job state.
 function resetNetworkState() {
   state.job.networkErrorCount = 0;
   state.job.isReconnecting = false;
@@ -38,9 +39,9 @@ function resetNetworkState() {
   state.results.error = null;
 }
 
-// ==================================================================================== #
-// IMAGE FILE SELECTION & VALIDATION EVENTS
-// ==================================================================================== #
+// ==================================================================================== //
+// IMAGE SELECTION EVENTS
+// ==================================================================================== //
 
 // upload:selected is triggered when user uploads a valid file.
 emitter.on("upload:selected", ({ file, previewURL, metadata }) => {
@@ -72,9 +73,9 @@ emitter.on("upload:validation_error", (errorMessage) => {
   render();
 });
 
-// ==================================================================================== #
-// IMAGE FILE UPLOAD & JOB INITIALIZATION EVENTS
-// ==================================================================================== #
+// ==================================================================================== //
+// UPLOAD AND JOB INITIALIZATION EVENTS
+// ==================================================================================== //
 
 // upload:process is triggered when form submits and HTTP POST begins.
 emitter.on("upload:process", () => {
@@ -138,9 +139,9 @@ emitter.on("upload:error", (errorPayload) => {
   render();
 });
 
-// ==================================================================================== #
-// JOB OBSERVATION & STEP PROGRESSION EVENTS
-// ==================================================================================== #
+// ==================================================================================== //
+// JOB OBSERVATION AND PROGRESS EVENTS
+// ==================================================================================== //
 
 // job:observe_start starts job status observation using the currently selected observation mode.
 emitter.on("job:observe_start", () => {
@@ -400,9 +401,9 @@ emitter.on("job:network_error", (errorMessage) => {
   render();
 });
 
-// ==================================================================================== #
-// IMAGE VARIANTS RESULTS EVENTS
-// ==================================================================================== #
+// ==================================================================================== //
+// IMAGE VARIANT RESULT EVENTS
+// ==================================================================================== //
 
 // variant:single_fetched is triggered when an individual variant blob finishes loading.
 emitter.on("variant:single_fetched", ({ name, localURL }) => {
@@ -426,9 +427,9 @@ emitter.on("variants:error", (errorMessage) => {
   render();
 });
 
-// ==================================================================================== #
-// PAGE LIFECYCLE & APP INITIALIZATION
-// ==================================================================================== #
+// ==================================================================================== //
+// PAGE LIFECYCLE AND INITIALIZATION
+// ==================================================================================== //
 
 // Abort active observation when the page unloads or navigates away.
 window.addEventListener("beforeunload", () => {

@@ -1,19 +1,21 @@
-// createEmitter implements an emitter for the Observer Pattern API using a map of
-// event strings to an arrays of callback functions.
+// ==================================================================================== //
+// EVENT BUS
+// ==================================================================================== //
+
+// createEmitter implements the small observer bus used to decouple UI events from
+// network and rendering modules. Events carry state transitions, not DOM elements.
 function createEmitter() {
   const listeners = new Map();
 
-  // on subscribes a callback function to an event.
+  // on subscribes a callback to an event name.
   function on(event, callback) {
-    // if event doesn't exist, create it in the Map
     if (!listeners.has(event)) {
       listeners.set(event, []);
     }
     listeners.get(event).push(callback);
   }
 
-  // emit publishes/notifies an event, calling each callback function
-  // with the passed in data.
+  // emit publishes an event to every listener registered for that name.
   function emit(event, data) {
     if (!listeners.has(event)) {
       return;
@@ -21,7 +23,7 @@ function createEmitter() {
     listeners.get(event).forEach((cb) => cb(data));
   }
 
-  // off unsubscribes a callback function from an event.
+  // off removes one callback without affecting the other subscribers.
   function off(event, callback) {
     if (!listeners.has(event)) {
       return;

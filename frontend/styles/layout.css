@@ -1,3 +1,7 @@
+/* ====================================================================================
+  PAGE LAYOUT
+  ==================================================================================== */
+
 /* Layout Styles for the Application */
 .container {
   width: min(100% - 4rem, 1120px);
@@ -84,6 +88,7 @@
   background: #9ca3af; /* Gray offline dot */
 }
 
+/* Main content bands and the upload/status two-column layout. */
 main {
   padding-block: var(--space-8) 3rem;
 }
@@ -124,6 +129,7 @@ main {
   margin-top: var(--space-4);
 }
 
+/* Collapse the two-column work area for narrower screens. */
 @media (max-width: 800px) {
   .tagline {
     display: none;
@@ -133,6 +139,7 @@ main {
   }
 }
 
+/* Tighten page chrome and panel padding on phones. */
 @media (max-width: 480px) {
   .container {
     width: calc(100% - 2rem);

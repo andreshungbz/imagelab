@@ -2,15 +2,19 @@ import { state } from "./state.js";
 import { formatMimeType, formatBytes, escapeHTML } from "./helpers.js";
 import { icon } from "./icons.js";
 
-// renderResults generates the HTML for the results section supporting progressive variant rendering.
+// ==================================================================================== //
+// RESULTS RENDERER
+// ==================================================================================== //
+
+const EXPECTED_VARIANT_NAMES = ["thumbnail", "preview", "display"];
+
+// renderResults displays progressively hydrated variants and placeholders for work that
+// the authoritative job snapshot says is still pending or failed.
 export function renderResults() {
   // Get the container element and necessary state values.
   const container = document.querySelector("#results");
   if (!container) return;
   const { image_variants: variants, error } = state.results;
-
-  // Expected variant definitions for progress placeholders before state receives them.
-  const EXPECTED_VARIANTS = ["thumbnail", "preview", "display"];
 
   // Determine if the job is currently active or processing.
   const isProcessing =
@@ -28,7 +32,7 @@ export function renderResults() {
     displayedVariants = [...variants];
 
     if (isProcessing || isFailedJob) {
-      EXPECTED_VARIANTS.forEach((expectedName) => {
+      EXPECTED_VARIANT_NAMES.forEach((expectedName) => {
         const exists = variants.some((v) => v.name === expectedName);
         if (!exists) {
           displayedVariants.push({
@@ -40,7 +44,7 @@ export function renderResults() {
     }
   } else if (isProcessing || isFailedJob) {
     // Job is active/failed but no intermediate variants arrived; show placeholders.
-    displayedVariants = EXPECTED_VARIANTS.map((name) => ({
+    displayedVariants = EXPECTED_VARIANT_NAMES.map((name) => ({
       name,
       status: isFailedJob ? "failed" : "pending",
     }));

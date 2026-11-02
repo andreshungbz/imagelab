@@ -1,13 +1,17 @@
-// initWorkspace dynamically checks the status of the API server.
+// ==================================================================================== //
+// WORKSPACE HEALTH INDICATOR
+// ==================================================================================== //
+
+// initWorkspace performs a lightweight API check and updates the header indicator.
 export async function initWorkspace() {
   const workspaceEl = document.getElementById("workspace");
   if (!workspaceEl) return;
 
-  // Dynamically resolve the API host and base URL based on the current location.
+  // Resolve the API host from the page location so the static frontend is portable.
   const API_HOST = window.location.hostname;
   const API_BASE = `http://${API_HOST}:4000`;
 
-  // Send a lightweight check to test if backend on port 4000 is reachable.
+  // OPTIONS is sufficient here; no image or job data is created by this check.
   try {
     const res = await fetch(`${API_BASE}/v1/images`, { method: "OPTIONS" });
     if (res.ok || res.status < 500) {

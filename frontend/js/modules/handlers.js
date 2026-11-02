@@ -1,13 +1,19 @@
 import { emitter } from "./event-emitter.js";
 import { state } from "./state.js";
 
-// handleFileSelected validates the selected file and creates an object URL for preview.
+// ==================================================================================== //
+// UPLOAD INPUT HANDLERS
+// ==================================================================================== //
+
+const ALLOWED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/jpg"];
+const MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024;
+
+// handleFileSelected validates one file and creates its browser preview URL.
 function handleFileSelected(file) {
   if (!file) return;
 
-  // Validate particular image format.
-  const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/jpg"];
-  if (!ALLOWED_TYPES.includes(file.type.toLowerCase())) {
+  // Validate the image format before allocating preview metadata.
+  if (!ALLOWED_IMAGE_TYPES.includes(file.type.toLowerCase())) {
     emitter.emit(
       "upload:validation_error",
       "Your image file format is not supported. Please upload a JPEG or PNG image.",
@@ -15,8 +21,7 @@ function handleFileSelected(file) {
     return;
   }
 
-  // Validate maximum image size.
-  const MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024; // 10MB
+  // Validate the 10 MB client-side size limit.
   if (file.size > MAX_FILE_SIZE_BYTES) {
     emitter.emit(
       "upload:validation_error",
@@ -52,14 +57,20 @@ function handleFileSelected(file) {
   img.src = previewURL;
 }
 
-// setupHandlers sets up event listeners using event delegation.
+// ==================================================================================== //
+// DELEGATED DOM EVENTS
+// ==================================================================================== //
+
+// setupHandlers attaches stable listeners to containers whose contents are rerendered.
 export function setupHandlers() {
   // Get the necessary container elements.
   const imageInputSection = document.querySelector("#image-input");
   const jobStatusSection = document.querySelector("#job-status");
   if (!imageInputSection || !jobStatusSection) return;
 
-  // IMAGE INPUT SECTION HANDLERS
+  // ----------------------------------------------------------------------------------
+  // Image input section.
+  // ----------------------------------------------------------------------------------
 
   // File Input Area Click Handler
   imageInputSection.addEventListener("click", (e) => {
@@ -132,7 +143,9 @@ export function setupHandlers() {
     }
   });
 
-  // JOB STATUS SECTION HANDLERS
+  // ----------------------------------------------------------------------------------
+  // Job status and observation controls.
+  // ----------------------------------------------------------------------------------
 
   // Manually Start / Retry Observation Handler & Action Delegation
   jobStatusSection.addEventListener("click", (e) => {

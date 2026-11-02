@@ -1,3 +1,7 @@
+/* ====================================================================================
+  BASE RESET AND ACCESSIBILITY
+  ==================================================================================== */
+
 /* Base Styles for the Application */
 *,
 *::before,
@@ -23,11 +27,13 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+/* Form controls inherit the application type scale. */
 button,
 input {
   font: inherit;
 }
 
+/* Keep media inside its layout track and make SVGs predictable inline blocks. */
 img,
 svg {
   display: block;
@@ -37,6 +43,7 @@ img {
   max-width: 100%;
 }
 
+/* Keyboard focus remains visible against both surface and muted backgrounds. */
 button:focus-visible,
 a:focus-visible,
 input:focus-visible {
@@ -49,6 +56,7 @@ input:focus-visible {
   color: var(--color-teal);
 }
 
+/* Respect users who ask the browser to reduce motion. */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

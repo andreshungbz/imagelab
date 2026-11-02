@@ -1,4 +1,10 @@
+/* ====================================================================================
+  JOB STATUS AND OBSERVATION CONTROLS
+  ==================================================================================== */
+
 /* Job Status Styles for the Application */
+
+/* Observation mode, existing-job lookup, and job identity controls. */
 #job-status {
   display: flex;
   flex-direction: column;
@@ -111,6 +117,7 @@
   }
 }
 
+/* Mode selectors and copy feedback. */
 .form-select-sm {
   padding: 0.35rem 1.6rem 0.35rem 0.9rem;
   border: 1px solid var(--color-border-accent, #d1d5db);
@@ -136,12 +143,14 @@
   outline-offset: 1px;
 }
 
+/* Job metadata and progress summary. */
 .job-status-empty {
   flex: 1;
   min-height: 275px;
 }
 
 .job-meta-card {
+/* Variant progress bar. */
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
@@ -238,6 +247,7 @@
   animation: progress-stripe-shimmer 1s linear infinite;
 }
 
+/* Vertical processing timeline and actions. */
 .job-progress {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 150px;
@@ -350,6 +360,7 @@
   border-radius: 2px;
 }
 
+/* Connection feedback and motion. */
 .job-status-warning {
   margin-top: var(--space-3);
   padding: var(--space-2) var(--space-3);

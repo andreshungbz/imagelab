@@ -1,4 +1,10 @@
+/* ====================================================================================
+  GENERATED RESULTS
+  ==================================================================================== */
+
 /* Results Styles for the Application */
+
+/* Empty state and responsive variant grid. */
 .results-empty {
   min-height: 175px;
   padding-bottom: var(--space-4);
@@ -10,6 +16,7 @@
   gap: var(--space-4);
 }
 
+/* Each card keeps the image, metadata, and download action aligned. */
 .variant-card {
   display: grid;
   grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);

@@ -1,6 +1,10 @@
 import { icon } from "./icons.js";
 
-// formatMimeType converts a MIME type to a human-readable format.
+// ==================================================================================== //
+// DISPLAY HELPERS
+// ==================================================================================== //
+
+// formatMimeType converts a MIME type to the short label used in the UI.
 export function formatMimeType(mimeType) {
   if (!mimeType) return "";
   const map = {
@@ -11,7 +15,7 @@ export function formatMimeType(mimeType) {
   return map[mimeType.toLowerCase()] || "";
 }
 
-// formatBytes converts a byte count to a human-readable string.
+// formatBytes converts a byte count to a compact human-readable string.
 export function formatBytes(bytes) {
   if (!bytes || bytes === 0) return "0 Bytes";
   const k = 1024;
@@ -20,7 +24,7 @@ export function formatBytes(bytes) {
   return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
 }
 
-// escapeHTML sanitizes untrusted display values to prevent XSS attacks.
+// escapeHTML sanitizes values before they are inserted into generated HTML.
 export function escapeHTML(str) {
   if (!str) return "";
   const div = document.createElement("div");
@@ -29,7 +33,7 @@ export function escapeHTML(str) {
   return div.innerHTML.replace(/"/g, "&quot;").replace(/'/g, "&#39;");
 }
 
-// getStepStatusIcon determines the status badge for a processing step.
+// getStepStatusIcon returns the icon content for one processing-step state.
 export function getStepStatusIcon(status) {
   switch (status) {
     case "completed":
@@ -44,7 +48,7 @@ export function getStepStatusIcon(status) {
   }
 }
 
-// getBelizeISOString returns the current date and time in ISO 8601 format for the America/Belize timezone.
+// getBelizeISOString returns an ISO 8601 timestamp in the assessment's Belize timezone.
 export function getBelizeISOString() {
   const now = new Date();
 

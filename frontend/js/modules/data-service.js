@@ -2,12 +2,21 @@ import { emitter } from "./event-emitter.js";
 import { state } from "./state.js";
 import { getBelizeISOString } from "./helpers.js";
 
-// Dynamically resolve the API host and base URL based on the current location.
+// ==================================================================================== //
+// API CONFIGURATION
+// ==================================================================================== //
+
+// Resolve the API host from the page location so the same frontend works locally and
+// when the static web container is reached through another hostname.
 const API_HOST = window.location.hostname;
 const API_BASE = `http://${API_HOST}:4000`;
 
 // DataService is the layer that interacts with the server API to interact with the database.
 export const DataService = {
+  // ----------------------------------------------------------------------------------
+  // Upload API
+  // ----------------------------------------------------------------------------------
+
   // uploadImage sends the image file to the server API.
   async uploadImage(file) {
     try {
@@ -65,7 +74,11 @@ export const DataService = {
     }
   },
 
-  // observeJob conducts job status updates using either short polling or long polling.
+  // ----------------------------------------------------------------------------------
+  // Polling observation API
+  // ----------------------------------------------------------------------------------
+
+  // observeJob retrieves one snapshot using short or version-based long polling.
   async observeJob(statusURL, signal, token) {
     if (token !== state.job.observationToken) return; // UI-04
 
@@ -148,7 +161,11 @@ export const DataService = {
     }
   },
 
-  // observeJobSSE opens one EventSource for a job and keeps it available for browser reconnection.
+  // ----------------------------------------------------------------------------------
+  // Server-Sent Events observation API
+  // ----------------------------------------------------------------------------------
+
+  // observeJobSSE opens one EventSource and leaves reconnect ownership with the browser.
   observeJobSSE(statusURL, token) {
     if (token !== state.job.observationToken) return null;
 
@@ -175,9 +192,21 @@ export const DataService = {
 
       switch (data.status) {
         case "completed":
+          // MEAS-04: Record browser receipt time for SSE terminal snapshots as well as polling snapshots.
+          console.log({
+            id: data.id,
+            status: data.status,
+            browser_receipt_time: getBelizeISOString(),
+          });
           emitter.emit("job:completed", data);
           break;
         case "failed":
+          // MEAS-04: Record browser receipt time for SSE terminal snapshots as well as polling snapshots.
+          console.log({
+            id: data.id,
+            status: data.status,
+            browser_receipt_time: getBelizeISOString(),
+          });
           emitter.emit("job:failed", data);
           break;
         case "queued":
@@ -197,7 +226,11 @@ export const DataService = {
     return events;
   },
 
-  // fetchSingleVariantBlob downloads binary image data for a single newly generated variant.
+  // ----------------------------------------------------------------------------------
+  // Variant asset API
+  // ----------------------------------------------------------------------------------
+
+  // fetchSingleVariantBlob downloads one newly generated variant.
   async fetchSingleVariantBlob(variant) {
     try {
       const res = await fetch(`${API_BASE}${variant.url}`);

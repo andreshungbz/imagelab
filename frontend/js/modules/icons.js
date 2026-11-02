@@ -1,4 +1,8 @@
-// Decorative line icons that inherit their size and color from CSS.
+// ==================================================================================== //
+// ICON LIBRARY
+// ==================================================================================== //
+
+// Inline line icons inherit their size and color from the surrounding CSS.
 const paths = {
   upload:
     '<path d="M7 17H5a4 4 0 0 1-.5-8 7 7 0 0 1 13.6-1.5A5 5 0 0 1 19 17h-2M12 21V10m-4 4 4-4 4 4"/>',
@@ -16,7 +20,7 @@ const paths = {
   close: '<path d="m6 6 12 12M18 6 6 18"/>',
 };
 
-// icon returns an SVG icon by name.
+// icon returns a named SVG icon with a safe image fallback for unknown names.
 export function icon(name) {
   return `<svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">${paths[name] || paths.image}</svg>`;
 }

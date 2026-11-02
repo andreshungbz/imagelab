@@ -2,7 +2,28 @@ import { state } from "./state.js";
 import { escapeHTML, getStepStatusIcon } from "./helpers.js";
 import { icon } from "./icons.js";
 
-// renderJobStatus generates the HTML for the job status section and observation mode controls.
+// ==================================================================================== //
+// JOB STATUS RENDERER
+// ==================================================================================== //
+
+const KNOWN_JOB_STATUSES = [
+  "pending",
+  "queued",
+  "processing",
+  "completed",
+  "failed",
+];
+
+const JOB_STEPS = [
+  ["uploadAccepted", "Upload Accepted"],
+  ["originalStored", "Original Stored"],
+  ["generatingVariants", "Generating Variants"],
+  ["completed", "Complete"],
+];
+
+const LONG_POLL_WAIT_OPTIONS = [20, 10, 1];
+
+// renderJobStatus renders job metadata, observation controls, progress, and connection feedback.
 export function renderJobStatus() {
   // Get the container element and necessary state values.
   const container = document.querySelector("#job-status");
@@ -103,9 +124,7 @@ export function renderJobStatus() {
         const waitSelectHTML = `
           <label for="wait-select" class="sr-only">Wait Duration</label>
           <select id="wait-select" class="form-select-sm" aria-label="Select long poll wait duration">
-            <option value="20" ${longPollWait === 20 ? "selected" : ""}>Wait 20s</option>
-            <option value="10" ${longPollWait === 10 ? "selected" : ""}>Wait 10s</option>
-            <option value="1" ${longPollWait === 1 ? "selected" : ""}>Wait 1s</option>
+            ${LONG_POLL_WAIT_OPTIONS.map((seconds) => `<option value="${seconds}" ${longPollWait === seconds ? "selected" : ""}>Wait ${seconds}s</option>`).join("")}
           </select>`;
         modeControlGroup.insertAdjacentHTML("afterbegin", waitSelectHTML);
       } else if (parseInt(currentWaitSelect.value, 10) !== longPollWait) {
@@ -141,14 +160,7 @@ export function renderJobStatus() {
     }
 
     // 3. Update status badge.
-    const knownStatuses = [
-      "pending",
-      "queued",
-      "processing",
-      "completed",
-      "failed",
-    ];
-    const statusClass = knownStatuses.includes(status) ? status : "pending";
+    const statusClass = KNOWN_JOB_STATUSES.includes(status) ? status : "pending";
     const statusLabel =
       statusClass.charAt(0).toUpperCase() + statusClass.slice(1);
     const badgeEl = container.querySelector(".job-meta-card .badge");
@@ -203,15 +215,8 @@ export function renderJobStatus() {
     }
 
     // 6. Update Step Items.
-    const steps = [
-      ["uploadAccepted", "Upload Accepted"],
-      ["originalStored", "Original Stored"],
-      ["generatingVariants", "Generating Variants"],
-      ["completed", "Complete"],
-    ];
-
     const stepItems = container.querySelectorAll(".step-item");
-    steps.forEach(([key, label], idx) => {
+    JOB_STEPS.forEach(([key], idx) => {
       const itemEl = stepItems[idx];
       if (!itemEl) return;
       const step = progress[key];
@@ -305,14 +310,7 @@ export function renderJobStatus() {
     return;
   }
 
-  const knownStatuses = [
-    "pending",
-    "queued",
-    "processing",
-    "completed",
-    "failed",
-  ];
-  const statusClass = knownStatuses.includes(status) ? status : "pending";
+  const statusClass = KNOWN_JOB_STATUSES.includes(status) ? status : "pending";
   const statusLabel =
     statusClass.charAt(0).toUpperCase() + statusClass.slice(1);
 
@@ -326,9 +324,7 @@ export function renderJobStatus() {
             ? `
           <label for="wait-select" class="sr-only">Wait Duration</label>
           <select id="wait-select" class="form-select-sm" aria-label="Select long poll wait duration">
-            <option value="20" ${longPollWait === 20 ? "selected" : ""}>Wait 20s</option>
-            <option value="10" ${longPollWait === 10 ? "selected" : ""}>Wait 10s</option>
-            <option value="1" ${longPollWait === 1 ? "selected" : ""}>Wait 1s</option>
+            ${LONG_POLL_WAIT_OPTIONS.map((seconds) => `<option value="${seconds}" ${longPollWait === seconds ? "selected" : ""}>Wait ${seconds}s</option>`).join("")}
           </select>`
             : ""
         }
@@ -361,13 +357,6 @@ export function renderJobStatus() {
       </div>`;
   } else {
     // Otherwise, display the job details and progress.
-    const steps = [
-      ["uploadAccepted", "Upload Accepted"],
-      ["originalStored", "Original Stored"],
-      ["generatingVariants", "Generating Variants"],
-      ["completed", "Complete"],
-    ];
-
     content += `
       <div class="job-meta-card">
         <div class="meta-item">
@@ -427,7 +416,7 @@ export function renderJobStatus() {
 
       <div class="job-progress">
         <ol class="job-steps-list">
-          ${steps
+          ${JOB_STEPS
             .map(([key, label]) => {
               const step = progress[key];
               const stepStatus = [

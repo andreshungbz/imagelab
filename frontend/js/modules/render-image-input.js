@@ -2,18 +2,22 @@ import { state } from "./state.js";
 import { formatMimeType, formatBytes, escapeHTML } from "./helpers.js";
 import { icon } from "./icons.js";
 
-// renderImageInput generates the HTML for the image upload input and preview area.
+// ==================================================================================== //
+// IMAGE INPUT RENDERER
+// ==================================================================================== //
+
+// renderImageInput renders the upload form and either its dropzone or selected preview.
 export function renderImageInput() {
   // Get the container element and necessary state values.
   const container = document.querySelector("#image-input");
   if (!container) return;
   const { previewURL, metadata, isSubmitting, error } = state.upload;
 
-  // Determine if the "Process Image" button should be disabled based on the current state.
+  // A submitted upload or an existing job prevents a second submission.
   const isProcessDisabled =
     !previewURL || isSubmitting || Boolean(state.job.publicID);
 
-  // Generate the HTML content for the image input section.
+  // Generate the complete section markup from the current upload state.
   const content = `
     <div class="section-header">
       <h3 id="upload-heading">${icon("upload")} Upload Image</h3>

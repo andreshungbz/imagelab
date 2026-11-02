@@ -1,6 +1,12 @@
-// state holds all the necessary data for UI rendering and data retrieval.
+// ==================================================================================== //
+// APPLICATION STATE
+// ==================================================================================== //
+
+// state is the single client-side source of truth for rendering and observation.
 export const state = {
-  // Image Upload Section
+  // ----------------------------------------------------------------------------------
+  // Image upload state.
+  // ----------------------------------------------------------------------------------
   upload: {
     file: null,
     previewURL: null, // Local browser preview via URL.createObjectURL()
@@ -15,7 +21,9 @@ export const state = {
     error: null,
   },
 
-  // Job Status Section
+  // ----------------------------------------------------------------------------------
+  // Job observation state.
+  // ----------------------------------------------------------------------------------
   job: {
     publicID: "",
     imageID: 0,
@@ -25,7 +33,7 @@ export const state = {
     statusURL: "",
     error: null,
 
-    // Progress steps
+    // Progress steps shown in the processing timeline.
     progress: {
       uploadAccepted: {
         status: "pending", // 'pending' | 'active' | 'completed' | 'failed'
@@ -45,7 +53,7 @@ export const state = {
       },
     },
 
-    // Polling
+    // Observation controls and lifecycle handles.
     pollingMode: "short", // 'short' | 'long' | 'sse'
     isPolling: false,
     abortController: null,
@@ -57,14 +65,16 @@ export const state = {
     shortPollTimerID: null,
     longPollWait: 20,
 
-    // Network
+    // Transient network and reconnect feedback.
     networkErrorCount: 0,
     maxNetworkRetries: 3,
     isReconnecting: false,
     sseError: null,
   },
 
-  // Results Section
+  // ----------------------------------------------------------------------------------
+  // Generated variant state.
+  // ----------------------------------------------------------------------------------
   results: {
     image_variants: [],
     isLoading: false,
@@ -72,7 +82,11 @@ export const state = {
   },
 };
 
-// resetState reverts all state variables to their initial values.
+// ==================================================================================== //
+// RESET LIFECYCLE
+// ==================================================================================== //
+
+// resetState clears the current upload, job, and result while preserving user settings.
 export function resetState() {
   // Revoke local preview URL.
   if (state.upload.previewURL) {
@@ -88,7 +102,7 @@ export function resetState() {
     });
   }
 
-  // Stop polling and abort any pending requests.
+  // Stop polling and abort any pending requests before replacing the state.
   if (state.job.shortPollTimerID) {
     clearInterval(state.job.shortPollTimerID);
   }
@@ -127,8 +141,7 @@ export function resetState() {
   state.job.error = null;
   state.job.version = 0;
   state.job.simulatedProgress = 0;
-  state.job.pollingMode = state.job.pollingMode; // Preserve user-selected polling mode.
-  state.job.longPollWait = state.job.longPollWait; // Preserve user-selected long poll wait duration.
+  // pollingMode and longPollWait are intentionally preserved across uploads.
   state.job.isPolling = false;
   state.job.shortPollTimerID = null;
   state.job.eventSource = null;
