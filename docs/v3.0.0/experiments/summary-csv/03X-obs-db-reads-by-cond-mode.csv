@@ -1,0 +1,8 @@
+Condition,Mode,Observation Database Reads Count,,,
+,,Minimum,Maximum,Median,Average
+A,Long Polling,160,160,160,160.0
+A,SSE,5,5,5,5.0
+B,Long Polling,8,9,8,8.3
+B,SSE,5,5,5,5.0
+C,Long Polling,105,108,107,106.7
+C,SSE,55,55,55,55.0

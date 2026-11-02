@@ -1,0 +1,19 @@
+run_id,condition,mode,repetition,job_id,image,baseline_version,terminal_version,observation_gets,sse_stream_gets,job_events_received,heartbeats,versions_received,version_gaps,processing_ms,detection_ms,observation_db_reads,stream_duration_ms,peak_active_streams,notes
+1,A,long polling,1,00238787-d8fa-493d-bf3f-c5519893e056,photo.jpg,1,5,6,-,-,-,1-5,-,30561,124,160,-,-,
+2,A,long polling,2,71bc0f9d-74a0-4711-bda8-6f82956dde7a,photo.jpg,1,5,6,-,-,-,1-5,-,30586,103,160,-,-,
+3,A,long polling,3,ba1290ea-1bdb-495a-b1fa-210ead70c817,photo.jpg,1,5,6,-,-,-,1-5,-,30556,126,160,-,-,
+4,A,SSE,1,3938a55c-fd91-4470-8121-6da9721e0ba4,photo.jpg,1,5,-,1,5,1,1-5,-,30601,4,5,30779,1,
+5,A,SSE,2,7886dc3b-dd9d-4f95-969b-ab546168de9e,photo.jpg,1,5,-,1,5,1,1-5,-,30601,1,5,30724,1,
+6,A,SSE,3,ea0b6ece-6e22-4795-840a-25d2c3451364,photo.jpg,1,5,-,1,5,1,1-5,-,30642,3,5,30696,1,
+7,B,long polling,1,9dd6f119-f1c8-470c-adb9-01fe49cb86b9,photo.jpg,1,5,4,-,-,-,"1,3,4,5",2,584,31,8,-,-,Timing variance caused version gaps.
+8,B,long polling,2,74abc851-ff17-4378-8f90-53a976e66655,photo.jpg,1,5,4,-,-,-,"1,3,4,5",2,563,40,8,-,-,Timing variance caused version gaps.
+9,B,long polling,3,994395a9-b96e-4b38-a275-e8cb78ac8963,photo.jpg,1,5,5,-,-,-,1-5,-,562,71,9,-,-,Timing variance caused version gaps.
+10,B,SSE,1,29a8bb6b-9143-4a13-bbdc-24b3786a172b,photo.jpg,1,5,-,1,5,0,1-5,-,570,4,5,633,1,
+11,B,SSE,2,c1f73e91-dd6d-4cf5-beab-0e8b1dca29f5,photo.jpg,1,5,-,1,5,0,1-5,-,546,5,5,602,1,
+12,B,SSE,3,7023f6aa-37d2-4db5-9331-22a2839a466d,photo.jpg,1,5,-,1,5,0,1-5,-,593,3,5,703,1,
+13,C,long polling,1,947d41a1-f82c-42ba-a18d-4f10bba46eb9,photo.jpg,1,55,55,-,-,-,1-55,-,10586,95,108,-,-,
+14,C,long polling,2,90fd5ac0-1e4b-4c54-a23e-7b62129df9f8,photo.jpg,1,55,53,-,-,-,1-55,"3, 42",10556,115,105,-,-,Timing variance caused version gaps.
+15,C,long polling,3,0e4ca6f9-2cfe-4ebb-90f5-03421aee8be3,photo.jpg,1,55,54,-,-,-,1-55,7,10605,42,107,-,-,Timing variance caused version gaps.
+16,C,SSE,1,1d181d30-54d4-4190-89d2-fbf1e14887c0,photo.jpg,1,55,-,1,55,0,1-55,-,10577,4,55,10673,1,
+17,C,SSE,2,bfe30138-f620-4b65-a80e-3bb4af3d5a2d,photo.jpg,1,55,-,1,55,0,1-55,-,10598,4,55,10653,1,
+18,C,SSE,3,a94eddbf-4e11-4928-8c31-41376a575873,photo.jpg,1,55,-,1,55,0,1-55,-,10587,4,55,10768,1,

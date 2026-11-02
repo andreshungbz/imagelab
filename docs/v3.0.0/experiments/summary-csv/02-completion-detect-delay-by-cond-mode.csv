@@ -1,0 +1,8 @@
+Condition,Mode,Completion-Detection Delay (ms),,,
+,,Minimum,Maximum,Median,Average
+A,Long Polling,103,126,124,117.7
+A,SSE,1,4,3,2.7
+B,Long Polling,31,71,40,47.3
+B,SSE,3,5,4,4.0
+C,Long Polling,42,115,95,84.0
+C,SSE,4,4,4,4.0

@@ -1,0 +1,8 @@
+Condition,Mode,Observation GET (LP) / Stream GET (SSE) Count,,,
+,,Minimum,Maximum,Median,Average
+A,Long Polling,6,6,6,6.0
+A,SSE,1,1,1,1.0
+B,Long Polling,4,5,4,4.3
+B,SSE,1,1,1,1.0
+C,Long Polling,53,55,54,54.0
+C,SSE,1,1,1,1.0
