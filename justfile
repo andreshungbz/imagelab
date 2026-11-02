@@ -237,3 +237,7 @@ meas-v3-cond-b: meas-v2-exp-cond-b
 
 # MEAS-03: v2 Condition C2 configuration.
 meas-v3-cond-c: meas-v2-exp-cond-c2
+
+# Helper to show v3 SSE versus long-polling detection delay results.
+show-v3-detect-del:
+    uv run --directory ./python show-v3-detection-delays
