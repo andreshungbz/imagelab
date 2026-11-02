@@ -1,6 +1,10 @@
-FROM golang:1.27.2-trixie
+FROM golang:1.27.3-trixie
 
 WORKDIR /app
+
+RUN apt-get update && \
+  apt-get install -y --no-install-recommends just make && \
+  rm -rf /var/lib/apt/lists/*
 
 RUN curl -L https://github.com/golang-migrate/migrate/releases/latest/download/migrate.linux-amd64.tar.gz \
   -o /tmp/migrate.tar.gz && \
@@ -15,4 +19,4 @@ COPY . .
 
 EXPOSE 4000
 
-CMD ["sh", "-c", "cp .envrc.docker .envrc && make db/migrations/up && make test/delay-3s"]
+CMD ["sh", "-c", "cp .envrc.docker .envrc && just db-migrations-up && just run"]
