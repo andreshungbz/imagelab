@@ -238,7 +238,7 @@ v3-cond-a: exp-cond-a
 v3-cond-b: exp-cond-b
 
 # MEAS-03: v3 alias for the existing fast simulated Condition C2 server configuration.
-v3-cond-c2: exp-cond-c2
+v3-cond-c: exp-cond-c2
 
 # ==================================================================================== #
 # HELPERS
