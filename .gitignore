@@ -43,6 +43,7 @@ devenv.local.yaml
 *.log
 !console.log
 !server.log
+!events.log
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

@@ -1,0 +1,165 @@
+event: job-update
+data: {"completed_at":null,"id":"1d181d30-54d4-4190-89d2-fbf1e14887c0","image_id":16,"queued_at":"2026-11-02T19:16:05.383393Z","simulated_progress":0,"stage":"starting","started_at":null,"status":"queued","variants_completed":0,"version":1}
+
+event: job-update
+data: {"completed_at":null,"id":"1d181d30-54d4-4190-89d2-fbf1e14887c0","image_id":16,"queued_at":"2026-11-02T19:16:05.383393Z","simulated_progress":0,"stage":"starting","started_at":"2026-11-02T19:16:05.483002Z","status":"processing","variants_completed":0,"version":2}
+
+event: job-update
+data: {"completed_at":null,"id":"1d181d30-54d4-4190-89d2-fbf1e14887c0","image_id":16,"queued_at":"2026-11-02T19:16:05.383393Z","simulated_progress":1,"stage":"starting","started_at":"2026-11-02T19:16:05.483002Z","status":"processing","variants_completed":0,"version":3}
+
+event: job-update
+data: {"completed_at":null,"id":"1d181d30-54d4-4190-89d2-fbf1e14887c0","image_id":16,"queued_at":"2026-11-02T19:16:05.383393Z","simulated_progress":2,"stage":"starting","started_at":"2026-11-02T19:16:05.483002Z","status":"processing","variants_completed":0,"version":4}
+
+event: job-update
+data: {"completed_at":null,"id":"1d181d30-54d4-4190-89d2-fbf1e14887c0","image_id":16,"queued_at":"2026-11-02T19:16:05.383393Z","simulated_progress":3,"stage":"starting","started_at":"2026-11-02T19:16:05.483002Z","status":"processing","variants_completed":0,"version":5}
+
+event: job-update
+data: {"completed_at":null,"id":"1d181d30-54d4-4190-89d2-fbf1e14887c0","image_id":16,"queued_at":"2026-11-02T19:16:05.383393Z","simulated_progress":4,"stage":"starting","started_at":"2026-11-02T19:16:05.483002Z","status":"processing","variants_completed":0,"version":6}
+
+event: job-update
+data: {"completed_at":null,"id":"1d181d30-54d4-4190-89d2-fbf1e14887c0","image_id":16,"queued_at":"2026-11-02T19:16:05.383393Z","simulated_progress":5,"stage":"starting","started_at":"2026-11-02T19:16:05.483002Z","status":"processing","variants_completed":0,"version":7}
+
+event: job-update
+data: {"completed_at":null,"id":"1d181d30-54d4-4190-89d2-fbf1e14887c0","image_id":16,"queued_at":"2026-11-02T19:16:05.383393Z","simulated_progress":6,"stage":"starting","started_at":"2026-11-02T19:16:05.483002Z","status":"processing","variants_completed":0,"version":8}
+
+event: job-update
+data: {"completed_at":null,"id":"1d181d30-54d4-4190-89d2-fbf1e14887c0","image_id":16,"queued_at":"2026-11-02T19:16:05.383393Z","simulated_progress":7,"stage":"starting","started_at":"2026-11-02T19:16:05.483002Z","status":"processing","variants_completed":0,"version":9}
+
+event: job-update
+data: {"completed_at":null,"id":"1d181d30-54d4-4190-89d2-fbf1e14887c0","image_id":16,"queued_at":"2026-11-02T19:16:05.383393Z","simulated_progress":8,"stage":"starting","started_at":"2026-11-02T19:16:05.483002Z","status":"processing","variants_completed":0,"version":10}
+
+event: job-update
+data: {"completed_at":null,"id":"1d181d30-54d4-4190-89d2-fbf1e14887c0","image_id":16,"queued_at":"2026-11-02T19:16:05.383393Z","simulated_progress":9,"stage":"starting","started_at":"2026-11-02T19:16:05.483002Z","status":"processing","variants_completed":0,"version":11}
+
+event: job-update
+data: {"completed_at":null,"id":"1d181d30-54d4-4190-89d2-fbf1e14887c0","image_id":16,"queued_at":"2026-11-02T19:16:05.383393Z","simulated_progress":10,"stage":"starting","started_at":"2026-11-02T19:16:05.483002Z","status":"processing","variants_completed":0,"version":12}
+
+event: job-update
+data: {"completed_at":null,"id":"1d181d30-54d4-4190-89d2-fbf1e14887c0","image_id":16,"queued_at":"2026-11-02T19:16:05.383393Z","simulated_progress":11,"stage":"starting","started_at":"2026-11-02T19:16:05.483002Z","status":"processing","variants_completed":0,"version":13}
+
+event: job-update
+data: {"completed_at":null,"id":"1d181d30-54d4-4190-89d2-fbf1e14887c0","image_id":16,"queued_at":"2026-11-02T19:16:05.383393Z","simulated_progress":12,"stage":"starting","started_at":"2026-11-02T19:16:05.483002Z","status":"processing","variants_completed":0,"version":14}
+
+event: job-update
+data: {"completed_at":null,"id":"1d181d30-54d4-4190-89d2-fbf1e14887c0","image_id":16,"queued_at":"2026-11-02T19:16:05.383393Z","simulated_progress":13,"stage":"starting","started_at":"2026-11-02T19:16:05.483002Z","status":"processing","variants_completed":0,"version":15}
+
+event: job-update
+data: {"completed_at":null,"id":"1d181d30-54d4-4190-89d2-fbf1e14887c0","image_id":16,"queued_at":"2026-11-02T19:16:05.383393Z","simulated_progress":14,"stage":"starting","started_at":"2026-11-02T19:16:05.483002Z","status":"processing","variants_completed":0,"version":16}
+
+event: job-update
+data: {"completed_at":null,"id":"1d181d30-54d4-4190-89d2-fbf1e14887c0","image_id":16,"queued_at":"2026-11-02T19:16:05.383393Z","simulated_progress":15,"stage":"starting","started_at":"2026-11-02T19:16:05.483002Z","status":"processing","variants_completed":0,"version":17}
+
+event: job-update
+data: {"completed_at":null,"id":"1d181d30-54d4-4190-89d2-fbf1e14887c0","image_id":16,"queued_at":"2026-11-02T19:16:05.383393Z","simulated_progress":16,"stage":"starting","started_at":"2026-11-02T19:16:05.483002Z","status":"processing","variants_completed":0,"version":18}
+
+event: job-update
+data: {"completed_at":null,"id":"1d181d30-54d4-4190-89d2-fbf1e14887c0","image_id":16,"queued_at":"2026-11-02T19:16:05.383393Z","simulated_progress":17,"stage":"starting","started_at":"2026-11-02T19:16:05.483002Z","status":"processing","variants_completed":0,"version":19}
+
+event: job-update
+data: {"completed_at":null,"id":"1d181d30-54d4-4190-89d2-fbf1e14887c0","image_id":16,"queued_at":"2026-11-02T19:16:05.383393Z","simulated_progress":18,"stage":"starting","started_at":"2026-11-02T19:16:05.483002Z","status":"processing","variants_completed":0,"version":20}
+
+event: job-update
+data: {"completed_at":null,"id":"1d181d30-54d4-4190-89d2-fbf1e14887c0","image_id":16,"queued_at":"2026-11-02T19:16:05.383393Z","simulated_progress":19,"stage":"starting","started_at":"2026-11-02T19:16:05.483002Z","status":"processing","variants_completed":0,"version":21}
+
+event: job-update
+data: {"completed_at":null,"id":"1d181d30-54d4-4190-89d2-fbf1e14887c0","image_id":16,"queued_at":"2026-11-02T19:16:05.383393Z","simulated_progress":20,"stage":"starting","started_at":"2026-11-02T19:16:05.483002Z","status":"processing","variants_completed":0,"version":22}
+
+event: job-update
+data: {"completed_at":null,"id":"1d181d30-54d4-4190-89d2-fbf1e14887c0","image_id":16,"queued_at":"2026-11-02T19:16:05.383393Z","simulated_progress":21,"stage":"starting","started_at":"2026-11-02T19:16:05.483002Z","status":"processing","variants_completed":0,"version":23}
+
+event: job-update
+data: {"completed_at":null,"id":"1d181d30-54d4-4190-89d2-fbf1e14887c0","image_id":16,"queued_at":"2026-11-02T19:16:05.383393Z","simulated_progress":22,"stage":"starting","started_at":"2026-11-02T19:16:05.483002Z","status":"processing","variants_completed":0,"version":24}
+
+event: job-update
+data: {"completed_at":null,"id":"1d181d30-54d4-4190-89d2-fbf1e14887c0","image_id":16,"queued_at":"2026-11-02T19:16:05.383393Z","simulated_progress":23,"stage":"starting","started_at":"2026-11-02T19:16:05.483002Z","status":"processing","variants_completed":0,"version":25}
+
+event: job-update
+data: {"completed_at":null,"id":"1d181d30-54d4-4190-89d2-fbf1e14887c0","image_id":16,"queued_at":"2026-11-02T19:16:05.383393Z","simulated_progress":24,"stage":"starting","started_at":"2026-11-02T19:16:05.483002Z","status":"processing","variants_completed":0,"version":26}
+
+event: job-update
+data: {"completed_at":null,"id":"1d181d30-54d4-4190-89d2-fbf1e14887c0","image_id":16,"queued_at":"2026-11-02T19:16:05.383393Z","simulated_progress":25,"stage":"starting","started_at":"2026-11-02T19:16:05.483002Z","status":"processing","variants_completed":0,"version":27}
+
+event: job-update
+data: {"completed_at":null,"id":"1d181d30-54d4-4190-89d2-fbf1e14887c0","image_id":16,"queued_at":"2026-11-02T19:16:05.383393Z","simulated_progress":26,"stage":"starting","started_at":"2026-11-02T19:16:05.483002Z","status":"processing","variants_completed":0,"version":28}
+
+event: job-update
+data: {"completed_at":null,"id":"1d181d30-54d4-4190-89d2-fbf1e14887c0","image_id":16,"queued_at":"2026-11-02T19:16:05.383393Z","simulated_progress":27,"stage":"starting","started_at":"2026-11-02T19:16:05.483002Z","status":"processing","variants_completed":0,"version":29}
+
+event: job-update
+data: {"completed_at":null,"id":"1d181d30-54d4-4190-89d2-fbf1e14887c0","image_id":16,"queued_at":"2026-11-02T19:16:05.383393Z","simulated_progress":28,"stage":"starting","started_at":"2026-11-02T19:16:05.483002Z","status":"processing","variants_completed":0,"version":30}
+
+event: job-update
+data: {"completed_at":null,"id":"1d181d30-54d4-4190-89d2-fbf1e14887c0","image_id":16,"queued_at":"2026-11-02T19:16:05.383393Z","simulated_progress":29,"stage":"starting","started_at":"2026-11-02T19:16:05.483002Z","status":"processing","variants_completed":0,"version":31}
+
+event: job-update
+data: {"completed_at":null,"id":"1d181d30-54d4-4190-89d2-fbf1e14887c0","image_id":16,"queued_at":"2026-11-02T19:16:05.383393Z","simulated_progress":30,"stage":"starting","started_at":"2026-11-02T19:16:05.483002Z","status":"processing","variants_completed":0,"version":32}
+
+event: job-update
+data: {"completed_at":null,"id":"1d181d30-54d4-4190-89d2-fbf1e14887c0","image_id":16,"queued_at":"2026-11-02T19:16:05.383393Z","simulated_progress":31,"stage":"starting","started_at":"2026-11-02T19:16:05.483002Z","status":"processing","variants_completed":0,"version":33}
+
+event: job-update
+data: {"completed_at":null,"id":"1d181d30-54d4-4190-89d2-fbf1e14887c0","image_id":16,"queued_at":"2026-11-02T19:16:05.383393Z","simulated_progress":32,"stage":"starting","started_at":"2026-11-02T19:16:05.483002Z","status":"processing","variants_completed":0,"version":34}
+
+event: job-update
+data: {"completed_at":null,"id":"1d181d30-54d4-4190-89d2-fbf1e14887c0","image_id":16,"queued_at":"2026-11-02T19:16:05.383393Z","simulated_progress":33,"stage":"starting","started_at":"2026-11-02T19:16:05.483002Z","status":"processing","variants_completed":0,"version":35}
+
+event: job-update
+data: {"completed_at":null,"id":"1d181d30-54d4-4190-89d2-fbf1e14887c0","image_id":16,"queued_at":"2026-11-02T19:16:05.383393Z","simulated_progress":34,"stage":"starting","started_at":"2026-11-02T19:16:05.483002Z","status":"processing","variants_completed":0,"version":36}
+
+event: job-update
+data: {"completed_at":null,"id":"1d181d30-54d4-4190-89d2-fbf1e14887c0","image_id":16,"queued_at":"2026-11-02T19:16:05.383393Z","simulated_progress":35,"stage":"starting","started_at":"2026-11-02T19:16:05.483002Z","status":"processing","variants_completed":0,"version":37}
+
+event: job-update
+data: {"completed_at":null,"id":"1d181d30-54d4-4190-89d2-fbf1e14887c0","image_id":16,"queued_at":"2026-11-02T19:16:05.383393Z","simulated_progress":36,"stage":"starting","started_at":"2026-11-02T19:16:05.483002Z","status":"processing","variants_completed":0,"version":38}
+
+event: job-update
+data: {"completed_at":null,"id":"1d181d30-54d4-4190-89d2-fbf1e14887c0","image_id":16,"queued_at":"2026-11-02T19:16:05.383393Z","simulated_progress":37,"stage":"starting","started_at":"2026-11-02T19:16:05.483002Z","status":"processing","variants_completed":0,"version":39}
+
+event: job-update
+data: {"completed_at":null,"id":"1d181d30-54d4-4190-89d2-fbf1e14887c0","image_id":16,"queued_at":"2026-11-02T19:16:05.383393Z","simulated_progress":38,"stage":"starting","started_at":"2026-11-02T19:16:05.483002Z","status":"processing","variants_completed":0,"version":40}
+
+event: job-update
+data: {"completed_at":null,"id":"1d181d30-54d4-4190-89d2-fbf1e14887c0","image_id":16,"queued_at":"2026-11-02T19:16:05.383393Z","simulated_progress":39,"stage":"starting","started_at":"2026-11-02T19:16:05.483002Z","status":"processing","variants_completed":0,"version":41}
+
+event: job-update
+data: {"completed_at":null,"id":"1d181d30-54d4-4190-89d2-fbf1e14887c0","image_id":16,"queued_at":"2026-11-02T19:16:05.383393Z","simulated_progress":40,"stage":"starting","started_at":"2026-11-02T19:16:05.483002Z","status":"processing","variants_completed":0,"version":42}
+
+event: job-update
+data: {"completed_at":null,"id":"1d181d30-54d4-4190-89d2-fbf1e14887c0","image_id":16,"queued_at":"2026-11-02T19:16:05.383393Z","simulated_progress":41,"stage":"starting","started_at":"2026-11-02T19:16:05.483002Z","status":"processing","variants_completed":0,"version":43}
+
+event: job-update
+data: {"completed_at":null,"id":"1d181d30-54d4-4190-89d2-fbf1e14887c0","image_id":16,"queued_at":"2026-11-02T19:16:05.383393Z","simulated_progress":42,"stage":"starting","started_at":"2026-11-02T19:16:05.483002Z","status":"processing","variants_completed":0,"version":44}
+
+event: job-update
+data: {"completed_at":null,"id":"1d181d30-54d4-4190-89d2-fbf1e14887c0","image_id":16,"queued_at":"2026-11-02T19:16:05.383393Z","simulated_progress":43,"stage":"starting","started_at":"2026-11-02T19:16:05.483002Z","status":"processing","variants_completed":0,"version":45}
+
+event: job-update
+data: {"completed_at":null,"id":"1d181d30-54d4-4190-89d2-fbf1e14887c0","image_id":16,"queued_at":"2026-11-02T19:16:05.383393Z","simulated_progress":44,"stage":"starting","started_at":"2026-11-02T19:16:05.483002Z","status":"processing","variants_completed":0,"version":46}
+
+event: job-update
+data: {"completed_at":null,"id":"1d181d30-54d4-4190-89d2-fbf1e14887c0","image_id":16,"queued_at":"2026-11-02T19:16:05.383393Z","simulated_progress":45,"stage":"starting","started_at":"2026-11-02T19:16:05.483002Z","status":"processing","variants_completed":0,"version":47}
+
+event: job-update
+data: {"completed_at":null,"id":"1d181d30-54d4-4190-89d2-fbf1e14887c0","image_id":16,"queued_at":"2026-11-02T19:16:05.383393Z","simulated_progress":46,"stage":"starting","started_at":"2026-11-02T19:16:05.483002Z","status":"processing","variants_completed":0,"version":48}
+
+event: job-update
+data: {"completed_at":null,"id":"1d181d30-54d4-4190-89d2-fbf1e14887c0","image_id":16,"queued_at":"2026-11-02T19:16:05.383393Z","simulated_progress":47,"stage":"starting","started_at":"2026-11-02T19:16:05.483002Z","status":"processing","variants_completed":0,"version":49}
+
+event: job-update
+data: {"completed_at":null,"id":"1d181d30-54d4-4190-89d2-fbf1e14887c0","image_id":16,"queued_at":"2026-11-02T19:16:05.383393Z","simulated_progress":48,"stage":"starting","started_at":"2026-11-02T19:16:05.483002Z","status":"processing","variants_completed":0,"version":50}
+
+event: job-update
+data: {"completed_at":null,"id":"1d181d30-54d4-4190-89d2-fbf1e14887c0","image_id":16,"queued_at":"2026-11-02T19:16:05.383393Z","simulated_progress":49,"stage":"starting","started_at":"2026-11-02T19:16:05.483002Z","status":"processing","variants_completed":0,"version":51}
+
+event: job-update
+data: {"completed_at":null,"id":"1d181d30-54d4-4190-89d2-fbf1e14887c0","image_id":16,"queued_at":"2026-11-02T19:16:05.383393Z","simulated_progress":50,"stage":"starting","started_at":"2026-11-02T19:16:05.483002Z","status":"processing","variants_completed":0,"version":52}
+
+event: job-update
+data: {"completed_at":null,"id":"1d181d30-54d4-4190-89d2-fbf1e14887c0","image_id":16,"queued_at":"2026-11-02T19:16:05.383393Z","simulated_progress":50,"stage":"thumbnail_ready","started_at":"2026-11-02T19:16:05.483002Z","status":"processing","variants":[{"url":"/v1/images/16/variants/thumbnail","name":"thumbnail","width":150,"height":150}],"variants_completed":1,"version":53}
+
+event: job-update
+data: {"completed_at":null,"id":"1d181d30-54d4-4190-89d2-fbf1e14887c0","image_id":16,"queued_at":"2026-11-02T19:16:05.383393Z","simulated_progress":50,"stage":"preview_ready","started_at":"2026-11-02T19:16:05.483002Z","status":"processing","variants":[{"url":"/v1/images/16/variants/thumbnail","name":"thumbnail","width":150,"height":150},{"url":"/v1/images/16/variants/preview","name":"preview","width":800,"height":450}],"variants_completed":2,"version":54}
+
+event: job-update
+data: {"completed_at":"2026-11-02T19:16:16.060344Z","id":"1d181d30-54d4-4190-89d2-fbf1e14887c0","image_id":16,"queued_at":"2026-11-02T19:16:05.383393Z","simulated_progress":50,"stage":"display_ready","started_at":"2026-11-02T19:16:05.483002Z","status":"completed","variants":[{"url":"/v1/images/16/variants/thumbnail","name":"thumbnail","width":150,"height":150},{"url":"/v1/images/16/variants/preview","name":"preview","width":800,"height":450},{"url":"/v1/images/16/variants/display","name":"display","width":1200,"height":675}],"variants_completed":3,"version":55}
+

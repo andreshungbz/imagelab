@@ -1,0 +1,15 @@
+go run ./cmd/api -db-dsn="$IMAGELAB_DB_DSN" -port="$PORT" -cors-trusted-origins="$CORS_TRUSTED_ORIGINS" -consumer-id="$CONSUMER_ID" 
+{"time":"2026-11-02T13:07:58.047-06:00","level":"INFO","msg":"database connection pool established"}
+{"time":"2026-11-02T13:07:58.047-06:00","level":"INFO","msg":"starting server","addr":":4000","env":"development"}
+{"time":"2026-11-02T13:08:09.215-06:00","level":"INFO","msg":"client request","method":"POST","path":"/v1/images"}
+{"time":"2026-11-02T13:08:09.237-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/jobs/29a8bb6b-9143-4a13-bbdc-24b3786a172b/events"}
+{"time":"2026-11-02T13:08:09.238-06:00","level":"INFO","msg":"sse stream started","job_id":"29a8bb6b-9143-4a13-bbdc-24b3786a172b","peak_active_sse_streams":1}
+{"time":"2026-11-02T13:08:09.298-06:00","level":"INFO","msg":"image job started","job_id":"29a8bb6b-9143-4a13-bbdc-24b3786a172b","exp_quiet_delay":false,"exp_simulation_phase":false}
+{"time":"2026-11-02T13:08:09.431-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/images/10/variants/thumbnail"}
+{"time":"2026-11-02T13:08:09.629-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/images/10/variants/preview"}
+{"time":"2026-11-02T13:08:09.867-06:00","level":"INFO","msg":"terminal commit","job_id":"29a8bb6b-9143-4a13-bbdc-24b3786a172b","status":"completed","committed version":5}
+{"time":"2026-11-02T13:08:09.871-06:00","level":"INFO","msg":"observation query count","job_id":"29a8bb6b-9143-4a13-bbdc-24b3786a172b","status":"completed","observation_queries":5}
+{"time":"2026-11-02T13:08:09.871-06:00","level":"INFO","msg":"sse stream ended","job_id":"29a8bb6b-9143-4a13-bbdc-24b3786a172b","stream_duration_ms":633,"peak_active_sse_streams":1}
+{"time":"2026-11-02T13:08:09.874-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/images/10/variants/thumbnail"}
+{"time":"2026-11-02T13:08:09.874-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/images/10/variants/display"}
+{"time":"2026-11-02T13:08:09.875-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/images/10/variants/preview"}

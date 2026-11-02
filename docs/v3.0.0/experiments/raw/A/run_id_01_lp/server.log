@@ -1,0 +1,19 @@
+go run ./cmd/api -db-dsn="$IMAGELAB_DB_DSN" -port="$PORT" -cors-trusted-origins="$CORS_TRUSTED_ORIGINS" -consumer-id="$CONSUMER_ID" -exp-quiet-delay-enabled=true -exp-quiet-delay-duration=30s
+{"time":"2026-11-02T12:53:32.698-06:00","level":"INFO","msg":"database connection pool established"}
+{"time":"2026-11-02T12:53:32.698-06:00","level":"INFO","msg":"starting server","addr":":4000","env":"development"}
+{"time":"2026-11-02T12:54:01.535-06:00","level":"INFO","msg":"client request","method":"POST","path":"/v1/images"}
+{"time":"2026-11-02T12:54:01.552-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/jobs/00238787-d8fa-493d-bf3f-c5519893e056"}
+{"time":"2026-11-02T12:54:01.556-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/jobs/00238787-d8fa-493d-bf3f-c5519893e056"}
+{"time":"2026-11-02T12:54:01.700-06:00","level":"INFO","msg":"image job started","job_id":"00238787-d8fa-493d-bf3f-c5519893e056","exp_quiet_delay":true,"exp_simulation_phase":false}
+{"time":"2026-11-02T12:54:01.700-06:00","level":"INFO","msg":"starting quiet delay phase","job_id":"00238787-d8fa-493d-bf3f-c5519893e056","duration":30000000000}
+{"time":"2026-11-02T12:54:01.760-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/jobs/00238787-d8fa-493d-bf3f-c5519893e056"}
+{"time":"2026-11-02T12:54:21.772-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/jobs/00238787-d8fa-493d-bf3f-c5519893e056"}
+{"time":"2026-11-02T12:54:31.977-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/jobs/00238787-d8fa-493d-bf3f-c5519893e056"}
+{"time":"2026-11-02T12:54:31.986-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/images/1/variants/thumbnail"}
+{"time":"2026-11-02T12:54:32.181-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/images/1/variants/preview"}
+{"time":"2026-11-02T12:54:32.182-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/jobs/00238787-d8fa-493d-bf3f-c5519893e056"}
+{"time":"2026-11-02T12:54:32.261-06:00","level":"INFO","msg":"terminal commit","job_id":"00238787-d8fa-493d-bf3f-c5519893e056","status":"completed","committed version":5}
+{"time":"2026-11-02T12:54:32.383-06:00","level":"INFO","msg":"observation query count","job_id":"00238787-d8fa-493d-bf3f-c5519893e056","status":"completed","observation_queries":160}
+{"time":"2026-11-02T12:54:32.388-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/images/1/variants/thumbnail"}
+{"time":"2026-11-02T12:54:32.388-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/images/1/variants/display"}
+{"time":"2026-11-02T12:54:32.388-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/images/1/variants/preview"}

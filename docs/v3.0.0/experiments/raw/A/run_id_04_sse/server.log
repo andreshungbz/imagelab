@@ -1,0 +1,16 @@
+go run ./cmd/api -db-dsn="$IMAGELAB_DB_DSN" -port="$PORT" -cors-trusted-origins="$CORS_TRUSTED_ORIGINS" -consumer-id="$CONSUMER_ID" -exp-quiet-delay-enabled=true -exp-quiet-delay-duration=30s
+{"time":"2026-11-02T12:58:00.588-06:00","level":"INFO","msg":"database connection pool established"}
+{"time":"2026-11-02T12:58:00.588-06:00","level":"INFO","msg":"starting server","addr":":4000","env":"development"}
+{"time":"2026-11-02T12:58:29.141-06:00","level":"INFO","msg":"client request","method":"POST","path":"/v1/images"}
+{"time":"2026-11-02T12:58:29.163-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/jobs/3938a55c-fd91-4470-8121-6da9721e0ba4/events"}
+{"time":"2026-11-02T12:58:29.164-06:00","level":"INFO","msg":"sse stream started","job_id":"3938a55c-fd91-4470-8121-6da9721e0ba4","peak_active_sse_streams":1}
+{"time":"2026-11-02T12:58:29.349-06:00","level":"INFO","msg":"image job started","job_id":"3938a55c-fd91-4470-8121-6da9721e0ba4","exp_quiet_delay":true,"exp_simulation_phase":false}
+{"time":"2026-11-02T12:58:29.349-06:00","level":"INFO","msg":"starting quiet delay phase","job_id":"3938a55c-fd91-4470-8121-6da9721e0ba4","duration":30000000000}
+{"time":"2026-11-02T12:58:59.502-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/images/4/variants/thumbnail"}
+{"time":"2026-11-02T12:58:59.716-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/images/4/variants/preview"}
+{"time":"2026-11-02T12:58:59.939-06:00","level":"INFO","msg":"terminal commit","job_id":"3938a55c-fd91-4470-8121-6da9721e0ba4","status":"completed","committed version":5}
+{"time":"2026-11-02T12:58:59.943-06:00","level":"INFO","msg":"observation query count","job_id":"3938a55c-fd91-4470-8121-6da9721e0ba4","status":"completed","observation_queries":5}
+{"time":"2026-11-02T12:58:59.943-06:00","level":"INFO","msg":"sse stream ended","job_id":"3938a55c-fd91-4470-8121-6da9721e0ba4","stream_duration_ms":30779,"peak_active_sse_streams":1}
+{"time":"2026-11-02T12:58:59.946-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/images/4/variants/thumbnail"}
+{"time":"2026-11-02T12:58:59.947-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/images/4/variants/preview"}
+{"time":"2026-11-02T12:58:59.947-06:00","level":"INFO","msg":"client request","method":"GET","path":"/v1/images/4/variants/display"}
