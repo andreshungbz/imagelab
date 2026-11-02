@@ -232,13 +232,13 @@ exp-cond-c3: exp-cond-c2
 # ==================================================================================== #
 
 # MEAS-01: v3 alias for the existing quiet Condition A server configuration.
-v3-meas-01: exp-cond-a
+v3-cond-a: exp-cond-a
 
 # MEAS-02: v3 alias for the existing ordinary Condition B server configuration.
-v3-meas-02: exp-cond-b
+v3-cond-b: exp-cond-b
 
 # MEAS-03: v3 alias for the existing fast simulated Condition C2 server configuration.
-v3-meas-03: exp-cond-c2
+v3-cond-c2: exp-cond-c2
 
 # ==================================================================================== #
 # HELPERS
