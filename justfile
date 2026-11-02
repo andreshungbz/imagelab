@@ -143,7 +143,7 @@ test-img-proc-del-3s-fail:
       -test-simulated-worker-failure=true \
       -test-individual-image-process-delay=3s
 
-# Test the API server with a 3s image process delay and close the SSE stream once after the thumbnail variant update.
+# Test the API server with a 3s image process delay and closed SSE stream.
 test-img-proc-del-3s-sse-disc:
     go run ./cmd/api \
       -db-dsn="$IMAGELAB_DB_DSN" \
