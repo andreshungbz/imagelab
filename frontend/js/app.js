@@ -81,6 +81,9 @@ emitter.on("upload:validation_error", (errorMessage) => {
 emitter.on("upload:process", () => {
   if (!state.upload.file) return;
 
+  // Clear a previous upload error when the user starts a new submission attempt.
+  state.upload.error = null;
+
   // Set submitting flag.
   state.upload.isSubmitting = true;
 
