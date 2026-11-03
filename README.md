@@ -1,12 +1,12 @@
 # ImageLab
 
-ImageLab is a single-page application for generating image variants. It generates the following variantes:
+ImageLab is a single-page application for generating image variants. It generates the following variants:
 
 - thumbnail variant (150px x 150px square, center-cropped)
 - preview variant (800px x 600px maximums, within bounds, preserving aspect ratio)
 - display variant (1200px x 900px maximums, within bounds, preserving aspect ratio).
 
-It implements 3 different asynchronous APIs (application programming interfaces) and the event emitter pattern. There are three main parts: an API server written in Go (`cmd/api`), a web application using HTML, CSS, and JavaScript (`frontend`), and a PostgreSQL database (`migrations`).
+It implements 3 different asynchronous application programming interfaces (APIs) and the event emitter pattern. There are three main parts: an API server written in Go (`cmd/api`), a web application using HTML, CSS, and JavaScript (`frontend`), and a PostgreSQL database (`migrations`).
 
 ![ImageLab Screenshot](assets/imagelab-desktop.png)
 
@@ -24,21 +24,21 @@ Reports, presentations, tables, charts, and raw log files can be found in the `/
 
 ## Asynchronous APIs
 
-ImageLab demonstrates the asynchronous APIs of short polling, long polling, and server-sent events. Use the dropdown in the UI to change the mode. Long polling provides an additional dropdown for configuration the wait timer before a 204 No Content response is sent. Manual cancellation is implemented by `AbortController`, and modes can be changed mid-processing without issue. A single job can be simultaneously observed by using the provided input UI.
+ImageLab demonstrates the asynchronous APIs of short polling, long polling, and server-sent events. Use the dropdown in the UI to change the mode. Long polling provides an additional dropdown for configuring the wait timer before a 204 No Content response is sent. Manual cancellation is implemented by `AbortController`, and modes can be changed mid-processing without issue. A single job can be simultaneously observed by using the provided input UI.
 
 ![ImageLab Dropdown Screenshot](assets/imagelab-dropdown.png)
 
 ### Short Polling
 
-Short polling uses the `/v1/jobs/:id` endpoint. By default it is configured to poll every 1 second. It is implemented by a client-side timer that makes a request to the server every second.
+Short polling uses the `/v1/jobs/:id` endpoint. By default, it polls every 1 second. It is implemented by a client-side timer that makes a request to the server every second.
 
 ### Long Polling
 
-Long polling reuses the `/v1/jobs/:id` endpoint, but requires least an `after` query parameter to be set. The server will wait for a job update to occur before responding, returning a 204 No Content response when there is no update and after the configured wait time expires (default is 20 seconds). Long polling is implemented using a timer and ticker approach, where the ticker for reading the database fires every 200ms.
+Long polling reuses the `/v1/jobs/:id` endpoint, but requires at least an `after` query parameter to be set. The server will wait for a job update before responding, returning a 204 No Content response if no update occurs and after the configured wait time expires (default is 20 seconds). Long polling is implemented using a timer-and-ticker approach, where the ticker that reads the database fires every 200ms.
 
 ### Server-Sent Events (SSE)
 
-SSE uses the `/v1/jobs/:id/events` endpoint. The server will send a `job-update` events as a job updates and `: keep-alive` heartbeats every 20 seconds if there are no updates. SSE is implemented using a channel notification system, where the database update triggers a notification to the channel, which is then read by the SSE handler to send the event to the client.
+SSE uses the `/v1/jobs/:id/events` endpoint. The server will send `job-update` events as a job updates and `: keep-alive` heartbeats every 20 seconds if there are no updates. SSE is implemented using a channel notification system, where a database update triggers a notification to the channel, which the SSE handler then reads to send the event to the client.
 
 ## Running the Project
 
@@ -92,13 +92,13 @@ just run
 > [!NOTE]
 > Using a host other than `localhost` or a different port other than `5500` requires appropriately setting the `CORS_TRUSTED_ORIGINS` environment variable so that the API server does not block requests from the web application.
 
-Use any HTTP server application such as [nginx](https://nginx.org/en/), [Apache](https://httpd.apache.org/), or [Caddy](https://caddyserver.com/) to serve the static web application files in the `frontend` directory. The [Live Server](https://marketplace.visualstudio.com/items?itemName=ritwickdey.LiveServer) extension for VS Code can also be used, but ensure the workspace is the `frontend` directory and not the repository root. Then, the web application will be available at http://localhost:5500.
+Use any HTTP server application such as [nginx](https://nginx.org/en/), [Apache](https://httpd.apache.org/), or [Caddy](https://caddyserver.com/) to serve the static web application files in the `frontend` directory. The [Live Server](https://marketplace.visualstudio.com/items?itemName=ritwickdey.LiveServer) extension for VS Code can also be used, but ensure the workspace is set to the `frontend` directory, not the repository root. Then, the web application will be available at http://localhost:5500.
 
 ## Experimentation Configuration
 
 ### v1 Measurements
 
-Tests in this version automated to the client. With the API server running, run the `meas-v1-single` and `meas-v1-five` recipes to run the 1-count and 5-count measurements, respectively. For clearer delineation, run the API server with a 3-second image processing delay. The results will be printed to the terminal.
+Tests in this version are automated on the client-side. With the API server running, run the `meas-v1-single` and `meas-v1-five` recipes to run the 1-count and 5-count measurements, respectively. For clearer delineation, run the API server with a 3-second image processing delay. The results will be printed to the terminal.
 
 ```
 just test-wrk-del-3s
@@ -132,7 +132,7 @@ just show-v2-meas
 
 ### v3 Measurements
 
-Since these measurments reuse the same server configurations as v2, aliases ar provided. Conditions A and B map to v2, which Condition C maps to C2 in v2.
+Since these measurements reuse the same server configurations as v2, aliases are provided. Conditions A and B map to v2, while Condition C maps to C2 in v2.
 
 | Condition | Server Configuration Command |
 | --------- | ---------------------------- |
